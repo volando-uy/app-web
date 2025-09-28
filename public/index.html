@@ -19,9 +19,16 @@
 <body class="bg-brand-900 min-h-screen flex flex-col min-h-screen">
 	<!-- Header dinámico -->
 	<div id="header-container"></div>
-	<!-- Contenido principal aquí si lo deseas -->
+
+		<!-- Componente de paquetes y vuelos -->
+		<main class="flex-1 w-full flex flex-col items-center justify-center gap-12">
+			<div id="paquetes" class="w-full opacity-0 translate-y-8 transition-all duration-700"></div>
+			<div id="vuelos" class="w-full opacity-0 translate-y-8 transition-all duration-700"></div>
+		</main>
+
 	<!-- Footer dinámico -->
 	<div id="footer-container" class="mt-auto"></div>
-	<script src="src/views/index.js"></script>
+
+		<script src="/public/index.js"></script>
 </body>
 </html>
