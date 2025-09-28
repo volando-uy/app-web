@@ -10,3 +10,16 @@ fetch("../header/header.html")
     };
     document.body.appendChild(script);
   });
+
+// Inyectar footer dinámicamente
+function importFooter() {
+  fetch("../footer/footer.html")
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("footer").innerHTML = data;
+    });
+}
+
+if (document.getElementById("footer")) {
+  importFooter();
+}
