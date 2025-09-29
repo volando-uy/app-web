@@ -86,7 +86,7 @@ function renderFlights() {
 					<div class="text-right text-xs text-gray-500">${v.tipo}</div>
 					<div class="text-2xl font-bold text-orange-600">${v.precio === 0 ? "+US$0.00" : `US$${v.precio}`}</div>
 					<div class="text-xs text-gray-400">Precio por persona<br>(impuestos y tasas incl.)</div>
-					<button class="mt-2 px-4 py-2 bg-orange-500 text-white rounded-lg font-bold hover:bg-orange-600 transition">Selecciona este ${v.tipo}</button>
+					<button class="mt-2 px-4 py-2 bg-orange-500 text-white rounded-lg font-bold hover:bg-orange-600 transition" onclick="selectFlight(${idx})">Selecciona este ${v.tipo}</button>
 				</div>
 			</div>
 		</div>
@@ -117,6 +117,19 @@ function showFlightModal(idx) {
 function closeFlightModal() {
 	const modal = document.getElementById('flight-modal-bg');
 	if (modal) modal.remove();
+}
+
+// guardar vuelo y navegar a la reserva
+function selectFlight(idx) {
+	const vuelo = vuelos[idx];
+	try {
+		sessionStorage.setItem('bookingFlight', JSON.stringify(vuelo));
+		// navegar a la página de reserva (ajusta la ruta si usas JSP en futuro)
+		window.location.href = '../bookFlight/bookflight.html';
+	} catch (e) {
+		console.error('No se pudo guardar el vuelo en sessionStorage', e);
+		alert('Error al seleccionar vuelo.');
+	}
 }
 
 // Render al cargar
