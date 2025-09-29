@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("volver").addEventListener("click", () => {
-    window.location.href = "../header/header.html";
+    window.location.href = "/public/index.html";
   });
 });
 

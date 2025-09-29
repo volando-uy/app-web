@@ -2,6 +2,9 @@ function getRelativePath(target) {
   const current = window.location.pathname;
   const idx = current.indexOf('/src/views/');
   let base = '';
+  if (target === 'index.html') {
+    return '/public/index.html';
+  }
   if (idx !== -1) {
     const after = current.substring(idx + 11);
     const depth = after.split('/').length - 1;
