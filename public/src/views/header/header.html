@@ -12,25 +12,25 @@
       </svg>
     </button>
  
-    <nav class="hidden md:flex items-center gap-6"> 
-  <a href="#" class="nav-link hover:text-yellow-300" data-target="flightf/flight.html">Vuelos</a>
-  <a href="#" class="nav-link hover:text-yellow-300" data-target="package/package.html">Paquetes</a> 
+    <!-- Nav de escritorio (reemplazable por JS) -->
+    <nav id="nav-desktop" class="hidden md:flex items-center gap-6">
+      <a href="#" class="nav-link hover:text-yellow-300" data-target="flightf/flight.html">Vuelos</a>
+      <a href="#" class="nav-link hover:text-yellow-300" data-target="package/package.html">Paquetes</a>
     </nav>
 
-    <!-- Acciones (derecha) desktop -->
-    <div class="hidden md:flex items-center gap-3">
-  <a href="#" class="nav-link px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20" data-target="register/register.html">Iniciar sesión</a> 
+    <!-- Acciones (derecha) desktop (reemplazable por JS) -->
+    <div id="header-actions" class="hidden md:flex items-center gap-3">
+      <a href="#" class="nav-link px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20" data-target="register/register.html">Iniciar sesión</a>
     </div>
   </div>
 
   <!-- Menú Cel -->
   <div id="mobileMenu" class="md:hidden hidden border-t border-white/10 bg-brand">
-    <nav class="container mx-auto px-4 py-3 flex flex-col gap-1"> 
-  <a href="#" class="nav-link block px-2 py-3 rounded " data-target="flightf/flight.html">Vuelos</a>
-  <a href="#" class="nav-link block px-2 py-3 rounded " data-target="package/package.html">Paquetes</a> 
+    <nav id="nav-mobile" class="container mx-auto px-4 py-3 flex flex-col gap-1">
+      <a href="#" class="nav-link block px-2 py-3 rounded" data-target="flightf/flight.html">Vuelos</a>
+      <a href="#" class="nav-link block px-2 py-3 rounded" data-target="package/package.html">Paquetes</a>
       <div class="h-px bg-white/10 my-2"></div>
-  <a href="#" class="nav-link block px-2 py-3 rounded " data-target="register/register.html">Iniciar sesión</a> 
-</header>
+      <a href="#" class="nav-link block px-2 py-3 rounded" data-target="register/register.html">Iniciar sesión</a>
     </nav>
   </div>
 </header>
