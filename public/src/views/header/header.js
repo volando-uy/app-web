@@ -6,6 +6,7 @@ function getRelativePath(target) {
   if (target.startsWith('flightf/')) return '/public/src/views/' + target;
   if (target.startsWith('package/')) return '/public/src/views/' + target;
   if (target.startsWith('register/')) return '/public/src/views/' + target;
+  if (target.startsWith('createCity&Category/')) return '/public/src/views/' + target;
   if (target.startsWith('adminPanel/')) return '/public/src/views/' + target;
   // fallback: si se pasa una ruta ya absoluta (empieza con /) la devolvemos
   if (target.startsWith('/')) return target;
@@ -59,7 +60,7 @@ function renderHeaderByRole() {
     { text: 'Paquetes', target: 'package/package.html' }
   ];
   const airlineLinks = [
-    { text: 'Varios', target: 'adminPanel/adminPanel.html' },
+    { text: 'Varios', target: 'createCity&Category/createCity&Category.html' },
     { text: 'Vuelos', target: 'flightf/flight.html' },
     { text: 'Listados', target: 'adminPanel/listings.html' },
     { text: 'Paquetes', target: 'package/package.html' }
