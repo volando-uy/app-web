@@ -1,4 +1,10 @@
 (async function () {
+  const path = location.pathname.replace(/\\/g,'/').toLowerCase();
+  if (path.endsWith('/public/index.html') || path.endsWith('/index.html') || path === '/' ) {
+    // No mostrar panel en la página principal
+    return;
+  }
+
   let container = document.getElementById('rightMenu');
   if (!container) {
     container = document.createElement('aside');
