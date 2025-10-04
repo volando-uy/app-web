@@ -1,43 +1,43 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: { colors: { brand: "#0B4C73" } }
-      }
-    }
-  </script>
+  <meta charset="utf-8"/>
   <title>Crear Vuelo</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{brand:"#0B4C73"}}}};</script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
   <div id="header"></div>
-
-  <main class="flex-1 w-full">
-    <div class="max-w-3xl mx-auto px-4 py-8 sm:py-12">
-      <h1 class="text-xl sm:text-2xl font-bold text-gray-800 mb-6 text-center sm:text-left">
-        Crear Vuelo
-      </h1>
-      <!-- Selección de ruta -->
-      <section class="mb-8">
-        <h2 class="text-base sm:text-lg font-semibold text-gray-700 mb-3">Rutas de vuelo</h2>
-        <div class="hidden sm:block overflow-x-auto border rounded-lg bg-white">
-          <table class="min-w-full text-sm text-left table-fixed">
-            <thead class="bg-gray-100 text-gray-700">
-              <tr>
-                <th class="px-3 py-2 border w-32">Nombre</th>
-                <th class="px-3 py-2 border">Descripción</th>
-                <th class="px-3 py-2 border w-28">Ciudad Origen</th>
-                <th class="px-3 py-2 border w-28">Ciudad Destino</th>
-                <th class="px-3 py-2 border w-24 text-center">Seleccionar</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="hover:bg-gray-50">
-                <td class="px-3 py-2 border truncate">Tremendo</td>
+  <main class="flex-1 container mx-auto px-4 py-8 max-w-3xl">
+    <h1 class="text-2xl font-bold text-brand mb-6">Crear vuelo (demo)</h1>
+    <div class="bg-white rounded-xl shadow p-6 space-y-4 text-sm">
+      <p class="text-gray-600">Página placeholder para crear un vuelo. Aquí luego podrás:</p>
+      <ul class="list-disc ml-6 text-gray-700 space-y-1">
+        <li>Seleccionar aerolínea (desde sesión)</li>
+        <li>Elegir ruta existente o definir tramo(s)</li>
+        <li>Configurar horarios, avión y asientos</li>
+        <li>Asignar precios por clase</li>
+      </ul>
+      <p class="text-xs text-gray-400">Archivo: createFlight/createFlight.html</p>
+    </div>
+  </main>
+  <div id="footer"></div>
+  <script src="../header/header.js"></script>
+  <script>
+    // inyección rápida de header/footer si usas patrón fetch en otras vistas
+    if(!document.getElementById('nav-desktop')){
+      fetch('../header/header.html').then(r=>r.text()).then(h=>{
+        const el=document.getElementById('header'); if(el) el.innerHTML=h;
+        if(typeof initHeader==='function') initHeader();
+      });
+      fetch('../footer/footer.html').then(r=>r.text()).then(h=>{
+        const el=document.getElementById('footer'); if(el) el.innerHTML=h;
+      });
+    }
+  </script>
+</body>
+</html>
                 <td class="px-3 py-2 border truncate">afjkaskfhkajskjas</td>
                 <td class="px-3 py-2 border truncate">San José</td>
                 <td class="px-3 py-2 border truncate">San José Este</td>

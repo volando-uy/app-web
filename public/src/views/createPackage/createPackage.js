@@ -116,6 +116,16 @@ document.addEventListener('DOMContentLoaded', () => {
   btnSave.addEventListener('click', ()=>{
     const name = (nameIn.value||'').trim();
     if(!name){ alert('Nombre obligatorio'); return; }
+    // Detectar aerolínea desde sesión
+    let airlineName = '';
+    try {
+      const auth = JSON.parse(sessionStorage.getItem('auth')||'null');
+      if(auth?.role === 'airline') airlineName = auth.name || auth.nickname || '';
+      if(!airlineName && sessionStorage.getItem('airline')) {
+        const a = JSON.parse(sessionStorage.getItem('airline'));
+        airlineName = a?.name || airlineName;
+      }
+    } catch {}
     const pkg = {
       id: editId || Date.now().toString(),
       name,
@@ -126,7 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
       price: priceIn.value||'',
       description: descIn.value||'',
       includes: includes.slice(),
-      images: images.slice()
+      images: images.slice(),
+      airline: airlineName // NUEVO
     };
     const list = read(KEY);
     if(editId){

@@ -152,6 +152,10 @@ function renderPackages() {
                   data-open-package="${pkg.id}">
             Ver paquete
           </button>
+          <a href="#" data-target="buypackage/buypackage.html"
+             class="mt-2 w-full inline-block text-center px-4 py-2 rounded-lg bg-emerald-600 text-white hover:brightness-110 nav-link">
+            Comprar
+          </a>
         </div>
       </div>
     </article>
@@ -222,6 +226,8 @@ function openPackageModal(pkg){
       <div class="flex items-center justify-end gap-2">
         <button type="button" id="pkg-cancel" class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50">Cerrar</button>
         <a href="#" class="nav-link px-4 py-2 rounded-lg bg-brand text-white hover:brightness-110" data-target="flightf/flight.html">Ver rutas</a>
+        <a href="#" class="nav-link px-4 py-2 rounded-lg bg-emerald-600 text-white hover:brightness-110"
+           data-target="buypackage/buypackage.html">Comprar</a>
       </div>
     </section>
   `;

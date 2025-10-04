@@ -43,7 +43,8 @@ window.loginAsDemo = function (kind = "user") {
     tipo: demo.tipo,
     nombre: demo.name,
     nickname: demo.nickname,
-    email: demo.email
+    email: demo.email,
+    avatar: '/assets/images/default-avatar.png'
   }));
   refreshHeader();
   if (typeof window.refreshRightMenu === 'function') window.refreshRightMenu();
@@ -68,6 +69,8 @@ function getRelativePath(target) {
   if (target.startsWith("register/")) return "/public/src/views/" + target;
   if (target.startsWith("createCity&Category/")) return "/public/src/views/" + target;
   if (target.startsWith("adminPanel/")) return "/public/src/views/" + target;
+  if (target.startsWith("createFlightRoute/")) return "/public/src/views/" + target;
+  if (target.startsWith("createFlight/")) return "/public/src/views/" + target;
   if (target.startsWith("/")) return target;
   return "/public/src/views/" + target;
 }
@@ -84,9 +87,21 @@ function setupHeaderLinks() {
   if (logo) logo.setAttribute("href", getRelativePath("index.html"));
 }
 
+// Asegura que el link de login siempre funcione
+function forceLoginLink() {
+  const links = document.querySelectorAll('[data-target="register/register.html"]');
+  links.forEach(a => {
+    a.addEventListener('click', (e) => {
+      const target = a.getAttribute('data-target');
+      if (!target) return;
+      e.preventDefault();
+      window.location.href = getRelativePath(target);
+    }, { once: true });
+  });
+}
+
 /* ---------- Detección de rol/nombre ---------- */
 function getRoleAndName() {
-  // SOLO sessionStorage define una sesión activa
   let role = null;
   let name = null;
   try {
@@ -104,7 +119,6 @@ function getRoleAndName() {
         name = JSON.parse(sessionStorage.getItem('airline')).name;
       }
     }
-    // Solo usar localStorage para completar nombre (no para “revivir” sesión)
     if (role && !name) {
       const ud = JSON.parse(localStorage.getItem('userData') || 'null');
       if (ud) name = ud.nombre || ud.nickname || ud.name;
@@ -117,132 +131,288 @@ function getRoleAndName() {
 function renderHeaderByRole() {
   const { role, name } = getRoleAndName();
   const desktopNav = document.getElementById("nav-desktop");
-  const mobileNav = document.getElementById("nav-mobile");
+  const mobileNav  = document.getElementById("nav-mobile");
   const rightActions = document.getElementById("header-actions");
 
-  const userLinks = [
+  // Base (desktop)
+  const baseUserLinks = [
     { text: "Vuelos", target: "flightf/flight.html" },
-    { text: "Paquetes", target: "package/package.html" },
+    { text: "Paquetes", target: "package/package.html" }
   ];
-  const airlineLinks = [
+  const baseAirlineLinks = [
     { text: "Varios", target: "createCity&Category/createCity&Category.html" },
-    { text: "Vuelos", target: "flightf/flight.html" },
-    { text: "Listados", target: "adminPanel/listings.html" },
-    { text: "Paquetes", target: "package/package.html" },
+    { text: "Crear vuelo", target: "createFlight/createFlight.html" },
+    { text: "Crear ruta de vuelo", target: "createFlightRoute/createflightRoute.html" },
+    { text: "Rutas de vuelo", target: "checkflightroute/checkflightroute.html" },
+    { text: "Paquetes", target: "package/package.html" }
   ];
 
-  const makeA = (item, extra = "") =>
-    `<a href="#" class="nav-link ${extra}" data-target="${item.target}">${escapeHtml(item.text)}</a>`;
+  // Extras SOLO mobile (sin 'Mi perfil')
+  const extraUserLinks = [
+    { text: "Panel Reservas", target: "reservationPanel/reservationPanel.html" }
+  ];
+  const extraAirlineLinks = [
+    { text: "Panel aerolínea", target: "adminPanel/adminPanel.html" },
+    { text: "Panel Reservas", target: "reservationPanel/reservationPanel.html" }
+  ];
 
-  // Desktop nav
+  // Estilo unificado tipo “pill”
+  const makeA = (item, extra="") =>
+    `<a href="#" class="nav-link px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition text-sm ${extra}"
+       data-target="${item.target}">${escapeHtml(item.text)}</a>`;
+
+  // Desktop
   if (desktopNav) {
-    const links = role === "airline" ? airlineLinks : userLinks;
-    desktopNav.innerHTML = links.map((l) => makeA(l, "hover:text-yellow-300")).join(" ");
-    desktopNav.classList.add("md:flex");
+    const links = role === "airline" ? baseAirlineLinks : baseUserLinks;
+    desktopNav.innerHTML = links.map(l => makeA(l)).join("");
+    desktopNav.classList.add("md:flex","gap-2");
   }
 
-  // Mobile nav
+  // Mobile (aplica mismo estilo a cada item)
   if (mobileNav) {
-    const links = role === "airline" ? airlineLinks : userLinks;
+    const base = role === "airline" ? baseAirlineLinks : baseUserLinks;
+    const extras = role === "airline" ? extraAirlineLinks : (role === "user" ? extraUserLinks : []);
+    const unique = [];
+    const seen = new Set();
+    [...base, ...extras].forEach(l => { if(!seen.has(l.target)){ seen.add(l.target); unique.push(l);} });
     mobileNav.innerHTML =
-      links
-        .map(
-          (l) =>
-            `<a href="#" class="nav-link block px-2 py-3 rounded" data-target="${l.target}">${escapeHtml(l.text)}</a>`
-        )
-        .join("") +
+      unique.map(l => `<a href="#" class="nav-link block px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm"
+         data-target="${l.target}">${escapeHtml(l.text)}</a>`).join("") +
       `<div class="h-px bg-white/10 my-2"></div>` +
       (role
-        ? `<button id="btnLogoutMobile" class="w-full text-left block px-2 py-3 rounded hover:bg-white/10">Cerrar sesión</button>`
-        : `<a href="#" class="nav-link block px-2 py-3 rounded" data-target="register/register.html">Iniciar sesión</a>`);
+        ? `<a href="#" class="nav-link block px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm"
+             data-target="profileInformation/profileInformation.html">Mi perfil</a>
+           <button id="btnLogoutMobile"
+             class="w-full text-left block px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm">Cerrar sesión</button>`
+        : `<a href="#" class="nav-link block px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm"
+             data-target="register/register.html">Iniciar sesión</a>`);
   }
 
-  // Acciones a la derecha (desktop)
+  // Acciones derecha: quitar botón extra de “+ Crear vuelo” (solo dropdown usuario / login)
   if (rightActions) {
-    if (role === "airline") {
+    if (role === "airline" || role === "user") {
+      const avatar = getUserAvatar();
+      const icon = role === 'airline' ? '✈️' : '👤';
       rightActions.innerHTML = `
-        <a href="#" class="nav-link px-3 py-2 text-white font-semibold"
-           data-target="adminPanel/adminPanel.html">✈️ ${escapeHtml(name || "Aerolínea")}</a>
-        <button id="btnLogout" class="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20">Cerrar sesión</button>
-      `;
-    } else if (role === "user") {
-      rightActions.innerHTML = `
-        <div class="text-sm text-white/90 mr-1">👤 ${escapeHtml(name || "Cliente")}</div>
-        <button id="btnLogout" class="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20">Cerrar sesión</button>
-      `;
+        <div id="user-menu" class="relative">
+          <button id="user-menu-trigger"
+            class="flex items-center gap-2 pl-2 pr-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 font-semibold
+                   focus:outline-none focus:ring-2 focus:ring-white/30 text-sm"
+            aria-haspopup="true" aria-expanded="false" aria-controls="user-menu-dropdown" type="button">
+            <img src="${avatar}" alt="avatar" class="w-7 h-7 rounded-full object-cover ring-1 ring-white/30">
+            <span class="flex items-center gap-1">${icon} ${escapeHtml(name || (role==='airline' ? 'Aerolínea' : 'Usuario'))}</span>
+            <svg class="w-4 h-4 opacity-80" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <div id="user-menu-dropdown"
+               class="absolute right-0 mt-2 w-52 bg-white text-gray-700 rounded-md shadow-lg border border-black/5 py-1 text-sm hidden z-50"
+               role="menu" aria-hidden="true">
+            <a href="#" data-target="profileInformation/profileInformation.html"
+               class="nav-link block px-4 py-2 hover:bg-gray-50" role="menuitem">Mi perfil</a>
+            <button id="btnLogout" class="w-full text-left px-4 py-2 hover:bg-gray-50" role="menuitem">Cerrar sesión</button>
+          </div>
+        </div>`;
     } else {
-      // sin sesión
       rightActions.innerHTML = `
-        <a href="#" class="nav-link px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20"
+        <a href="#" class="nav-link px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm"
            data-target="register/register.html">Iniciar sesión</a>`;
     }
-    rightActions.classList.add("md:flex");
+    rightActions.classList.add("md:flex","items-center","gap-3");
   }
 
-  // Listeners de logout (si hay sesión)
-  attachLogoutHandlers();
+  try { attachLogoutHandlers(); } catch {}
+  enhanceUserMenu();
 }
 
+// Helper para avatar
+function getUserAvatar() {
+  try {
+    const ud = JSON.parse(localStorage.getItem('userData') || 'null');
+    return (ud && ud.avatar) ? ud.avatar : '/assets/images/default-avatar.png';
+  } catch { return '/assets/images/default-avatar.png'; }
+}
+
+/* ---------- Handlers de logout ---------- */
 function attachLogoutHandlers() {
-  const btn1 = document.getElementById("btnLogout");
-  const btn2 = document.getElementById("btnLogoutMobile");
-  if (btn1) btn1.onclick = () => window.logout();
-  if (btn2) btn2.onclick = () => {
+  if (window.__logoutDesktopHandler) {
+    const old = document.getElementById('btnLogout');
+    old && old.removeEventListener('click', window.__logoutDesktopHandler);
+  }
+  if (window.__logoutMobileHandler) {
+    const oldm = document.getElementById('btnLogoutMobile');
+    oldm && oldm.removeEventListener('click', window.__logoutMobileHandler);
+  }
+
+  const btnDesktop = document.getElementById('btnLogout');
+  const btnMobile  = document.getElementById('btnLogoutMobile');
+
+  window.__logoutDesktopHandler = (e) => {
+    e.preventDefault();
     window.logout();
-    // cerrar menú móvil si estaba abierto
-    const menu = document.getElementById("mobileMenu");
-    if (menu && !menu.classList.contains("hidden")) menu.classList.add("hidden");
   };
+  window.__logoutMobileHandler = (e) => {
+    e.preventDefault();
+    window.logout();
+  };
+
+  if (btnDesktop) btnDesktop.addEventListener('click', window.__logoutDesktopHandler);
+  if (btnMobile)  btnMobile.addEventListener('click',  window.__logoutMobileHandler);
+}
+
+/* ---------- Toggle de menú usuario ---------- */
+function enhanceUserMenu() {
+  const tryBind = () => {
+    const trigger  = document.getElementById('user-menu-trigger');
+    const dropdown = document.getElementById('user-menu-dropdown');
+    const wrapper  = document.getElementById('user-menu');
+    if (!trigger || !dropdown || !wrapper) return false;
+
+    // Limpieza previa
+    if (window.__userMenuDocHandler)  document.removeEventListener('click', window.__userMenuDocHandler);
+    if (window.__userMenuEscHandler)  document.removeEventListener('keydown', window.__userMenuEscHandler);
+    if (window.__userMenuTriggerHandler) trigger.removeEventListener('click', window.__userMenuTriggerHandler);
+
+    let open = false;
+    const show = () => {
+      if (open) return;
+      dropdown.classList.remove('hidden');
+      dropdown.setAttribute('aria-hidden', 'false');
+      trigger.setAttribute('aria-expanded', 'true');
+      open = true;
+    };
+    const hide = () => {
+      if (!open) return;
+      dropdown.classList.add('hidden');
+      dropdown.setAttribute('aria-hidden', 'true');
+      trigger.setAttribute('aria-expanded', 'false');
+      open = false;
+    };
+
+    window.__userMenuTriggerHandler = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      open ? hide() : show();
+    };
+    trigger.addEventListener('click', window.__userMenuTriggerHandler);
+
+    window.__userMenuDocHandler = (e) => {
+      if (!wrapper.contains(e.target)) hide();
+    };
+    document.addEventListener('click', window.__userMenuDocHandler);
+
+    window.__userMenuEscHandler = (e) => { if (e.key === 'Escape') hide(); };
+    document.addEventListener('keydown', window.__userMenuEscHandler);
+
+    trigger.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (!open) show();
+        const first = dropdown.querySelector('a,button');
+        if (first) first.focus();
+      } else if (e.key === 'Escape') {
+        hide();
+      }
+    });
+
+    return true;
+  };
+  setTimeout(() => { if (!tryBind()) setTimeout(tryBind, 50); }, 0);
 }
 
 /* ---------- Mobile toggle + bootstrap ---------- */
 function initHeader() {
-  // Evita doble init
-  if (window.__headerInit) return;
-  window.__headerInit = true;
+  // NO marcar todavía __headerInit hasta enganchar elementos
+  if (window.__headerInit && document.getElementById('btnMenu') && document.getElementById('mobileMenu')) return;
 
-  // Espera a que el header exista (si lo inyectás por fetch)
-  const ensure = () => {
+  let attempts = 0;
+  const maxAttempts = 25; // ~2s (25 * 80ms)
+  function ensure() {
     const btn = document.getElementById('btnMenu');
     const menu = document.getElementById('mobileMenu');
+
     if (!btn || !menu) {
-      // reintenta un par de veces
-      return setTimeout(ensure, 80);
+      attempts++;
+      if (attempts < maxAttempts) return setTimeout(ensure, 80);
+      console.warn('[header] No se encontraron elementos de menú móvil tras varios intentos.');
+      return;
     }
 
-    // Toggle móvil
-    btn.addEventListener('click', () => {
-      menu.classList.toggle('hidden');
-      const open = btn.getAttribute('aria-expanded') === 'true';
-      btn.setAttribute('aria-expanded', String(!open));
-    });
+    // Limpieza previa de posibles handlers antiguos
+    if (window.__headerBtnHandler) {
+      btn.removeEventListener('click', window.__headerBtnHandler);
+    }
 
-    // Cerrar al navegar
-    document.addEventListener('click', (e) => {
-      const link = e.target.closest('.nav-link');
-      if (link && !menu.classList.contains('hidden')) {
+    function toggleMobileMenu(forceClose = false) {
+      const isHidden = menu.classList.contains('hidden');
+      if (forceClose) {
+        if (!isHidden) menu.classList.add('hidden');
+        btn.setAttribute('aria-expanded', 'false');
+        return;
+      }
+      if (isHidden) {
+        menu.classList.remove('hidden');
+        btn.setAttribute('aria-expanded', 'true');
+      } else {
         menu.classList.add('hidden');
         btn.setAttribute('aria-expanded', 'false');
       }
-    });
+    }
 
-    // Render + links
+    window.__headerBtnHandler = () => toggleMobileMenu();
+    btn.addEventListener('click', window.__headerBtnHandler);
+
+    // Atributos de accesibilidad
+    btn.setAttribute('aria-controls', 'mobileMenu');
+    btn.setAttribute('aria-expanded', 'false');
+
+    // Cerrar al hacer click en un link
+    if (window.__headerDocClickHandler) {
+      document.removeEventListener('click', window.__headerDocClickHandler);
+    }
+    window.__headerDocClickHandler = (e) => {
+      const link = e.target.closest('.nav-link');
+      if (link && !menu.classList.contains('hidden')) {
+        toggleMobileMenu(true);
+      }
+    };
+    document.addEventListener('click', window.__headerDocClickHandler);
+
+    // Cerrar con Escape
+    if (window.__headerEscHandler) {
+      document.removeEventListener('keydown', window.__headerEscHandler);
+    }
+    window.__headerEscHandler = (e) => {
+      if (e.key === 'Escape') toggleMobileMenu(true);
+    };
+    document.addEventListener('keydown', window.__headerEscHandler);
+
+    // Render y enlaces
     try { renderHeaderByRole(); } catch {}
     setupHeaderLinks();
-  };
+    forceLoginLink();
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', ensure);
-  } else {
-    ensure();
+    window.__headerInit = true;
   }
+
+  ensure();
 }
 
-/* ---------- Nuevo: refrescar header público ---------- */
+// Re-vincular manual si el header se reemplaza dinámicamente post-carga
+window.forceRebindHeaderMobile = function() {
+  window.__headerInit = false;
+  initHeader();
+};
+
+/* ---------- Refrescar header ---------- */
 function refreshHeader(){
   try { renderHeaderByRole(); } catch {}
   try { setupHeaderLinks(); } catch {}
-  attachLogoutHandlers();
+  try { attachLogoutHandlers(); } catch {}
+  enhanceUserMenu();
+  forceLoginLink();
+  // Reasegurar toggles si el botón fue reinyectado
+  if (!window.__headerInit) initHeader();
 }
 window.refreshHeader = refreshHeader;
 
@@ -250,7 +420,19 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
-/* Auto-init si el header ya está en el DOM */
+/* ---------- Auto-init ---------- */
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initHeader);
+} else {
+  initHeader();
+}
+window.refreshHeader = refreshHeader;
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+/* ---------- Auto-init ---------- */
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initHeader);
 } else {

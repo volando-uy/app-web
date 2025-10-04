@@ -23,3 +23,7 @@ function importFooter() {
 if (document.getElementById("footer")) {
   importFooter();
 }
+
+// Placeholder para futura lógica de creación de vuelos.
+// Puedes implementar guardado en localStorage o futura llamada a API aquí.
+console.log('[createFlight] listo para implementar.');

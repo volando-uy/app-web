@@ -247,7 +247,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function submitBooking(){
-    
     const seatClass = document.getElementById('seat-class').value;
     const passengers = Array.from(document.querySelectorAll('#passengers-table tbody tr')).map(tr=>{
       return {
@@ -287,6 +286,37 @@ document.addEventListener("DOMContentLoaded", () => {
     // demo: almacenar reserva y mostrar confirmación
     const booking = { flight, seatClass, passengers, createdAt: new Date().toISOString() };
     sessionStorage.setItem('lastBooking', JSON.stringify(booking));
+
+    // === NUEVO: persistir en localStorage (reservations) ===
+    try {
+      const list = JSON.parse(localStorage.getItem('reservations') || '[]');
+      // generar ids razonables
+      const flightId = flight.id || ('FL-' + (flight.aerolinea||'').substring(0,3).toUpperCase() + '-' + Date.now());
+      const routeKey = (flight.rutas && flight.rutas.length)
+        ? (flight.rutas[0].origen + '-' + flight.rutas[flight.rutas.length-1].destino)
+        : (flight.salida?.ciudad + '-' + flight.llegada?.ciudad);
+      const userAuth = JSON.parse(sessionStorage.getItem('auth') || 'null');
+      const entry = {
+        id: 'R-' + Date.now(),
+        flightId,
+        airline: flight.aerolinea,
+        routeKey,
+        flightSummary: {
+          salida: flight.salida,
+          llegada: flight.llegada,
+          duracion: flight.duracion,
+          tipo: flight.tipo,
+          precio: flight.precio
+        },
+        passengers,
+        seatClass,
+        createdAt: booking.createdAt,
+        userName: userAuth ? (userAuth.name || userAuth.nickname) : null
+      };
+      list.push(entry);
+      localStorage.setItem('reservations', JSON.stringify(list));
+    } catch(e){ console.warn('No se pudo guardar la reserva persistente', e); }
+
     alert('Reserva registrada correctamente. (Demo)');
  
   }
