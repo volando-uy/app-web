@@ -58,6 +58,8 @@ window.logout = function () {
   localStorage.removeItem("userData");
   refreshHeader();
   if (typeof window.refreshRightMenu === 'function') window.refreshRightMenu();
+  // Redirigir siempre al index después de logout
+  setTimeout(()=>{ window.location.href = '/public/index.html'; }, 50);
 };
 
 /* ---------- Ruteo relativo que ya usabas ---------- */
@@ -144,6 +146,11 @@ function renderHeaderByRole() {
     { text: "Crear vuelo", target: "createFlight/createFlight.html" },
     { text: "Crear ruta de vuelo", target: "createFlightRoute/createflightRoute.html" },
     { text: "Rutas de vuelo", target: "checkflightroute/checkflightroute.html" },
+    { text: "Paquetes", target: "checkPackage/checkPackage.html" }
+  ];
+  const baseAdminLinks = [
+    { text: "Aceptar rutas", target: "acceptFlightRoute/acceptFlightRoute.html" },
+    { text: "Vuelos", target: "flightf/flight.html" },
     { text: "Paquetes", target: "package/package.html" }
   ];
 
@@ -155,6 +162,7 @@ function renderHeaderByRole() {
     { text: "Panel aerolínea", target: "adminPanel/adminPanel.html" },
     { text: "Panel Reservas", target: "reservationPanel/reservationPanel.html" }
   ];
+  const extraAdminLinks = [{ text:"Panel Reservas", target:"reservationPanel/reservationPanel.html" }];
 
   // Estilo unificado tipo “pill”
   const makeA = (item, extra="") =>
@@ -163,15 +171,27 @@ function renderHeaderByRole() {
 
   // Desktop
   if (desktopNav) {
-    const links = role === "airline" ? baseAirlineLinks : baseUserLinks;
+    const links = role === "airline"
+      ? baseAirlineLinks
+      : role === "admin"
+        ? baseAdminLinks
+        : baseUserLinks;
     desktopNav.innerHTML = links.map(l => makeA(l)).join("");
     desktopNav.classList.add("md:flex","gap-2");
   }
 
   // Mobile (aplica mismo estilo a cada item)
   if (mobileNav) {
-    const base = role === "airline" ? baseAirlineLinks : baseUserLinks;
-    const extras = role === "airline" ? extraAirlineLinks : (role === "user" ? extraUserLinks : []);
+    const base = role === "airline"
+      ? baseAirlineLinks
+      : role === "admin"
+        ? baseAdminLinks
+        : baseUserLinks;
+    const extras = role === "airline"
+      ? extraAirlineLinks
+      : role === "admin"
+        ? extraAdminLinks
+        : (role === "user" ? extraUserLinks : []);
     const unique = [];
     const seen = new Set();
     [...base, ...extras].forEach(l => { if(!seen.has(l.target)){ seen.add(l.target); unique.push(l);} });
@@ -190,9 +210,9 @@ function renderHeaderByRole() {
 
   // Acciones derecha: quitar botón extra de “+ Crear vuelo” (solo dropdown usuario / login)
   if (rightActions) {
-    if (role === "airline" || role === "user") {
+    if (role === "airline" || role === "user" || role === "admin") {
       const avatar = getUserAvatar();
-      const icon = role === 'airline' ? '✈️' : '👤';
+      const icon = role === 'airline' ? '✈️' : (role === 'admin' ? '🛡️' : '👤');
       rightActions.innerHTML = `
         <div id="user-menu" class="relative">
           <button id="user-menu-trigger"

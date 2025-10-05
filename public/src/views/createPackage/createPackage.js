@@ -243,13 +243,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const stored = JSON.parse(localStorage.getItem('flightRoutes') || '[]');
       if (Array.isArray(stored) && stored.length) {
         stored.forEach((f, fi) => {
-          // cada f: { aerolinea, routes: [{origen,destino,tiempo}] } o {label,...}
           if (!airline || String(f.aerolinea||'').toLowerCase() === String(airline||'').toLowerCase()) {
             const routes = Array.isArray(f.routes) ? f.routes : (f.detalles && f.detalles.rutas) || [];
-            routes.forEach((r, ri) => {
-              const label = r.label || ((r.origen && r.destino) ? `${r.origen} → ${r.destino} (${r.tiempo||''})` : JSON.stringify(r));
-              out.push({ id: `stored_${fi}_${ri}`, label });
-            });
+            routes
+              .filter(r=>r.status!=='Rechazada') // evitar rechazadas
+              .forEach((r, ri) => {
+                const label = r.label || ((r.origen && r.destino) ? `${r.origen} → ${r.destino} (${r.tiempo||''})` : JSON.stringify(r));
+                out.push({ id: `stored_${fi}_${ri}`, label });
+              });
           }
         });
       }

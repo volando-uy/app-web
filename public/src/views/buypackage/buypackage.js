@@ -217,6 +217,19 @@ function renderPackages(){
     });
   });
 
+  // PRESELECCIÓN desde package.js
+  const pre = sessionStorage.getItem('preselectPackage');
+  if (pre && user) {
+    const prePkg = pkgs.find(p=>p.id === pre);
+    if (prePkg && !hasActivePurchase(user, prePkg)) {
+      selection = prePkg;
+      const card = listEl.querySelector(`[data-pkg-id="${pre}"]`);
+      card?.classList.add('ring-2','ring-brand');
+      showSelection(prePkg, user);
+    }
+    sessionStorage.removeItem('preselectPackage');
+  }
+
   renderPurchases(user);
 }
 

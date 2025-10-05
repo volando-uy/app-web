@@ -48,10 +48,12 @@ const vuelos = [
 	}
 ];
 
+let vuelosFiltrados = [...vuelos]; // Array para mantener los vuelos filtrados
+
 function renderFlights() {
 	const container = document.getElementById("flights-list");
 	if (!container) return;
-	container.innerHTML = vuelos.map((v, idx) => `
+	container.innerHTML = vuelosFiltrados.map((v, idx) => `
 		<div class="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col md:flex-row items-center mb-6 p-4 gap-4">
 			<div class="flex flex-col items-center w-32">
 				<img src="${v.logo}" alt="${v.aerolinea}" class="h-8 object-contain mb-2" />
@@ -80,17 +82,44 @@ function renderFlights() {
 					${v.llegada.dia ? `<div class="text-xs text-orange-500 font-semibold">${v.llegada.dia}</div>` : ""}
 				</div>
 				<div class="flex flex-col items-center">
-					<button class="text-xs text-brand border border-brand rounded px-3 py-1 mt-2 hover:bg-brand hover:text-white transition" onclick="showFlightModal(${idx})">Detalles del vuelo</button>
+					<button class="text-xs text-brand border border-brand rounded px-3 py-1 mt-2 hover:bg-brand hover:text-white transition" onclick="showFlightModal(${vuelos.indexOf(v)})">Detalles del vuelo</button>
 				</div>
 				<div class="flex flex-col items-center">
 					<div class="text-right text-xs text-gray-500">${v.tipo}</div>
 					<div class="text-2xl font-bold text-orange-600">${v.precio === 0 ? "+US$0.00" : `US$${v.precio}`}</div>
 					<div class="text-xs text-gray-400">Precio por persona<br>(impuestos y tasas incl.)</div>
-					<button class="mt-2 px-4 py-2 bg-orange-500 text-white rounded-lg font-bold hover:bg-orange-600 transition" onclick="selectFlight(${idx})">Selecciona este ${v.tipo}</button>
+					<button class="mt-2 px-4 py-2 bg-orange-500 text-white rounded-lg font-bold hover:bg-orange-600 transition" onclick="selectFlight(${vuelos.indexOf(v)})">Selecciona este ${v.tipo}</button>
 				</div>
 			</div>
 		</div>
 	`).join("");
+}
+
+// Función para poblar el filtro de aerolíneas
+function populateAirlineFilter() {
+	const select = document.getElementById("aerolinea-filter");
+	if (!select) return;
+	
+	const aerolineas = [...new Set(vuelos.map(v => v.aerolinea))].sort();
+	aerolineas.forEach(aerolinea => {
+		const option = document.createElement("option");
+		option.value = aerolinea;
+		option.textContent = aerolinea;
+		select.appendChild(option);
+	});
+}
+
+// Función para filtrar vuelos por aerolínea
+function filterByAirline() {
+	const selectedAirline = document.getElementById("aerolinea-filter").value;
+	
+	if (selectedAirline === "") {
+		vuelosFiltrados = [...vuelos];
+	} else {
+		vuelosFiltrados = vuelos.filter(v => v.aerolinea === selectedAirline);
+	}
+	
+	renderFlights();
 }
 
 // Modal de detalles
@@ -133,7 +162,16 @@ function selectFlight(idx) {
 }
 
 // Render al cargar
-document.addEventListener("DOMContentLoaded", renderFlights);
+document.addEventListener("DOMContentLoaded", () => {
+	populateAirlineFilter();
+	renderFlights();
+	
+	// Agregar event listener al filtro de aerolíneas
+	const airlineFilter = document.getElementById("aerolinea-filter");
+	if (airlineFilter) {
+		airlineFilter.addEventListener("change", filterByAirline);
+	}
+});
 
 // Inyectar header dinámicamente
 fetch("../header/header.html")
@@ -161,3 +199,17 @@ function importFooter() {
 if (document.getElementById("footer")) {
   importFooter();
 }
+
+// Asegurar que flightRoutes tengan status si existen (para admin)
+(function ensureRouteStatuses(){
+	try{
+		const fr = JSON.parse(localStorage.getItem('flightRoutes')||'[]');
+		let changed = false;
+		fr.forEach(g=>{
+			(g.routes||[]).forEach(r=>{
+				if(!r.status){ r.status='Ingresada'; changed=true; }
+			});
+		});
+		if(changed) localStorage.setItem('flightRoutes', JSON.stringify(fr));
+	}catch{}
+})();

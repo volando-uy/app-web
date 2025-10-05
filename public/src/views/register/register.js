@@ -46,6 +46,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const roleSel = document.getElementById('login-role')?.value || 'cliente';
       if (!username) { alert('Ingresa un username'); return; }
 
+      // Admin (simple, sin validación estricta)
+      if (roleSel === 'admin') {
+        establishSession('admin', {
+          tipo: 'admin',
+          nickname: username,
+          nombre: username,
+          email: username + '@admin.local'
+        });
+        goProfileInfo();
+        return;
+      }
+
       // Intentar login contra usuarios demo sembrados
       let demoData = null;
       if (roleSel === 'aerolinea') {
@@ -173,7 +185,9 @@ function establishSession(role, userDataObj) {
   localStorage.setItem('userData', JSON.stringify(userDataObj));
   sessionStorage.setItem('role', role);
   // Para mantener compatibilidad con código existente:
-  if (role === 'airline') {
+  if (role === 'admin') {
+    // nada extra, solo userData / auth
+  } else if (role === 'airline') {
     sessionStorage.setItem('airline', JSON.stringify({ name: userDataObj.nombre }));
   } else {
     sessionStorage.setItem('user', JSON.stringify({ name: userDataObj.nombre }));

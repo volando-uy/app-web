@@ -152,23 +152,34 @@ function renderPackages() {
                   data-open-package="${pkg.id}">
             Ver paquete
           </button>
-          <a href="#" data-target="buypackage/buypackage.html"
-             class="mt-2 w-full inline-block text-center px-4 py-2 rounded-lg bg-emerald-600 text-white hover:brightness-110 nav-link">
+          <!-- MOD: botón comprar con data-buy-package -->
+          <button type="button"
+             data-buy-package="${pkg.id}"
+             class="mt-2 w-full px-4 py-2 rounded-lg bg-emerald-600 text-white hover:brightness-110">
             Comprar
-          </a>
+          </button>
         </div>
       </div>
     </article>
   `).join("");
 
-  // Delego eventos de apertura de modal
+  // Delego eventos (ver / comprar)
   container.addEventListener("click", (e) => {
-    const btn = e.target.closest("[data-open-package]");
-    if (!btn) return;
-    const id = btn.getAttribute("data-open-package");
-    const pkg = paquetes.find(p => p.id === id);
-    if (pkg) openPackageModal(pkg);
-  });
+    const openBtn = e.target.closest("[data-open-package]");
+    if (openBtn) {
+      const id = openBtn.getAttribute("data-open-package");
+      const pkg = paquetes.find(p => p.id === id);
+      if (pkg) openPackageModal(pkg);
+      return;
+    }
+    const buyBtn = e.target.closest("[data-buy-package]");
+    if (buyBtn) {
+      const id = buyBtn.getAttribute("data-buy-package");
+      // guardar ID para preselección en compra
+      sessionStorage.setItem('preselectPackage', id);
+      window.location.href = "../buypackage/buypackage.html";
+    }
+  }, { once: true }); // una sola vez basta para esta render
 }
 
 /* ======================= Modal: detalle de paquete ======================= */

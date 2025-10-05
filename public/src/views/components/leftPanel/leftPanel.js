@@ -126,6 +126,12 @@
     addLink('Mis paquetes','checkPackage/checkPackage.html','📦');
     addLink('Panel Reservas','reservationPanel/reservationPanel.html','🧾');
     addLink('Paquetes','package/package.html','🎒');
+  } else if (ctx.role==='admin'){
+    // Eliminar Panel Reservas si existe en la plantilla base
+    const pr = list.querySelector('[data-route="reservationPanel/reservationPanel.html"]')?.closest('li');
+    if(pr) pr.remove();
+    // Añadir sólo Aceptar rutas
+    addLink('Aceptar rutas','acceptFlightRoute/acceptFlightRoute.html','🛡️');
   }
 
   function resolve(route){
