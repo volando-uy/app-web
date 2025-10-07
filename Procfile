@@ -1,1 +1,1 @@
-web: mvn clean package cargo:run
+web: java -jar target/dependency/webapp-runner.jar --port $PORT target/*.war
