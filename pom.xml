@@ -40,6 +40,12 @@
             <version>3.0.1</version>
         </dependency>
 
+        <!-- Tu librería VolandoUY -->
+        <dependency>
+            <groupId>com.gyabisito</groupId>
+            <artifactId>VolandoUY</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
 
@@ -65,38 +71,36 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.4.0</version>
                 <configuration>
-                    <webResources>
-                        <resource>
-                            <directory>${project.basedir}/lib</directory>
-                            <includes>
-                                <include>VolandoUY-1.0-SNAPSHOT.jar</include>
-                            </includes>
-                            <targetPath>WEB-INF/lib</targetPath>
-                        </resource>
-                    </webResources>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
 
+            <!-- Desplegar automáticamente en Tomcat 10 (local) con Cargo -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals><goal>copy</goal></goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.heroku</groupId>
-                                    <artifactId>webapp-runner</artifactId>
-                                    <version>10.1.46.0</version>
-                                    <destFileName>webapp-runner.jar</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <configuration>
+                    <container>
+                        <containerId>tomcat10x</containerId>
+                        <type>installed</type>
+                        <home>C:\Drivers\apache-tomcat-11.0.12</home> <!-- AJUSTÁ ESTA RUTA -->
+                    </container>
+                    <configuration>
+                        <type>standalone</type>
+                        <properties>
+                            <cargo.servlet.port>8085</cargo.servlet.port>
+                        </properties>
+                    </configuration>
+                    <deployables>
+                        <deployable>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>${project.artifactId}</artifactId>
+                            <type>war</type>
+                        </deployable>
+                    </deployables>
+                </configuration>
             </plugin>
+
         </plugins>
     </build>
 

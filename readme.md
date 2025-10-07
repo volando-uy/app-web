@@ -125,3 +125,8 @@ Esta estructura permite:
 * `config/`: reglas del edificio.
 
 Todo separado, limpio y listo para escalar.
+
+---
+Compilar proyecto a servlet y correrlo
+
+**mvn clean package cargo:run**
