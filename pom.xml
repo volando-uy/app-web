@@ -45,6 +45,8 @@
             <groupId>com.gyabisito</groupId>
             <artifactId>VolandoUY</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+            <systemPath>${project.basedir}/lib/VolandoUY-1.0-SNAPSHOT.jar</systemPath>
         </dependency>
 
     </dependencies>
@@ -100,6 +102,29 @@
                     </deployables>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>copy</goal></goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.heroku</groupId>
+                                    <artifactId>webapp-runner</artifactId>
+                                    <version>9.0.97.0</version>
+                                    <destFileName>webapp-runner.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
 
         </plugins>
     </build>
