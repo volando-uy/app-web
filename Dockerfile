@@ -30,7 +30,7 @@ FROM amazoncorretto:17
 
 WORKDIR /app
 
-ENV ENVIROMENT="PROD"
+ENV ENVIRONMENT="PROD"
 
 COPY tomcat ./tomcat/
 COPY catalina-wrapper.sh .
