@@ -1,36 +1,41 @@
 FROM openjdk:17-alpine AS build
 
+WORKDIR /app
+
+ENV ENVIROMENT="PROD"
+
+# Install Maven and Git
 RUN apk add --no-cache maven git
 
+# Clone the app-central repo
 RUN git clone https://github.com/volando-uy/app-central
 
 WORKDIR /app/app-central/VolandoUY
 
-RUN mvn clean install -DskipTests
+# Install the app-central
+RUN mvn clean install -Dmaven.test.skip=true
 
 WORKDIR /app
 
-RUN mv ./app-central/VolandoUY/target/VolandoUY-1.0-SNAPSHOT.jar ./lib/VolandoUY-1.0-SNAPSHOT.jar
-
+# Copy the project files
 COPY pom.xml .
-
 COPY src ./src
 
-COPY lib ./lib
+# Move the VolandoUY jar to the lib folder
+RUN mkdir lib && mv /app/app-central/VolandoUY/target/VolandoUY-1.0-SNAPSHOT.jar /app/lib/VolandoUY-1.0-SNAPSHOT.jar
 
-RUN mvn clean package dependency:resolve
+# Package the application
+RUN mvn clean package dependency:resolve -Dmaven.test.skip=true
 
 
-FROM ubuntu:latest
+FROM amazoncorretto:17
 
 WORKDIR /app
 
-COPY ./apache-tomcat-11.0.12 ./apache-tomcat-11.0.12
+COPY tomcat ./tomcat/
+COPY catalina-wrapper.sh .
+RUN chmod +x ./catalina-wrapper.sh
 
-COPY --from=build /app/target/app-web-jsp.war ./apache-tomcat-11.0.12/webapps/
+COPY --from=build /app/target/app-web-jsp.war ./tomcat/webapps/
 
-COPY catalina-wrapper.sh /apache-tomcat-11.0.12/bin/catalina-wrapper.sh
-
-RUN chmod +x /usr/local/tomcat/bin/catalina-wrapper.sh
-
-CMD ["catalina-wrapper.sh"]
+CMD ["/app/catalina-wrapper.sh"]
