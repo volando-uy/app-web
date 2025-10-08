@@ -2,8 +2,6 @@ FROM openjdk:17-alpine AS build
 
 WORKDIR /app
 
-ENV ENVIROMENT="PROD"
-
 # Install Maven and Git
 RUN apk add --no-cache maven git
 
@@ -31,6 +29,8 @@ RUN mvn clean package dependency:resolve -Dmaven.test.skip=true
 FROM amazoncorretto:17
 
 WORKDIR /app
+
+ENV ENVIROMENT="PROD"
 
 COPY tomcat ./tomcat/
 COPY catalina-wrapper.sh .
