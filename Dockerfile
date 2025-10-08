@@ -21,4 +21,6 @@ COPY --from=build /app/target/app-web-jsp.war /usr/local/tomcat/webapps/
 
 COPY --from=build /app/catalina-wrapper.sh /usr/local/tomcat/bin/
 
+RUN chmod +x /usr/local/tomcat/bin/catalina-wrapper.sh
+
 CMD ["catalina-wrapper.sh"]
