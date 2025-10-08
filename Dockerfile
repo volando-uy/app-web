@@ -34,7 +34,7 @@ WORKDIR /app
 
 COPY tomcat ./tomcat/
 COPY catalina-wrapper.sh .
-RUN chmod +x ./catalina-wrapper.sh
+RUN chmod +x /app/catalina-wrapper.sh
 
 COPY --from=build /app/target/app-web-jsp.war ./tomcat/webapps/
 
