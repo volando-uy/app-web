@@ -2,4 +2,4 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: catalina-wrapper.sh
+  web: /app/catalina-wrapper.sh
