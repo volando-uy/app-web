@@ -85,12 +85,12 @@
                     <container>
                         <containerId>tomcat10x</containerId>
                         <type>installed</type>
-                        <home>C:/Drivers/apache-tomcat-11.0.12</home> <!-- AJUSTÁ ESTA RUTA -->
+                        <home>${project.basedir}/apache-tomcat-11.0.12</home> <!-- AJUSTÁ ESTA RUTA -->
                     </container>
                     <configuration>
                         <type>standalone</type>
                         <properties>
-                            <cargo.servlet.port>8085</cargo.servlet.port>
+                            <cargo.servlet.port>8080</cargo.servlet.port>
                         </properties>
                     </configuration>
                     <deployables>
@@ -102,29 +102,6 @@
                     </deployables>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals><goal>copy</goal></goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.heroku</groupId>
-                                    <artifactId>webapp-runner</artifactId>
-                                    <version>9.0.97.0</version>
-                                    <destFileName>webapp-runner.jar</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-
 
         </plugins>
     </build>
