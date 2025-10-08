@@ -1,8 +1,16 @@
 FROM openjdk:17-alpine AS build
 
-RUN apk add --no-cache maven
+RUN apk add --no-cache maven git
+
+RUN git clone https://github.com/volando-uy/app-central
+
+WORKDIR /app/app-central/VolandoUY
+
+RUN mvn clean install -DskipTests
 
 WORKDIR /app
+
+RUN mv ./app-central/VolandoUY/target/VolandoUY-1.0-SNAPSHOT.jar ./lib/VolandoUY-1.0-SNAPSHOT.jar
 
 COPY pom.xml .
 
@@ -12,7 +20,7 @@ COPY lib ./lib
 
 COPY catalina-wrapper.sh .
 
-RUN mvn install:install-file -Dfile=lib/VolandoUY-1.0-SNAPSHOT.jar -DgroupId=com.gyabisito -DartifactId=VolandoUY -Dversion=1.0-SNAPSHOT -Dpackaging=jar clean package dependency:resolve
+RUN mvn clean package dependency:resolve
 
 
 FROM tomcat:11.0.0-jdk17
