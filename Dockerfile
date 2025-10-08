@@ -12,7 +12,7 @@ COPY lib ./lib
 
 COPY catalina-wrapper.sh .
 
-RUN mvn install:install-file -Dfile=lib/VolandoUY-1.0-SNAPSHOT.jar -DgroupId=com.gyabisito -DartifactId=VolandoUY -Dversion=1.0-SNAPSHOT -Dpackaging=jar clean package
+RUN mvn install:install-file -Dfile=lib/VolandoUY-1.0-SNAPSHOT.jar -DgroupId=com.gyabisito -DartifactId=VolandoUY -Dversion=1.0-SNAPSHOT -Dpackaging=jar clean package dependency:resolve
 
 
 FROM tomcat:11.0.0-jdk17
