@@ -19,4 +19,6 @@ FROM tomcat:11.0.0-jdk17
 
 COPY --from=build /app/target/app-web-jsp.war /usr/local/tomcat/webapps/
 
+COPY --from=build /app/catalina-wrapper.sh /usr/local/tomcat/bin/
+
 CMD ["catalina-wrapper.sh"]
