@@ -1,1 +1,1 @@
-web: chmod +x apache-tomcat-11.0.12/bin/catalina.sh && apache-tomcat-11.0.12/bin/catalina.sh run
+web: java -jar target/dependency/webapp-runner.jar target/*.war
