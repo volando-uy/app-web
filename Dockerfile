@@ -18,16 +18,18 @@ COPY src ./src
 
 COPY lib ./lib
 
-COPY catalina-wrapper.sh .
-
 RUN mvn clean package dependency:resolve
 
 
-FROM tomcat:11.0.0-jdk17
+FROM ubuntu:latest
 
-COPY --from=build /app/target/app-web-jsp.war /usr/local/tomcat/webapps/
+WORKDIR /app
 
-COPY --from=build /app/catalina-wrapper.sh /usr/local/tomcat/bin/
+COPY ./apache-tomcat-11.0.12 ./apache-tomcat-11.0.12
+
+COPY --from=build /app/target/app-web-jsp.war ./apache-tomcat-11.0.12/webapps/
+
+COPY catalina-wrapper.sh /apache-tomcat-11.0.12/bin/catalina-wrapper.sh
 
 RUN chmod +x /usr/local/tomcat/bin/catalina-wrapper.sh
 
