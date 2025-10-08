@@ -45,8 +45,6 @@
             <groupId>com.gyabisito</groupId>
             <artifactId>VolandoUY</artifactId>
             <version>1.0-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/VolandoUY-1.0-SNAPSHOT.jar</systemPath>
         </dependency>
 
     </dependencies>
