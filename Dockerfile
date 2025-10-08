@@ -3,24 +3,15 @@ FROM openjdk:17-alpine AS build
 WORKDIR /app
 
 # Install Maven and Git
-RUN apk add --no-cache maven git
-
-# Clone the app-central repo
-RUN git clone https://github.com/volando-uy/app-central
-
-WORKDIR /app/app-central/VolandoUY
-
-# Install the app-central
-RUN mvn clean install -Dmaven.test.skip=true
-
-WORKDIR /app
+RUN apk add --no-cache maven
 
 # Copy the project files
 COPY pom.xml .
 COPY src ./src
+COPY lib ./lib
 
 # Move the VolandoUY jar to the lib folder
-RUN mkdir lib && mv /app/app-central/VolandoUY/target/VolandoUY-1.0-SNAPSHOT.jar /app/lib/VolandoUY-1.0-SNAPSHOT.jar
+RUN mv /app/app-central/VolandoUY/target/VolandoUY-1.0-SNAPSHOT.jar /app/lib/VolandoUY-1.0-SNAPSHOT.jar
 
 # Package the application
 RUN mvn clean package dependency:resolve -Dmaven.test.skip=true
