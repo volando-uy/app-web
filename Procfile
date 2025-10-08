@@ -1,1 +1,1 @@
-web: mvn cargo:run
+web: apache-tomcat-11.0.12/bin/catalina.sh run
