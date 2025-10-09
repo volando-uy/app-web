@@ -127,6 +127,22 @@ Esta estructura permite:
 Todo separado, limpio y listo para escalar.
 
 ---
+
+## 🔄 CI/CD
+
+Estamos usando un workflow de Heroku.
+Se activa por cada push a main.
+
+1. Los archivos importantes son el Dockerfile y el Heroku.yml, estos definen el workflow.
+2. Heroku detecta el push y comienza a buildear el Dockerfile.
+   1. Se descarga el JAR desde la app-central y se instala
+   2. Se buildea el WAR de la app-web
+   3. Se modifica el puerto de la aplicación por el generado dinámicamente de Heroku, esto mediante el catalina-wrapper.sh
+   4. Se inicia la aplicación con el catalina.sh
+3. Una vez finalizado el buildeo, se inicia un contenedor con el comando de inicio en Heroku.yaml
+4. Ya quedaría desplegada la [aplicación web](https://volando-uy-c508d037c1a0.herokuapp.com/app-web-jsp/)
+
+---
 Compilar proyecto a servlet y correrlo
 
 **mvn clean package cargo:run**
