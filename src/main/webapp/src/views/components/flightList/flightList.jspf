@@ -1,0 +1,80 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.*" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
+<%@ page import="domain.dtos.flight.BaseFlightDTO" %>
+
+<% { // ----- BLOQUE LOCAL PARA EVITAR VARIABLES DUPLICADAS -----
+    @SuppressWarnings("unchecked")
+    List<BaseFlightDTO> __flights = (List<BaseFlightDTO>) request.getAttribute("flights");
+    boolean __hasFlights = (__flights != null && !__flights.isEmpty());
+    DateTimeFormatter __fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+%>
+
+<section class="w-full flex flex-col items-center justify-center py-8">
+    <div class="w-full max-w-5xl relative">
+        <h2 class="sr-only">Vuelos</h2>
+
+        <% if (!__hasFlights) { %>
+        <div class="w-full rounded-xl border border-yellow-300 bg-yellow-50 p-4 text-yellow-900">
+            <strong>No hay vuelos para mostrar.</strong>
+        </div>
+        <% } else { %>
+        <%
+            boolean __asCarousel = __flights.size() > 3;
+            String __containerClasses = __asCarousel
+                    ? "flex gap-8 w-full overflow-x-auto scroll-smooth no-scrollbar pr-6 -mr-6 pb-6 -mb-6 snap-x snap-mandatory"
+                    : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 w-full";
+        %>
+
+        <div id="flight-list-container" class="<%= __containerClasses %>">
+            <% for (BaseFlightDTO f : __flights) {
+                String __img = (f.getImage() != null && !f.getImage().isEmpty())
+                        ? f.getImage()
+                        : "https://via.placeholder.com/640x360?text=Vuelo";
+                String __dep = (f.getDepartureTime() != null) ? __fmt.format(f.getDepartureTime()) : "--";
+                String __min = (f.getDuration() != null) ? String.valueOf(f.getDuration()) : "0";
+            %>
+            <div class="bg-gray-50 rounded-2xl shadow-lg overflow-hidden flex flex-col
+                      <%= __asCarousel ? "min-w-[320px] max-w-xs w-full flex-shrink-0 snap-start" : "" %>">
+                <div class="relative">
+                    <img src="<%= __img %>" alt="<%= f.getName() %>" class="w-full h-40 object-cover" />
+                    <div class="absolute bottom-0 left-0 w-full px-4 py-2 bg-gradient-to-t from-black/70 to-transparent">
+                        <span class="text-white text-xs font-light">VUELO</span>
+                    </div>
+                </div>
+                <div class="p-4 flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900"><%= f.getName() %></h3>
+                    <p class="text-gray-500 text-sm">Sale: <%= __dep %></p>
+                    <p class="text-gray-500 text-sm">Duración: <%= __min %> min</p>
+                </div>
+            </div>
+            <% } %>
+        </div>
+
+        <% if (__asCarousel) { %>
+        <!-- Flecha izquierda -->
+        <button id="flight-prev" aria-label="Anterior"
+                class="absolute left-0 top-1/2 -translate-y-1/2 z-10
+                 bg-black/40 hover:bg-black/70 text-white rounded-full
+                 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center focus:outline-none">
+            <svg class="w-5 md:w-7 h-5 md:h-7" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+
+        <!-- Flecha derecha -->
+        <button id="flight-next" aria-label="Siguiente"
+                class="absolute right-0 top-1/2 -translate-y-1/2 z-10
+                 bg-black/40 hover:bg-black/70 text-white rounded-full
+                 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center focus:outline-none">
+            <svg class="w-5 md:w-7 h-5 md:h-7" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <% } %>
+
+        <script defer src="${pageContext.request.contextPath}/src/views/components/flightList/flightList.js"></script>
+        <% } %>
+    </div>
+</section>
+
+
+<% } %>

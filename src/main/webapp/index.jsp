@@ -1,42 +1,42 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" language="java" %>
+<%
+    // Si entran directo al JSP (sin pasar por el servlet), reenviamos al servlet /index
+    if (request.getAttribute("packages") == null || request.getAttribute("flights") == null) {
+        request.getRequestDispatcher("/index").forward(request, response);
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Volando Index</title>
-	<script src="https://cdn.tailwindcss.com"></script>
-	<script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { brand: "#0B4C73" }
-        }
-      }
-    }
-	</script>
-	<link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Volando Index</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { brand: "#0B4C73" } } } }
+    </script>
+
 </head>
-<body class="bg-brand-900 min-h-screen flex flex-col">
-	<!-- Header dinámico -->
-	<div id="header-container"></div>
+<body class="bg-brand/10 min-h-screen flex flex-col">
 
-	<!-- Contenido principal: paquetes y vuelos -->
-	<main class="flex-1 container mx-auto px-4 py-8 flex flex-col">
-		<div id="paquetes" class="w-full opacity-0 translate-y-8 transition-all duration-700 mb-8"></div>
-		<div id="vuelos" class="w-full opacity-0 translate-y-8 transition-all duration-700"></div>
-	</main>
+<div id="header-container"></div>
 
-	<!-- Footer dinámico (UNICO contenedor) -->
-	<div id="footer-container" class="mt-auto"></div>
+<main class="flex-1 container mx-auto px-4 py-8 flex flex-col gap-12">
+    <section id="paquetes" class="w-full">
+        <%@ include file="/src/views/components/packageList/packageList.jspf" %>
+    </section>
 
-	<!-- carga principal de scripts -->
-	<script src="index.js"></script>
-</body>
-</html>
-	<div id="footer-container" class="mt-auto"></div>
+    <section id="vuelos" class="w-full">
+        <%@ include file="/src/views/components/flightList/flightList.jspf" %>
+    </section>
+</main>
 
-	<!-- script del menú derecho (necesario para inyección) -->
-	<script src="src/views/components/leftPanel/leftPanel.js"></script>
- 	<script src="/public/index.js"></script>
+<div id="footer-container" class="mt-auto"></div>
+
+<script>window.__BASE__ = "${pageContext.request.contextPath}";</script>
+<script src="${pageContext.request.contextPath}/index.js"></script>
 </body>
 </html>
