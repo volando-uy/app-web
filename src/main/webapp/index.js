@@ -1,65 +1,77 @@
-// // Animación
-// function animateOnScroll(element) {
-//   if (!element) return;
-//   element.classList.add("opacity-0","translate-y-8","transition-all","duration-700");
-//   const observer = new IntersectionObserver((entries, obs) => {
-//     entries.forEach(entry => {
-//       if (entry.isIntersecting) {
-//         entry.target.classList.add("opacity-100","translate-y-0");
-//         entry.target.classList.remove("opacity-0","translate-y-8");
-//         obs.unobserve(entry.target);
-//       }
-//     });
-//   }, { threshold: 0.2 });
-//   observer.observe(element);
-// }
-//
-// // Header
-// async function injectHeader() {
-//   const container = document.getElementById("header-container");
-//   const res = await fetch("src/views/header/header.html");
-//   container.innerHTML = await res.text();
-//   const script = document.createElement("script");
-//   script.src = "src/views/header/header.js";
-//   script.onload = () => { if (typeof initHeader === "function") initHeader(); };
-//   document.body.appendChild(script);
-// }
-//
-// // Footer
-// async function injectFooter() {
-//   const container = document.getElementById("footer-container");
-//   const res = await fetch("src/views/footer/footer.html");
-//   container.innerHTML = await res.text();
-// }
-//
-// // Paquetes
-// async function injectPackageList() {
-//   const container = document.getElementById("paquetes");
-//   const res = await fetch("src/views/components/packageList/packageList.html");
-//   container.innerHTML = await res.text();
-//   animateOnScroll(container);
-//   const script = document.createElement("script");
-//   script.src = "src/views/components/packageList/packageList.js";
-//   document.body.appendChild(script);
-// }
-//
-// // Vuelos (inyecta HTML y luego llama initFlights cuando cargue el JS)
-// async function injectFlightList() {
-//   const container = document.getElementById("vuelos");
-//   const res = await fetch("src/views/components/flightList/flightList.html");
-//   container.innerHTML = await res.text();
-//   animateOnScroll(container);
-//
-//   const script = document.createElement("script");
-//   script.src = "src/views/components/flightList/flightList.js";
-//   script.onload = () => { if (typeof initFlights === "function") initFlights(); };
-//   document.body.appendChild(script);
-// }
-//
-// window.addEventListener("DOMContentLoaded", () => {
-//   injectHeader();
-//   injectFooter();
-//   injectPackageList();
-//   injectFlightList();
-//   animateOnScroll(document.getElementById("footer-container"));
-// });
+// index.js
+
+(function () {
+    function getBase() {
+        if (window.__BASE__) return window.__BASE__;
+        var m = location.pathname.match(/^\/[^/]+/);
+        return m ? m[0] : "";
+    }
+    var BASE = getBase();
+
+    function $(sel, ctx) { return (ctx || document).querySelector(sel); }
+
+    function animateOnScroll(el) {
+        if (!el) return;
+        el.classList.add("opacity-0", "translate-y-8", "transition-all", "duration-700");
+        var obs = new IntersectionObserver(function (entries, o) {
+            entries.forEach(function (e) {
+                if (e.isIntersecting) {
+                    e.target.classList.add("opacity-100", "translate-y-0");
+                    e.target.classList.remove("opacity-0", "translate-y-8");
+                    o.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.18 });
+        obs.observe(el);
+    }
+
+    async function injectHeader() {
+        var container = $("#header-container");
+        if (!container) return;
+        try {
+            var res = await fetch(BASE + "/src/views/header/header.html", { cache: "no-cache" });
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            container.innerHTML = await res.text();
+
+            // Cargar el JS del header (si existe)
+            var script = document.createElement("script");
+            script.src = BASE + "/src/views/header/header.js";
+            script.defer = true;
+            script.onload = function () {
+                try { if (typeof window.initHeader === "function") window.initHeader(); } catch (_) {}
+            };
+            document.body.appendChild(script);
+        } catch (err) {
+            console.warn("[header] No se pudo inyectar:", err);
+        }
+    }
+
+    async function injectFooter() {
+        var container = $("#footer-container");
+        if (!container) return;
+        try {
+            var res = await fetch(BASE + "/src/views/footer/footer.html", { cache: "no-cache" });
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            container.innerHTML = await res.text();
+
+        } catch (err) {
+            console.warn("[footer] No se pudo inyectar:", err);
+        }
+    }
+
+    function init() {
+         injectHeader();
+        injectFooter();
+
+        // Animaciones suaves
+        animateOnScroll(document.getElementById("paquetes"));
+        animateOnScroll(document.getElementById("vuelos"));
+        animateOnScroll(document.getElementById("footer-container"));
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+})();
