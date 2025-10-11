@@ -91,7 +91,7 @@ function setupHeaderLinks() {
 
 // Asegura que el link de login siempre funcione
 function forceLoginLink() {
-  const links = document.querySelectorAll('[data-target="register/register.html"]');
+  const links = document.querySelectorAll('[data-target="register/register.jsp"]');
   links.forEach(a => {
     a.addEventListener('click', (e) => {
       const target = a.getAttribute('data-target');
@@ -138,31 +138,31 @@ function renderHeaderByRole() {
 
   // Base (desktop)
   const baseUserLinks = [
-    { text: "Vuelos", target: "flightf/flight.html" },
-    { text: "Paquetes", target: "package/package.html" }
+    { text: "Vuelos", target: "flightf/flight.jsp" },
+    { text: "Paquetes", target: "package/package.jsp" }
   ];
   const baseAirlineLinks = [
     { text: "Varios", target: "createCity&Category/createCityAndCategory.jsp" },
     { text: "Crear vuelo", target: "createFlight/createFlight.jsp" },
-    { text: "Crear ruta de vuelo", target: "createFlightRoute/createflightRoute.html" },
+    { text: "Crear ruta de vuelo", target: "createFlightRoute/createflightRoute.jsp" },
     { text: "Rutas de vuelo", target: "checkflightroute/checkflightroute.html" },
-    { text: "Paquetes", target: "checkPackage/checkPackage.html" }
+    { text: "Paquetes", target: "checkPackage/checkPackage.jsp" }
   ];
   const baseAdminLinks = [
-    { text: "Aceptar rutas", target: "acceptFlightRoute/acceptFlightRoute.html" },
-    { text: "Vuelos", target: "flightf/flight.html" },
-    { text: "Paquetes", target: "package/package.html" }
+    { text: "Aceptar rutas", target: "acceptFlightRoute/acceptFlightRoute.jsp" },
+    { text: "Vuelos", target: "flightf/flight.jsp" },
+    { text: "Paquetes", target: "package/package.jsp" }
   ];
 
   // Extras SOLO mobile (sin 'Mi perfil')
   const extraUserLinks = [
-    { text: "Panel Reservas", target: "reservationPanel/reservationPanel.html" }
+    { text: "Panel Reservas", target: "reservationPanel/reservationPanel.jsp" }
   ];
   const extraAirlineLinks = [
     { text: "Panel aerolínea", target: "adminPanel/adminPanel.html" },
-    { text: "Panel Reservas", target: "reservationPanel/reservationPanel.html" }
+    { text: "Panel Reservas", target: "reservationPanel/reservationPanel.jsp" }
   ];
-  const extraAdminLinks = [{ text:"Panel Reservas", target:"reservationPanel/reservationPanel.html" }];
+  const extraAdminLinks = [{ text:"Panel Reservas", target:"reservationPanel/reservationPanel.jsp" }];
 
   // Estilo unificado tipo “pill”
   const makeA = (item, extra="") =>

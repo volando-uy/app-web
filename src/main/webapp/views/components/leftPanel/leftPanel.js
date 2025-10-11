@@ -37,10 +37,10 @@
 
   async function loadTemplate(){
     const guesses = [
-      'leftPanel.html',
-      '../components/leftPanel/leftPanel.html',
-      '../../views/components/leftPanel/leftPanel.html',
-      '/public/src/views/components/leftPanel/leftPanel.html',
+      'leftPanel.jsp',
+      '../components/leftPanel/leftPanel.jsp',
+      '../../views/components/leftPanel/leftPanel.jsp',
+      '/public/src/views/components/leftPanel/leftPanel.jsp',
       // fallback (por compatibilidad previa):
       'rightMenu.html',
       '../components/rightMenu/rightMenu.html',
@@ -112,26 +112,26 @@
   }
 
   if(!ctx.role){
-    addLink('Iniciar sesión','register/register.html','🔐');
+    addLink('Iniciar sesión','register/register.jsp','🔐');
   } else if (ctx.role==='user'){
-    addLink('Buscar vuelos','flightf/flight.html','✈️');
-    addLink('Panel Reservas','reservationPanel/reservationPanel.html','🧾');
-    addLink('Paquetes','package/package.html','🎒');
+    addLink('Buscar vuelos','flightf/flight.jsp','✈️');
+    addLink('Panel Reservas','reservationPanel/reservationPanel.jsp','🧾');
+    addLink('Paquetes','package/package.jsp','🎒');
   } else if (ctx.role==='airline'){
     addLink('Panel aerolínea','adminPanel/adminPanel.html','🛠️');
-    addLink('Rutas de vuelo','checkflightroute/checkflightroute.html','🧭');
+    addLink('Rutas de vuelo','checkflightroute/checkflightroute.jsp','🧭');
     addLink('Crear vuelo','createFlight/createFlight.jsp','✈️');
-    addLink('Crear ruta de vuelo','createFlightRoute/createflightRoute.html','🧭');
-    addLink('Crear paquete','createPackage/createPackage.html','🆕');
-    addLink('Mis paquetes','checkPackage/checkPackage.html','📦');
-    addLink('Panel Reservas','reservationPanel/reservationPanel.html','🧾');
-    addLink('Paquetes','package/package.html','🎒');
+    addLink('Crear ruta de vuelo','createFlightRoute/createflightRoute.jsp','🧭');
+    addLink('Crear paquete','createPackage/createPackage.jsp','🆕');
+    addLink('Mis paquetes','checkPackage/checkPackage.jsp','📦');
+    addLink('Panel Reservas','reservationPanel/reservationPanel.jsp','🧾');
+    addLink('Paquetes','package/package.jsp','🎒');
   } else if (ctx.role==='admin'){
     // Eliminar Panel Reservas si existe en la plantilla base
-    const pr = list.querySelector('[data-route="reservationPanel/reservationPanel.html"]')?.closest('li');
+    const pr = list.querySelector('[data-route="reservationPanel/reservationPanel.jsp"]')?.closest('li');
     if(pr) pr.remove();
     // Añadir sólo Aceptar rutas
-    addLink('Aceptar rutas','acceptFlightRoute/acceptFlightRoute.html','🛡️');
+    addLink('Aceptar rutas','acceptFlightRoute/acceptFlightRoute.jsp','🛡️');
   }
 
   function resolve(route){
