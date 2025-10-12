@@ -22,7 +22,7 @@
 </head>
 <body class="bg-brand/10 min-h-screen flex flex-col">
 
-<div id="header-container"></div>
+<jsp:include page="src/views/header/header.jsp" />
 
 <main class="flex-1 container mx-auto px-4 py-8 flex flex-col gap-12">
     <section id="paquetes" class="w-full">
@@ -34,7 +34,7 @@
     </section>
 </main>
 
-<div id="footer-container" class="mt-auto"></div>
+<jsp:include page="src/views/footer/footer.jspf" />
 
 <script>window.__BASE__ = "${pageContext.request.contextPath}";</script>
 <script src="${pageContext.request.contextPath}/index.js"></script>
