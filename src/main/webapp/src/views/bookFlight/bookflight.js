@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="bg-white p-6 rounded-xl shadow-md text-center">
         <h2 class="text-xl font-bold text-brand mb-2">No hay vuelo seleccionado</h2>
         <p class="text-gray-600 mb-4">Vuelve a la búsqueda y selecciona un vuelo para reservar.</p>
-        <div><a href="../flightf/flight.html" class="px-4 py-2 bg-orange-500 text-white rounded">Volver a vuelos</a></div>
+        <div><a href="../flightf/bookFlight.jsp" class="px-4 py-2 bg-orange-500 text-white rounded">Volver a vuelos</a></div>
       </div>
     `;
     return;
@@ -190,7 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
     addPassengerRow();
   });
 
-  document.getElementById('btn-back').addEventListener('click', ()=> location.href = '../flightf/flight.html');
+  document.getElementById('btn-back').addEventListener('click', ()=> location.href = '../flightf/bookFlight.jsp');
 
   document.getElementById('btn-confirm').addEventListener('click', submitBooking);
 
