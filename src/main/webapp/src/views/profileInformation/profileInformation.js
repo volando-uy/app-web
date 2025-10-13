@@ -122,7 +122,7 @@ function renderProfile() {
   `;
 
   document.getElementById("btn-edit-profile")?.addEventListener("click", () => {
-    location.href = "../profile/profile.html";
+    location.href = "../profile/profile.jsp";
   });
   document.getElementById("btn-back-to-home")?.addEventListener("click", () => {
     location.href = "/public/index.html";

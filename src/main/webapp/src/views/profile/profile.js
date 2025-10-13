@@ -1,72 +1,75 @@
-document.addEventListener("DOMContentLoaded", () => {
-  // Simulación: datos guardados al iniciar sesión
-  const user = JSON.parse(localStorage.getItem("userData")) || {
-    tipo: "cliente", // "aerolinea" o "cliente"
-    nickname: "juan123",
-    nombre: "Juan",
-    apellido: "Pérez",
-    email: "juan@example.com",
-    fechaNacimiento: "1995-05-20",
-    tipoDoc: "ci",
-    documento: "12345678",
-    nacionalidad: "Uruguayo",
-    web: "https://mi-aerolinea.com",
-    descripcion: "Aerolinea líder en el mercado"
-  };
+document.addEventListener("DOMContentLoaded", async () => {
+    const nickname = new URLSearchParams(window.location.search).get("nickname");
+    const form = document.getElementById("profileForm");
 
-  // Rellenar formulario
-  document.getElementById("nickname").value = user.nickname;
-  document.getElementById("nombre").value = user.nombre;
-  document.getElementById("email").value = user.email;
-
-  if (user.tipo === "cliente") {
-    document.getElementById("apellido").value = user.apellido;
-    document.getElementById("fechaNacimiento").value = user.fechaNacimiento;
-    document.getElementById("tipoDoc").value = user.tipoDoc;
-    document.getElementById("documento").value = user.documento;
-    document.getElementById("nacionalidad").value = user.nacionalidad;
-  } else if (user.tipo === "aerolinea") {
-    // Ocultar campos de cliente
-    document.getElementById("apellidoField").classList.add("hidden");
-    document.getElementById("fechaNacimientoField").classList.add("hidden");
-    document.getElementById("docFields").classList.add("hidden");
-    document.getElementById("nacionalidadField").classList.add("hidden");
-
-    // Mostrar campos de aerolínea
-    document.getElementById("webField").classList.remove("hidden");
-    document.getElementById("descripcionField").classList.remove("hidden");
-
-    document.getElementById("web").value = user.web;
-    document.getElementById("descripcion").value = user.descripcion;
-  }
-
-  // Guardar cambios
-  document.getElementById("profileForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    if (user.tipo === "cliente") {
-      user.nombre = document.getElementById("nombre").value;
-      user.apellido = document.getElementById("apellido").value;
-      user.email = document.getElementById("email").value;
-      user.fechaNacimiento = document.getElementById("fechaNacimiento").value;
-      user.tipoDoc = document.getElementById("tipoDoc").value;
-      user.documento = document.getElementById("documento").value;
-      user.nacionalidad = document.getElementById("nacionalidad").value;
-    } else {
-      user.nombre = document.getElementById("nombre").value;
-      user.email = document.getElementById("email").value;
-      user.web = document.getElementById("web").value;
-      user.descripcion = document.getElementById("descripcion").value;
+    if (!nickname) {
+        alert("❌ No se encontró el usuario.");
+        return;
     }
 
-    // Guardar en localStorage (simulación de guardar en BD)
-    localStorage.setItem("userData", JSON.stringify(user));
+    // Obtener datos del usuario (desde el backend)
+    try {
+        const response = await fetch(`getUserData?nickname=${nickname}`);
+        const user = await response.json();
 
-    alert("✅ Datos actualizados correctamente");
-  });
+        if (!user) throw new Error("Usuario no encontrado");
 
-  document.getElementById("volver").addEventListener("click", () => {
-    window.location.href = "/public/index.html";
-  });
+        document.getElementById("nickname").value = user.nickname;
+        document.getElementById("nombre").value = user.name || "";
+        document.getElementById("email").value = user.email || "";
+
+        if (user.type === "CUSTOMER") {
+            // Mostrar campos cliente
+            document.getElementById("apellido").value = user.surname || "";
+            document.getElementById("fechaNacimiento").value = user.birthDate || "";
+            document.getElementById("tipoDoc").value = user.docType || "CI";
+            document.getElementById("documento").value = user.numDoc || "";
+            document.getElementById("nacionalidad").value = user.citizenship || "";
+        } else if (user.type === "AIRLINE") {
+            // Ocultar campos cliente
+            document.getElementById("apellidoField").classList.add("hidden");
+            document.getElementById("fechaNacimientoField").classList.add("hidden");
+            document.getElementById("docFields").classList.add("hidden");
+            document.getElementById("nacionalidadField").classList.add("hidden");
+
+            // Mostrar campos aerolínea
+            document.getElementById("webField").classList.remove("hidden");
+            document.getElementById("descripcionField").classList.remove("hidden");
+
+            document.getElementById("web").value = user.web || "";
+            document.getElementById("descripcion").value = user.description || "";
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Error al cargar el usuario.");
+    }
+
+    // Enviar formulario
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        try {
+            const response = await fetch(form.action, {
+                method: "POST",
+                body: formData
+            });
+
+            if (response.ok) {
+                alert("✅ Perfil actualizado correctamente");
+                window.location.href = `profile.jsp?nickname=${nickname}`;
+            } else {
+                alert("❌ Error al actualizar el perfil");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error de conexión al servidor");
+        }
+    });
+
+    // Volver
+    document.getElementById("volver").addEventListener("click", () => {
+        window.location.href = "index.jsp";
+    });
 });
-
