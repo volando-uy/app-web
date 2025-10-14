@@ -46,7 +46,6 @@
             <artifactId>VolandoUY</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -75,20 +74,21 @@
                 </configuration>
             </plugin>
 
-            <!-- Desplegar automáticamente en Tomcat 10 (local) con Cargo -->
+            <!-- Desplegar automáticamente en Tomcat 10 (local) con Cargo actualizado -->
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
-                <artifactId>cargo-maven2-plugin</artifactId>
+                <artifactId>cargo-maven3-plugin</artifactId>
+                <version>1.9.0</version> <!-- ⚠️ ¡Versión agregada! -->
                 <configuration>
                     <container>
                         <containerId>tomcat10x</containerId>
                         <type>installed</type>
-                        <home>${project.basedir}/apache-tomcat-11.0.12</home> <!-- AJUSTÁ ESTA RUTA -->
+                        <home>${project.basedir}/tomcat</home> <!-- Ruta a tu Tomcat local -->
                     </container>
                     <configuration>
                         <type>standalone</type>
                         <properties>
-                            <cargo.servlet.port>8080</cargo.servlet.port>
+                            <cargo.servlet.port>8085</cargo.servlet.port>
                         </properties>
                     </configuration>
                     <deployables>
@@ -100,7 +100,9 @@
                     </deployables>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
+
 
 </project>

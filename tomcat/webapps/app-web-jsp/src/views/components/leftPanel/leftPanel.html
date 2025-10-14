@@ -1,0 +1,39 @@
+<aside id="rightMenu">
+  <!-- ...existing code from old rightMenu.html (contenido original) ... -->
+  <div class="rm-head mb-4 w-full">
+    <div class="flex items-start gap-3 w-full">
+      <img src="/assets/images/default-avatar.png"
+           class="rm-avatar w-12 h-12 shrink-0 rounded-full ring-1 ring-black/5 object-cover bg-white/10" alt="">
+      <div class="min-w-0">
+        <h3 id="rm-name" class="text-base font-semibold leading-tight truncate">Visitante</h3>
+        <span id="rm-role" class="text-xs text-gray-200/80">Sesión no iniciada</span>
+      </div>
+    </div>
+  </div>
+  <nav class="w-full">
+    <ul id="rm-list" class="w-full space-y-1 text-sm">
+      <li>
+        <a href="#" data-route="profileInformation/profileInformation.html"
+           class="rm-link group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/30">
+          <span class="text-[15px]">ℹ️</span>
+          <span class="flex-1 truncate">Información</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" data-route="detailsProfile/detailsProfile.html"
+           class="rm-link flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10">
+          <span>✏️</span>
+          <span class="flex-1 truncate">Info perfil</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" data-route="reservationPanel/reservationPanel.html"
+           class="rm-link flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10">
+          <span>🧾</span>
+          <span class="flex-1 truncate">Panel Reservas</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <hr class="my-4 border-white/20">
+</aside>
