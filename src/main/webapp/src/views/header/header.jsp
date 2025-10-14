@@ -4,7 +4,7 @@
 <c:url var="homeUrl"     value="/index"/>
 <c:url var="flightsUrl"  value="/flight/list"/>
 <c:url var="packagesUrl" value="/packages/list"/>
-<c:url var="loginUrl"    value="/"/>
+<c:url var="loginUrl"    value="/users/login"/>
 
 <header class="sticky top-0 z-50 bg-brand text-white shadow-md">
     <div class="container mx-auto px-4 py-3 flex items-center justify-between">
