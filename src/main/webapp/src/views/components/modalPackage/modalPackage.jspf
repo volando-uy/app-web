@@ -1,0 +1,95 @@
+<%-- Usa taglibs de package.jsp --%>
+<c:if test="${not empty modalPackage}">
+    <c:set var="mp" value="${modalPackage}" />
+
+    <c:url var="backUrl" value="/packages/list">
+        <c:if test="${not empty param.q}"><c:param name="q" value="${param.q}" /></c:if>
+    </c:url>
+
+    <div id="modal-package" class="fixed inset-0 z-[50] flex items-center justify-center">
+        <a href="${backUrl}" class="absolute inset-0 bg-black/40" aria-label="Cerrar modal"></a>
+
+        <div role="dialog" aria-modal="true" aria-labelledby="modal-package-title"
+             class="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-[92%] md:w-full p-0 overflow-hidden">
+            <a href="${backUrl}"
+               class="absolute top-3 right-3 text-white/80 hover:text-white text-2xl leading-none"
+               aria-label="Cerrar" title="Cerrar">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                <span class="sr-only">Cerrar</span>
+            </a>
+
+            <div class="bg-gradient-to-r from-brand to-[#0b3d59] text-white p-6">
+                <h2 id="modal-package-title" class="text-2xl font-extrabold tracking-wide">
+                    <c:out value="${mp.name}"/>
+                </h2>
+                <div class="text-sm opacity-90 mt-2"><c:out value="${mp.description}"/></div>
+
+                <div class="flex flex-wrap gap-2 mt-3 text-xs">
+                    <c:if test="${not empty mp.seatType}">
+                        <span class="px-3 py-1 bg-white/15 rounded-full">Asiento: <c:out value="${mp.seatType}"/></span>
+                    </c:if>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="text-3xl font-bold text-emerald-600"><c:out value="${mp.totalStr}"/></div>
+                    <div class="text-xs text-gray-500 uppercase tracking-wider">Suma rutas (ref.)</div>
+                    <div class="text-right text-lg font-semibold text-gray-700"><c:out value="${mp.totalStr}"/></div>
+                </div>
+
+                <div class="border rounded-xl overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50 text-gray-600">
+                        <tr>
+                            <th class="text-left px-3 py-2">Ruta</th>
+                            <th class="text-left px-3 py-2">Aerol&iacute;nea</th>
+                            <th class="text-right px-3 py-2">Precio (turista)</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <c:choose>
+                            <c:when test="${not empty mp.routes}">
+                                <c:forEach var="r" items="${mp.routes}">
+                                    <c:url var="urlRoute" value="/packages/list">
+                                        <c:param name="modal" value="${mp.name}" />
+                                        <c:param name="route" value="${r.code}" />
+                                        <c:if test="${not empty param.q}"><c:param name="q" value="${param.q}" /></c:if>
+                                    </c:url>
+                                    <tr class="border-t">
+                                        <td class="px-3 py-2">
+                                            <a href="${urlRoute}#modal-route" class="text-brand hover:underline">
+                                                <c:out value="${r.origin}"/> &rarr; <c:out value="${r.destination}"/>
+                                                <span class="text-gray-400 ml-1">(<c:out value="${r.code}"/>)</span>
+                                            </a>
+                                        </td>
+                                        <td class="px-3 py-2"><c:out value="${r.airline}"/></td>
+                                        <td class="px-3 py-2 text-right"><c:out value="${r.priceTouristStr}"/></td>
+                                    </tr>
+                                </c:forEach>
+                            </c:when>
+                            <c:otherwise>
+                                <tr><td colspan="3" class="px-3 py-6 text-center text-gray-500">
+                                    Este paquete no tiene rutas asociadas.
+                                </td></tr>
+                            </c:otherwise>
+                        </c:choose>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 mt-4">
+                    <a href="${backUrl}" class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50">Cerrar</a>
+
+                        <%-- TODO: cambiá el destino si tu flujo real de compra es otro --%>
+                    <c:url var="buyUrl" value="/buypackage">
+                        <c:param name="pkg" value="${mp.name}" />
+                    </c:url>
+                    <a href="${buyUrl}" class="px-4 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600">
+                        Comprar paquete
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</c:if>

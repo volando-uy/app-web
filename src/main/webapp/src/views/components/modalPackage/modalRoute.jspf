@@ -1,0 +1,67 @@
+<%-- Usa taglibs de package.jsp --%>
+<c:if test="${not empty modalRoute}">
+    <c:set var="mr" value="${modalRoute}" />
+
+    <c:url var="backToPkg" value="/packages/list">
+        <c:param name="modal" value="${mr.pkgName}" />
+        <c:if test="${not empty param.q}"><c:param name="q" value="${param.q}" /></c:if>
+    </c:url>
+
+    <div id="modal-route" class="fixed inset-0 z-[60] flex items-center justify-center">
+        <a href="${backToPkg}" class="absolute inset-0 bg-black/50" aria-label="Cerrar modal"></a>
+
+        <div role="dialog" aria-modal="true" aria-labelledby="modal-route-title"
+             class="relative bg-white rounded-2xl shadow-2xl max-w-3xl w-[94%] md:w-full overflow-hidden">
+            <a href="${backToPkg}"
+               class="absolute top-3 right-3 text-white/90 hover:text-white text-2xl leading-none z-10"
+               aria-label="Cerrar" title="Cerrar">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                <span class="sr-only">Cerrar</span>
+            </a>
+
+            <div class="relative h-44 md:h-56 bg-gray-200">
+                <img src="${mr.image}"
+                     onerror="this.src='https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop'"
+                     alt="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                <div class="absolute bottom-3 left-4 right-12 text-white">
+                    <h3 id="modal-route-title" class="text-2xl font-extrabold tracking-wide">
+                        <c:out value="${mr.code}"/>
+                    </h3>
+                    <div class="opacity-90">
+                        <c:out value="${mr.origin}"/> &rarr; <c:out value="${mr.destination}"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <div class="flex flex-wrap gap-2 mb-4 text-xs">
+                    <c:if test="${not empty mr.status}">
+                        <span class="px-3 py-1 rounded-full bg-gray-100">Estado: <c:out value="${mr.status}"/></span>
+                    </c:if>
+                    <c:if test="${not empty mr.airline}">
+                        <span class="px-3 py-1 rounded-full bg-gray-100">Aerol&iacute;nea: <c:out value="${mr.airline}"/></span>
+                    </c:if>
+                    <c:if test="${not empty mr.seatType}">
+                        <span class="px-3 py-1 rounded-full bg-gray-100">Cabina: <c:out value="${mr.seatType}"/></span>
+                    </c:if>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="border rounded-xl p-4">
+                        <div class="text-sm text-gray-500 mb-1">Precio turista</div>
+                        <div class="text-xl font-bold"><c:out value="${mr.priceTouristStr}"/></div>
+                    </div>
+                    <div class="border rounded-xl p-4">
+                        <div class="text-sm text-gray-500 mb-1">Precio business</div>
+                        <div class="text-xl font-bold"><c:out value="${mr.priceBusinessStr}"/></div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end mt-6">
+                    <a href="${backToPkg}" class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50">Volver</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</c:if>

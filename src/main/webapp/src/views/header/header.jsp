@@ -2,8 +2,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <c:url var="homeUrl"     value="/index"/>
-<c:url var="flightsUrl"  value="/book-flight"/>
-<c:url var="packagesUrl" value="/index#paquetes"/>
+<c:url var="flightsUrl"  value="/flight/list"/>
+<c:url var="packagesUrl" value="/packages/list"/>
 <c:url var="loginUrl"    value="/"/>
 
 <header class="sticky top-0 z-50 bg-brand text-white shadow-md">
