@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Panel de Reservas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{brand:"#0B4C73"}}}};</script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+  <div id="header"></div>
+  <main class="flex-1 container mx-auto px-4 py-8">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <aside id="rightMenu" class="hidden lg:block"></aside>
+      <section class="lg:col-span-3 space-y-6">
+        <h1 class="text-2xl font-bold text-brand">Panel de Reservas</h1>
+        <div id="rp-alert" class="hidden p-4 rounded bg-yellow-100 text-yellow-800 text-sm"></div>
+
+        <!-- Controles dinámicos -->
+        <div id="rp-filters" class="space-y-4"></div>
+
+        <!-- Listas dinámicas -->
+        <div id="rp-results" class="space-y-6"></div>
+
+        <!-- Detalle de reserva -->
+        <div id="rp-detail" class="hidden bg-white rounded-xl shadow p-6"></div>
+      </section>
+    </div>
+  </main>
+  <div id="footer"></div>
+  <script src="../components/leftPanel/leftPanel.js"></script>
+  <script src="reservationPanel.js"></script>
+</body>
+</html>

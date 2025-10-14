@@ -18,6 +18,11 @@
     <script>
         tailwind.config = { theme: { extend: { colors: { brand: "#0B4C73" } } } }
     </script>
+    <!-- Notyf CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+
+    <!-- Notyf JS -->
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 
 </head>
 <body class="bg-brand/10 min-h-screen flex flex-col">
@@ -35,8 +40,26 @@
 </main>
 
 <jsp:include page="src/views/footer/footer.jspf" />
+<div id="toast-container" class="fixed top-5 right-5 z-50 space-y-2"></div>
 
 <script>window.__BASE__ = "${pageContext.request.contextPath}";</script>
 <script src="${pageContext.request.contextPath}/index.js"></script>
+<script>
+    const notyf = new Notyf({
+        duration: 3000,
+        position: {
+            x: 'right',
+            y: 'top',
+        }
+    });
+
+    // Mostrar un toast desde el backend
+    <% String toastMessage = (String) request.getAttribute("toastMessage"); %>
+    <% String toastType = (String) request.getAttribute("toastType"); %>
+    <% if (toastMessage != null) { %>
+    notyf.<%= toastType != null ? toastType : "success" %>("<%= toastMessage %>");
+    <% } %>
+</script>
+
 </body>
 </html>

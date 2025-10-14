@@ -1,0 +1,96 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.*" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
+<%@ page import="domain.dtos.flight.BaseFlightDTO" %>
+
+<%
+    @SuppressWarnings("unchecked")
+    List<BaseFlightDTO> flights = (List<BaseFlightDTO>) request.getAttribute("flights");
+    boolean hasFlights = (flights != null && !flights.isEmpty());
+
+    DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    boolean asCarousel = hasFlights && flights.size() > 3;
+
+    String containerClasses = asCarousel
+            ? "flex gap-6 w-full overflow-x-auto scroll-smooth no-scrollbar pr-6 -mr-6 pb-6 -mb-6 snap-x snap-mandatory"
+            : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full";
+%>
+
+<section class="w-full flex flex-col items-center justify-center py-8">
+    <div class="w-full max-w-5xl relative">
+
+        <% if (!hasFlights) { %>
+        <div class="w-full rounded-xl border border-yellow-300 bg-yellow-50 p-4 text-yellow-900">
+            <strong>No hay vuelos para mostrar.</strong>
+        </div>
+        <% } else { %>
+
+        <div id="flight-list-container" class="<%= containerClasses %>">
+            <% for (BaseFlightDTO f : flights) {
+                String img = (f.getImage() != null && !f.getImage().isEmpty())
+                        ? f.getImage()
+                        : "https://via.placeholder.com/640x360?text=Vuelo";
+                String dep = (f.getDepartureTime() != null) ? fmt.format(f.getDepartureTime()) : "--";
+                String mins = (f.getDuration() != null) ? String.valueOf(f.getDuration()) : "--";
+                String eco  = (f.getMaxEconomySeats() != null) ? String.valueOf(f.getMaxEconomySeats()) : "--";
+                String bus  = (f.getMaxBusinessSeats() != null) ? String.valueOf(f.getMaxBusinessSeats()) : "--";
+                String created = (f.getCreatedAt() != null) ? fmt.format(f.getCreatedAt()) : "--";
+            %>
+            <!-- Card clickeable -->
+            <article
+                    class="js-flight-card bg-white rounded-2xl shadow-md ring-1 ring-black/5 overflow-hidden flex flex-col
+                 <%= asCarousel ? "min-w-[320px] max-w-xs w-full flex-shrink-0 snap-start" : "" %>
+                 cursor-pointer transition hover:-translate-y-0.5 hover:shadow-lg"
+                    data-name="<%= f.getName() %>"
+                    data-image="<%= img %>"
+                    data-dep="<%= dep %>"
+                    data-duration="<%= mins %>"
+                    data-economy="<%= eco %>"
+                    data-business="<%= bus %>"
+                    data-created="<%= created %>"
+            >
+                <div class="relative">
+                    <img src="<%= img %>" alt="<%= f.getName() %>" class="w-full h-40 object-cover" />
+                    <span class="absolute top-2 left-2 text-white/90 text-[10px] font-semibold tracking-widest">VUELO</span>
+                    <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/75 via-black/20 to-transparent">
+                        <h3 class="text-white font-semibold text-sm md:text-base truncate"><%= f.getName() %></h3>
+                    </div>
+                </div>
+                <div class="p-4 flex-1">
+                    <p class="text-gray-600 text-sm">Sale: <span class="font-medium"><%= dep %></span></p>
+                    <p class="text-gray-600 text-sm">Duración: <span class="font-medium"><%= mins %></span> min</p>
+                </div>
+            </article>
+            <% } %>
+        </div>
+
+        <% if (asCarousel) { %>
+        <!-- Flecha izquierda -->
+        <button id="flight-prev" aria-label="Anterior"
+                class="absolute left-0 top-1/2 -translate-y-1/2 z-10
+                 bg-black/40 hover:bg-black/70 text-white rounded-full
+                 w-10 h-10 md:w-12 md:h-12 hidden items-center justify-center focus:outline-none">
+            <svg class="w-5 md:w-7 h-5 md:h-7" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+
+        <!-- Flecha derecha -->
+        <button id="flight-next" aria-label="Siguiente"
+                class="absolute right-0 top-1/2 -translate-y-1/2 z-10
+                 bg-black/40 hover:bg-black/70 text-white rounded-full
+                 w-10 h-10 md:w-12 md:h-12 hidden items-center justify-center focus:outline-none">
+            <svg class="w-5 md:w-7 h-5 md:h-7" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <% } %>
+
+        <style>
+            .no-scrollbar{ -ms-overflow-style:none; scrollbar-width:none; }
+            .no-scrollbar::-webkit-scrollbar{ width:0; height:0; }
+        </style>
+
+        <script defer src="${pageContext.request.contextPath}/src/views/components/flightList/flightList.js"></script>
+        <% } %>
+
+    </div>
+</section>

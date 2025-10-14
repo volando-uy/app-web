@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
 
-@WebServlet("/updateUser")
+@WebServlet("/perfil")
 public class profileServlet extends HttpServlet {
 
     private final IUserController userController = ControllerFactory.getUserController();
