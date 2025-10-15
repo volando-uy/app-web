@@ -26,6 +26,11 @@ FROM amazoncorretto:17-alpine
 
 WORKDIR /app
 
+# UNCOMMENT THESE LINE TO USE IN LOCAL
+# ENV PORT="8000"
+# EXPOSE $PORT
+
+# COMMENT THIS LINE TO USE IN LOCAL
 ENV ENVIRONMENT="PROD"
 
 COPY tomcat ./tomcat/
@@ -33,3 +38,6 @@ COPY catalina-wrapper.sh ./catalina-wrapper.sh
 RUN chmod +x /app/catalina-wrapper.sh
 
 COPY --from=build /app/target/app-web-jsp.war ./tomcat/webapps/
+
+# UNCOMMENT THIS LINE TO USE IN LOCAL
+# CMD ["/app/catalina-wrapper.sh"]
