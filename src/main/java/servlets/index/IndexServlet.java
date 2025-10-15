@@ -146,9 +146,9 @@ public class IndexServlet extends HttpServlet {
                 writeStr(out, "nombre", nvl(r.getName()));
                 out.append(',');
                 // origen/destino + aerolínea
-                writeStr(out, "originCity", nvl(r.getOriginCityName()));
+                writeStr(out, "originAero", nvl(r.getOriginAeroCode()));
                 out.append(',');
-                writeStr(out, "destinationCity", nvl(r.getDestinationCityName()));
+                writeStr(out, "destinationAero", nvl(r.getDestinationAeroCode()));
                 out.append(',');
                 writeStr(out, "airline", nvl(r.getAirlineNickname()));
                 out.append(',');
