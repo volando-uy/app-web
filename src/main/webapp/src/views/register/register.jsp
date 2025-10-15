@@ -23,7 +23,7 @@
         <div id="switchPanel"
              class="w-full md:w-1/2 bg-brand text-white flex flex-col items-center justify-center p-10 transition-all duration-700 relative">
             <!-- Flecha atrás -->
-            <a href="../../../index.html" class="absolute top-6 left-6 group" title="Volver al inicio">
+            <a href="${pageContext.request.contextPath}/index" class="absolute top-6 left-6 group" title="Volver al inicio">
                 <svg xmlns="http://www.w3.org/2000/svg"
                      class="h-8 w-8 text-white group-hover:text-yellow-300 transition" fill="none" viewBox="0 0 24 24"
                      stroke="currentColor" stroke-width="2">
