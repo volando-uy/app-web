@@ -64,8 +64,8 @@ public class BuyPackageServlet extends HttpServlet {
                     || name.toLowerCase(Locale.ROOT).contains(q)
                     || desc.toLowerCase(Locale.ROOT).contains(q)
                     || routes.stream().anyMatch(r ->
-                    nvl(r.getOriginCityName()).toLowerCase(Locale.ROOT).contains(q)
-                            || nvl(r.getDestinationCityName()).toLowerCase(Locale.ROOT).contains(q)
+                    nvl(r.getOriginAeroCode()).toLowerCase(Locale.ROOT).contains(q)
+                            || nvl(r.getDestinationAeroCode()).toLowerCase(Locale.ROOT).contains(q)
                             || nvl(r.getAirlineNickname()).toLowerCase(Locale.ROOT).contains(q)
                             || nvl(r.getName()).toLowerCase(Locale.ROOT).contains(q)
             );
@@ -104,8 +104,8 @@ public class BuyPackageServlet extends HttpServlet {
                 for (FlightRouteDTO r : routes) {
                     double pt = (r.getPriceTouristClass() != null ? r.getPriceTouristClass() : 0D);
                     Map<String,Object> row = new LinkedHashMap<>();
-                    row.put("origin",          nvl(r.getOriginCityName()));
-                    row.put("destination",     nvl(r.getDestinationCityName()));
+                    row.put("origin",          nvl(r.getOriginAeroCode()));
+                    row.put("destination",     nvl(r.getDestinationAeroCode()));
                     row.put("code",            nvl(r.getName()));
                     row.put("airline",         nvl(r.getAirlineNickname()));
                     row.put("priceTouristStr", String.format(Locale.US, "US$ %.2f", pt));
@@ -136,8 +136,8 @@ public class BuyPackageServlet extends HttpServlet {
                     Map<String,Object> routeVm = new LinkedHashMap<>();
                     routeVm.put("pkgName",      modalParam);
                     routeVm.put("code",         nvl(r.getName()));
-                    routeVm.put("origin",       nvl(r.getOriginCityName()));
-                    routeVm.put("destination",  nvl(r.getDestinationCityName()));
+                    routeVm.put("origin",       nvl(r.getOriginAeroCode()));
+                    routeVm.put("destination",  nvl(r.getDestinationAeroCode()));
                     routeVm.put("airline",      nvl(r.getAirlineNickname()));
                     routeVm.put("status",       (r.getStatus() != null ? r.getStatus().name() : ""));
                     routeVm.put("image",        nvl(r.getImage()));
