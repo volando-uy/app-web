@@ -41,3 +41,8 @@ COPY --from=build /app/target/app-web-jsp.war ./tomcat/webapps/
 
 # UNCOMMENT THIS LINE TO USE IN LOCAL
 # CMD ["/app/catalina-wrapper.sh"]
+
+# HOW TO USE THIS DOCKERFILE IN LOCAL:
+# docker build . -t volando-uy:latest
+# docker run -p 8000:8000 volandouy:latest
+# (8000 is PORT env-var)
