@@ -26,6 +26,10 @@ FROM amazoncorretto:17-alpine
 
 WORKDIR /app
 
+# UNCOMMENT THESE LINE TO USE IN LOCAL
+# ENV PORT="8000"
+# EXPOSE $PORT
+
 ENV ENVIRONMENT="PROD"
 
 COPY tomcat ./tomcat/
@@ -33,3 +37,11 @@ COPY catalina-wrapper.sh ./catalina-wrapper.sh
 RUN chmod +x /app/catalina-wrapper.sh
 
 COPY --from=build /app/target/app-web-jsp.war ./tomcat/webapps/
+
+# UNCOMMENT THIS LINE TO USE IN LOCAL
+# CMD ["/app/catalina-wrapper.sh"]
+
+# HOW TO USE THIS DOCKERFILE IN LOCAL:
+# docker build . -t volandouy:latest
+# docker run -p 8000:8000 volandouy:latest
+# (8000 is PORT env-var)
