@@ -9,6 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -18,8 +19,19 @@ public class profileServlet extends HttpServlet {
 
     private final IUserController userController = ControllerFactory.getUserController();
 
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("nickname") == null) {
+            resp.sendRedirect(req.getContextPath() + "/users/login");
+            return;
+        }
+
+        String nickname = (String) session.getAttribute("nickname");
+        UserDTO user = userController.getCustomerDetailsByNickname(nickname);
+        req.setAttribute("user", user);
+
         req.getRequestDispatcher("/src/views/profile/profile.jsp").forward(req, resp);
     }
 
@@ -27,15 +39,16 @@ public class profileServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        String nickname = req.getParameter("nickname");
-        UserDTO user = userController.getUserSimpleDetailsByNickname(nickname);
-
-        if (user == null) {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Usuario no encontrado");
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("nickname") == null) {
+            resp.sendRedirect(req.getContextPath() + "/users/login");
             return;
         }
 
-        if (user instanceof CustomerDTO customer) {
+        String nickname = (String) session.getAttribute("nickname");
+        UserDTO userDetails = userController.getCustomerDetailsByNickname(nickname);
+
+        if (userDetails instanceof CustomerDTO customer) {
             BaseCustomerDTO dto = new BaseCustomerDTO();
             dto.setName(req.getParameter("name"));
             dto.setSurname(req.getParameter("surname"));
@@ -45,8 +58,8 @@ public class profileServlet extends HttpServlet {
             dto.setNumDoc(req.getParameter("numDoc"));
 
             userController.updateUser(customer.getNickname(), dto, null);
-        }
-        else if (user instanceof AirlineDTO airline) {
+
+        } else if (userDetails instanceof AirlineDTO airline) {
             BaseAirlineDTO dto = new BaseAirlineDTO();
             dto.setName(req.getParameter("name"));
             dto.setDescription(req.getParameter("description"));
@@ -55,6 +68,8 @@ public class profileServlet extends HttpServlet {
             userController.updateUser(airline.getNickname(), dto, null);
         }
 
-        resp.sendRedirect(req.getContextPath() + "/profile.jsp?nickname=" + nickname);
+        session.setAttribute("toastMessage", "Perfil actualizado con éxito");
+        session.setAttribute("toastType", "success");
+        resp.sendRedirect(req.getContextPath() + "/perfil");
     }
 }

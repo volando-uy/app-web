@@ -151,8 +151,8 @@ public class FlightServlet extends HttpServlet {
                                     catch (Throwable ignored2) {}
                                 }
 
-                                String legOrigin = (legRoute != null) ? safe(legRoute.getOriginCityName()) : safe(tryGet(leg, "getOriginCityName"));
-                                String legDest   = (legRoute != null) ? safe(legRoute.getDestinationCityName()) : safe(tryGet(leg, "getDestinationCityName"));
+                                String legOrigin = (legRoute != null) ? safe(legRoute.getOriginAeroCode()) : safe(tryGet(leg, "getOriginCityName"));
+                                String legDest   = (legRoute != null) ? safe(legRoute.getDestinationAeroCode()) : safe(tryGet(leg, "getDestinationCityName"));
                                 Duration legDur  = toDurationMinutes(leg.getDuration());
 
                                 legs.add(Map.of("origen", legOrigin, "destino", legDest, "tiempo", fmtDuration(legDur)));
@@ -162,8 +162,8 @@ public class FlightServlet extends HttpServlet {
 
                     // Fallback: al menos 1 tramo coherente
                     if (legs.isEmpty()) {
-                        String o = (fr != null) ? safe(fr.getOriginCityName())      : safe(tryGet(f, "getOriginCityName"));
-                        String d = (fr != null) ? safe(fr.getDestinationCityName()) : safe(tryGet(f, "getDestinationCityName"));
+                        String o = (fr != null) ? safe(fr.getOriginAeroCode())      : safe(tryGet(f, "getOriginCityName"));
+                        String d = (fr != null) ? safe(fr.getDestinationAeroCode()) : safe(tryGet(f, "getDestinationCityName"));
                         Duration totalDur = toDurationMinutes(f.getDuration());
                         legs.add(Map.of("origen", o, "destino", d, "tiempo", fmtDuration(totalDur)));
                     }
@@ -227,8 +227,8 @@ public class FlightServlet extends HttpServlet {
                         catch (Throwable ignored) {}
                     }
 
-                    String legOrigin = (legRoute != null) ? safe(legRoute.getOriginCityName()) : safe(tryGet(leg, "getOriginCityName"));
-                    String legDest   = (legRoute != null) ? safe(legRoute.getDestinationCityName()) : safe(tryGet(leg, "getDestinationCityName"));
+                    String legOrigin = (legRoute != null) ? safe(legRoute.getOriginAeroCode()) : safe(tryGet(leg, "getOriginCityName"));
+                    String legDest   = (legRoute != null) ? safe(legRoute.getDestinationAeroCode()) : safe(tryGet(leg, "getDestinationCityName"));
                     Duration legDur  = toDurationMinutes(leg.getDuration());
 
                     legs.add(Map.of("origen", legOrigin, "destino", legDest, "tiempo", fmtDuration(legDur)));
