@@ -89,7 +89,7 @@
             .no-scrollbar::-webkit-scrollbar{ width:0; height:0; }
         </style>
 
-        <script defer src="${pageContext.request.contextPath}/src/views/components/flightList/flightList.js"></script>
+        <script defer src="${pageContext.request.contextPath}/src/components/flightList/flightList.js"></script>
         <% } %>
 
     </div>

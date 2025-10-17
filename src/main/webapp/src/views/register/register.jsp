@@ -1,21 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {brand: "#0B3C5D"}
-                }
-            }
-        }
-    </script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login / Register</title>
-</head>
+<%
+    request.setAttribute("pageTitle", "Registrarse - Volando.uy");
+%>
+
+<%@ include file="/src/components/layout/libs.jspf" %>
+<%@ include file="/src/components/layout/head.jspf" %>
 <body class="flex items-center justify-center min-h-screen bg-gradient-to-r from-brand to-blue-300 px-4">
 <div class="relative w-full max-w-4xl bg-white rounded-2xl shadow-lg overflow-hidden">
     <div class="flex flex-col md:flex-row">
@@ -101,6 +92,10 @@
         </div>
     </div>
 </div>
-<script src="${pageContext.request.contextPath}/src/views/register/register.js"></script>
+<!-- Script específico para esta página -->
+<%
+    request.setAttribute("pageScript", "src/views/register/register.js");
+%>
+<%@ include file="/src/components/layout/scripts.jspf" %>
 </body>
 </html>

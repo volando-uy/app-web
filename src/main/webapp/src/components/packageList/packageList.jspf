@@ -120,4 +120,4 @@
 <script>window.__PKG_MODAL_DATA__ = <%= modalJson %>;</script>
 
 <!-- JS del componente -->
-<script defer src="${pageContext.request.contextPath}/src/views/components/packageList/packageList.js"></script>
+<script defer src="${pageContext.request.contextPath}/src/components/packageList/packageList.js"></script>

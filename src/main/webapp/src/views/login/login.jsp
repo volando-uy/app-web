@@ -1,21 +1,15 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {brand: "#0B3C5D"}
-                }
-            }
-        }
-    </script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login / Register</title>
-</head>
+
+<%
+    request.setAttribute("pageTitle", "Login - Volando.uy");
+
+%>
+
+<%@ include file="/src/components/layout/libs.jspf" %>
+<%@ include file="/src/components/layout/head.jspf" %>
+
 <body class="flex items-center justify-center min-h-screen bg-gradient-to-r from-brand to-blue-300 px-4">
 <div class="relative w-full max-w-4xl bg-white rounded-2xl shadow-lg overflow-hidden">
     <div class="flex flex-col md:flex-row">
@@ -59,13 +53,27 @@
                         class="w-full bg-brand text-white py-2 rounded-lg hover:bg-blue-700 transition">Login
                 </button>
 
-                <% if (request.getAttribute("error") != null) { %>
-                <p class="mt-4 text-red-500 text-center"><%= request.getAttribute("error") %></p>
-                <% } %>
+
             </form>
         </div>
     </div>
 </div>
-<script src="${pageContext.request.contextPath}/src/views/register/register.js"></script>
+<%
+    request.setAttribute("pageScript", "src/views/login/login.js");
+%>
+<%@ include file="/src/components/layout/scripts.jspf" %>
 </body>
 </html>
+
+
+<%
+    String nickname = (String) session.getAttribute("nickname");
+    if (nickname != null) {
+%>
+<script>
+    document.getElementById("login-username").value = "<%= nickname %>";
+</script>
+<%
+        session.removeAttribute("nickname");
+    }
+%>

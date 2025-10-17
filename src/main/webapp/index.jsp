@@ -1,65 +1,42 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" language="java" %>
+
+<%@ include file="/src/components/layout/libs.jspf" %> <!-- Taglibs aquí una sola vez -->
+
 <%
-    // Si entran directo al JSP (sin pasar por el servlet), reenviamos al servlet /index
+    // Si entran directo al JSP sin pasar por el servlet, redirigimos
     if (request.getAttribute("packages") == null || request.getAttribute("flights") == null) {
         request.getRequestDispatcher("/index").forward(request, response);
         return;
     }
 %>
-<!DOCTYPE html>
+
 <html lang="es">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Volando Index</title>
+<jsp:include page="/src/components/layout/head.jspf"/>
 
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { theme: { extend: { colors: { brand: "#0B4C73" } } } }
-    </script>
-    <!-- Notyf CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+<body class="min-h-screen bg-brand/10 flex flex-col">
 
-    <!-- Notyf JS -->
-    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<!-- Header -->
+<jsp:include page="/src/views/header/header.jsp"/>
 
-</head>
-<body class="bg-brand/10 min-h-screen flex flex-col">
-
-<jsp:include page="src/views/header/header.jsp" />
-
+<!-- Contenido principal -->
 <main class="flex-1 container mx-auto px-4 py-8 flex flex-col gap-12">
     <section id="paquetes" class="w-full">
-        <%@ include file="/src/views/components/packageList/packageList.jspf" %>
+        <%@ include file="/src/components/packageList/packageList.jspf" %>
     </section>
 
     <section id="vuelos" class="w-full">
-        <%@ include file="/src/views/components/flightList/flightList.jspf" %>
+        <%@ include file="/src/components/flightList/flightList.jspf" %>
     </section>
 </main>
 
-<jsp:include page="src/views/footer/footer.jspf" />
-<div id="toast-container" class="fixed top-5 right-5 z-50 space-y-2"></div>
+<!-- Footer -->
+<jsp:include page="/src/views/footer/footer.jspf"/>
 
-<script>window.__BASE__ = "${pageContext.request.contextPath}";</script>
-<script src="${pageContext.request.contextPath}/index.js"></script>
-<script>
-    const notyf = new Notyf({
-        duration: 3000,
-        position: {
-            x: 'right',
-            y: 'bottom',
-        }
-    });
-
-    // Mostrar un toast desde el backend
-    <% String toastMessage = (String) request.getAttribute("toastMessage"); %>
-    <% String toastType = (String) request.getAttribute("toastType"); %>
-    <% if (toastMessage != null) { %>
-    notyf.<%= toastType != null ? toastType : "success" %>("<%= toastMessage %>");
-    <% } %>
-</script>
+<!-- Script específico para esta página -->
+<%
+    request.setAttribute("pageScript", "index.js");
+%>
+<%@ include file="/src/components/layout/scripts.jspf" %>
 
 </body>
 </html>

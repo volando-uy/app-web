@@ -2,11 +2,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>Editar Perfil</title>
-</head>
+<%
+    request.setAttribute("pageTitle", "Perfil - Volando.uy");
+%>
+
+<%@ include file="/src/components/layout/libs.jspf" %>
+<%@ include file="/src/components/layout/head.jspf" %>
 <body class="min-h-screen bg-gradient-to-r from-blue-900 to-blue-400 flex items-center justify-center px-4">
 <%
     UserDTO user = (UserDTO) request.getAttribute("user");
@@ -94,6 +95,13 @@
         </form>
     </div>
 </div>
+
+<!-- Script específico para esta página -->
+<%
+    request.setAttribute("pageScript", "src/views/profile/profile.js");
+%>
+<%@ include file="/src/components/layout/scripts.jspf" %>
+
 </body>
-<script src="profile.js"></script>
 </html>
+

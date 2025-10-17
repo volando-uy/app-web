@@ -1,10 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
-<c:url var="homeUrl"     value="/index"/>
-<c:url var="flightsUrl"  value="/flight/list"/>
-<c:url var="packagesUrl" value="/packages/list"/>
-<c:url var="loginUrl"    value="/users/login"/>
+<%@ include file="/src/components/layout/libs.jspf" %>
+<!-- Taglibs aquí una sola vez -->
 
 <header class="sticky top-0 z-50 bg-brand text-white shadow-md">
     <div class="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -20,20 +16,40 @@
         </button>
 
         <nav id="nav-desktop" class="hidden md:flex items-center gap-6">
-            <a href="${flightsUrl}"  class="hover:text-yellow-300">Vuelos</a>
+            <a href="${flightsUrl}" class="hover:text-yellow-300">Vuelos</a>
             <a href="${packagesUrl}" class="hover:text-yellow-300">Paquetes</a>
         </nav>
 
-        <div id="header-actions" class="hidden md:flex items-center gap-3">
-            <a href="${loginUrl}" class="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20">Iniciar sesión</a>
-        </div>
+        <c:choose>
+            <c:when test="${empty sessionScope.nickname}">
+                <div id="header-actions" class="hidden md:flex items-center gap-3">
+                    <a href="${loginUrl}" class="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20">Iniciar sesión</a>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <div id="header-actions" class="hidden md:flex items-center gap-3">
+                    <a href="${profileUrl}"
+                       class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-center">
+                        Ver Perfil
+                    </a>
+
+                    <form action="${logoutUrl}" method="post" title="Cerrar sesión de ${nickname}">
+                        <button type="submit"
+                                class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-center appearance-none">
+                            Cerrar sesión
+                        </button>
+                    </form>
+
+                </div>
+            </c:otherwise>
+
+        </c:choose>
     </div>
 
     <div id="mobileMenu" class="md:hidden hidden border-t border-white/10 bg-brand">
         <nav id="nav-mobile" class="container mx-auto px-4 py-3 flex flex-col gap-1">
-            <a href="${flightsUrl}"  class="block px-2 py-3 rounded">Vuelos</a>
+            <a href="${flightsUrl}" class="block px-2 py-3 rounded">Vuelos</a>
             <a href="${packagesUrl}" class="block px-2 py-3 rounded">Paquetes</a>
-            <div class="h-px bg-white/10 my-2"></div>
             <a href="${loginUrl}" class="block px-2 py-3 rounded">Iniciar sesión</a>
         </nav>
     </div>

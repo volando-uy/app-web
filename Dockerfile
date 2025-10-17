@@ -26,22 +26,20 @@ FROM amazoncorretto:17-alpine
 
 WORKDIR /app
 
-# UNCOMMENT THESE LINE TO USE IN LOCAL
-# ENV PORT="8000"
-# EXPOSE $PORT
-
-ENV ENVIRONMENT="PROD"
+# Necesario para convertir CRLF -> LF
+RUN apk add --no-cache dos2unix
 
 COPY tomcat ./tomcat/
 COPY catalina-wrapper.sh ./catalina-wrapper.sh
 RUN chmod +x /app/catalina-wrapper.sh
 
+# Corregimos los saltos de línea de Windows
+RUN find /app/tomcat/bin -name "*.sh" -exec dos2unix {} \;
+
 COPY --from=build /app/target/app-web-jsp.war ./tomcat/webapps/
 
-# UNCOMMENT THIS LINE TO USE IN LOCAL
-# CMD ["/app/catalina-wrapper.sh"]
+ENV PORT="8000"
+ENV ENVIRONMENT="PROD"
+EXPOSE $PORT
 
-# HOW TO USE THIS DOCKERFILE IN LOCAL:
-# docker build . -t volandouy:latest
-# docker run -p 8000:8000 volandouy:latest
-# (8000 is PORT env-var)
+CMD ["/app/catalina-wrapper.sh"]
