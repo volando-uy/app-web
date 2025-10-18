@@ -14,7 +14,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ attribute name="normalPrice" fragment="true" %>
 <%@ attribute name="onSale" fragment="true" %>
 <%@ variable name-given="name" %>

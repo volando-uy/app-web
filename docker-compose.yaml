@@ -1,26 +1,27 @@
-# Example docker-compose.yml
-services:
-  db:
-    image: postgres:latest
-    networks:
-      - net
-    ports:
-      - "5432:5432" # Maps container port 5432 to host port 5432
-    environment:
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: volandouy
-  app:
-    image: volandouy:latest
-    networks:
-      - net
-    depends_on:
-      - db
-    ports:
-      - '8000:8000'
-    environment:
-      ENVIRONMENT: 'PROD'
-      DATABASE_URL: 'postgres://postgres:admin@db:5432/volandouy'
+  # Example docker-compose.yml
+  services:
+    db:
+      image: postgres:latest
+      networks:
+        - net
+      ports:
+        - "5432:5432" # Maps container port 5432 to host port 5432
+      environment:
+        POSTGRES_PASSWORD: admin
+        POSTGRES_DB: volandouy
+    app:
+      image: volandouy:latest
+      networks:
+        - net
+      depends_on:
+        - db
+      ports:
+        - '8000:8000'
+      environment:
+        ENVIRONMENT: 'PROD'
+        DATABASE_URL: 'postgres://postgres:admin@db:5432/volandouy'
 
-networks:
-  net:
-    driver: bridge
+
+  networks:
+    net:
+      driver: bridge

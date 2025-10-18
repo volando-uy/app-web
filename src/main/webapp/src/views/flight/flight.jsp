@@ -140,7 +140,7 @@
         </c:forEach>
     </div>
 
-    <%@ include file="/src/views/components/modalFlight/modalFlight.jspf" %>
+    <%@ include file="/src/components/modalFlight/modalFlight.jspf" %>
 </main>
 
 <jsp:include page="/src/views/footer/footer.jspf" />

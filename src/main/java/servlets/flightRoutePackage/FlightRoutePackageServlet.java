@@ -21,7 +21,7 @@ public class FlightRoutePackageServlet extends HttpServlet {
         throws ServletException, IOException {
         var packages = ctrl.getAllFlightRoutesPackagesDetails();
         req.setAttribute("packages", packages);
-        req.getRequestDispatcher("/src/views/components/packageList/packageList.jspf")
+        req.getRequestDispatcher("/src/components/packageList/packageList.jspf")
                 .forward(req, resp);
     }
 }

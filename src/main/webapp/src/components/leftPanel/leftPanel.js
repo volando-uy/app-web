@@ -39,13 +39,13 @@
     const guesses = [
       'leftPanel.html',
       '../components/leftPanel/leftPanel.html',
-      '../../views/components/leftPanel/leftPanel.html',
-      '/public/src/views/components/leftPanel/leftPanel.html',
+      '../../components/leftPanel/leftPanel.html',
+      '/public/src/components/leftPanel/leftPanel.html',
       // fallback (por compatibilidad previa):
       'rightMenu.html',
       '../components/rightMenu/rightMenu.html',
-      '../../views/components/rightMenu/rightMenu.html',
-      '/public/src/views/components/rightMenu/rightMenu.html'
+      '../../components/rightMenu/rightMenu.html',
+      '/public/src/components/rightMenu/rightMenu.html'
     ];
     for (const url of guesses) {
       try { const r = await fetch(url,{cache:'no-store'}); if(r.ok) return await r.text(); } catch {}

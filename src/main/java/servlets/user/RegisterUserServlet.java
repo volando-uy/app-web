@@ -12,12 +12,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import java.beans.ExceptionListener;
 import java.io.IOException;
 import java.time.LocalDate;
 
 @WebServlet("/users/register")
 public class RegisterUserServlet extends HttpServlet {
     IUserController userController = ControllerFactory.getUserController();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.getRequestDispatcher("/src/views/register/register.jsp").forward(req, resp);
@@ -52,7 +54,13 @@ public class RegisterUserServlet extends HttpServlet {
             customer.setNumDoc(numeroDocumento);
             customer.setPassword(password);
 
-            userController.registerCustomer(customer, null);
+            try {
+                userController.registerCustomer(customer, null);
+            } catch (UnsupportedOperationException e) {
+                HttpSession session = req.getSession();
+                session.setAttribute("toastMessage", "Error al registrar el usuario: " + e.getMessage());
+                session.setAttribute("toastType", "error"); // también puede ser "error",
+            }
 
             req.setAttribute("Customer", customer);
         } else if ("aerolinea".equals(userType)) {
@@ -76,8 +84,13 @@ public class RegisterUserServlet extends HttpServlet {
 
             // Aquí podrías crear un objeto Aerolinea y guardarlo
             req.setAttribute("Airline", airline);
-
-            userController.registerAirline(airline, null);
+            try {
+                userController.registerAirline(airline, null);
+            } catch (UnsupportedOperationException e) {
+                HttpSession session = req.getSession();
+                session.setAttribute("toastMessage", "Error al registrar el usuario: " + e.getMessage());
+                session.setAttribute("toastType", "error");
+            }
         }
 
         // Redirigir o reenviar

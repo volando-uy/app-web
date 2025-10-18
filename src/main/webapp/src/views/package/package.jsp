@@ -82,8 +82,8 @@
 <%@ include file="/src/views/footer/footer.jspf" %>
 
 <!-- Modales SSR -->
-<%@ include file="/src/views/components/modalPackage/modalPackage.jspf" %>
-<%@ include file="/src/views/components/modalPackage/modalRoute.jspf" %>
+<%@ include file="/src/components/modalPackage/modalPackage.jspf" %>
+<%@ include file="/src/components/modalPackage/modalRoute.jspf" %>
 
 </body>
 </html>
