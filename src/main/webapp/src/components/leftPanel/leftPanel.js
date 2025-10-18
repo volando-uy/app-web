@@ -119,7 +119,7 @@
     addLink('Paquetes','package/package.html','🎒');
   } else if (ctx.role==='airline'){
     addLink('Panel aerolínea','adminPanel/adminPanel.html','🛠️');
-    addLink('Rutas de vuelo','checkflightroute/checkflightroute.html','🧭');
+    addLink('Rutas de vuelo','checkflightroute/checkflightroute.jsp','🧭');
     addLink('Crear vuelo','createFlight/createFlight.jsp','✈️');
     addLink('Crear ruta de vuelo','createFlightRoute/createflightRoute.html','🧭');
     addLink('Crear paquete','createPackage/createPackage.html','🆕');
