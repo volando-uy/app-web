@@ -14,8 +14,8 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.LocalDate;
 
-@WebServlet("/perfil")
-public class profileServlet extends HttpServlet {
+@WebServlet("/perfil/update")
+public class UpdateProfileServlet extends HttpServlet {
 
     private final IUserController userController = ControllerFactory.getUserController();
 
@@ -33,7 +33,7 @@ public class profileServlet extends HttpServlet {
         UserDTO user = userController.getUserSimpleDetailsByNickname(nickname);
         req.setAttribute("user", user);
 
-        req.getRequestDispatcher("/src/views/profile/profile.jsp").forward(req, resp);
+        req.getRequestDispatcher("/src/views/profile/update/updateProfile.jsp").forward(req, resp);
     }
 
     @Override

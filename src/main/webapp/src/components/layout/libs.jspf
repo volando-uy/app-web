@@ -6,4 +6,5 @@
 <c:url var="packagesUrl" value="/packages/list"/>
 <c:url var="loginUrl" value="/users/login"/>
 <c:url var="profileUrl" value="/perfil"/>
+<c:url var="profileUpdateUrl" value="/perfil/update"/>
 <c:url var="logoutUrl" value="/users/logout"/>

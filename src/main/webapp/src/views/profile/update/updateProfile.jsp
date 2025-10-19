@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <%
-    request.setAttribute("pageTitle", "Perfil - Volando.uy");
+    request.setAttribute("pageTitle", "Editar Perfil - Volando.uy");
 %>
 
 <%@ include file="/src/components/layout/libs.jspf" %>
@@ -82,11 +82,10 @@
             <% } %>
 
             <div class="flex gap-2 mt-4">
-                <button type="button"
-                        onclick="window.location.href='${pageContext.request.contextPath}/index'"
-                        class="w-1/2 bg-gray-400 text-white py-2 rounded-lg hover:bg-gray-500 transition">
+                <a href="${profileUrl}"
+                   class="block w-1/2 text-center bg-gray-400 text-white py-2 rounded-lg hover:bg-gray-500 transition">
                     Volver
-                </button>
+                </a>
 
                 <button type="submit" id="guPerfil" class="w-1/2 bg-blue-900 text-white py-2 rounded-lg hover:bg-blue-700 transition">
                     Guardar cambios
@@ -97,9 +96,9 @@
 </div>
 
 <!-- Script específico para esta página -->
-<%
-    request.setAttribute("pageScript", "src/views/profile/profile.js");
-%>
+<%--<%--%>
+<%--    request.setAttribute("pageScript", "src/views/profile/profile.js");--%>
+<%--%>--%>
 <%@ include file="/src/components/layout/scripts.jspf" %>
 
 </body>
