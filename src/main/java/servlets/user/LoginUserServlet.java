@@ -50,6 +50,7 @@ public class LoginUserServlet extends HttpServlet {
                 newSession.setAttribute("nickname", nickname);
                 newSession.setAttribute("toastMessage", nickname + " logueado con éxito");
                 newSession.setAttribute("toastType", "success");
+                System.out.println("Usuario " + nickname + " ha iniciado sesión.");
 
                 // 🔁 Redirección condicional si hay una URL previa almacenada
                 String redirectUrl = (String) newSession.getAttribute("redirectAfterLogin");

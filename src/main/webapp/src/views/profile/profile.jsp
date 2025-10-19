@@ -18,7 +18,7 @@
     <div class="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8">
         <h2 class="text-3xl font-bold text-center mb-6 text-blue-900">Editar Perfil</h2>
 
-        <form action="${pageContext.request.contextPath}/perfil" method="post" class="space-y-4">
+        <form action="${pageContext.request.contextPath}/perfil/update" method="post" class="space-y-4">
             <div>
                 <label class="block mb-1 font-semibold">Nickname</label>
                 <input type="text" name="nickname" value="<%= user.getNickname() %>"

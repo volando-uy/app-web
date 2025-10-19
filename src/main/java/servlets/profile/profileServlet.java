@@ -29,7 +29,8 @@ public class profileServlet extends HttpServlet {
         }
 
         String nickname = (String) session.getAttribute("nickname");
-        UserDTO user = userController.getCustomerDetailsByNickname(nickname);
+//        UserDTO user = userController.getCustomerDetailsByNickname(nickname);
+        UserDTO user = userController.getUserSimpleDetailsByNickname(nickname);
         req.setAttribute("user", user);
 
         req.getRequestDispatcher("/src/views/profile/profile.jsp").forward(req, resp);
