@@ -4,17 +4,36 @@
                              https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
 
+    <!-- Página de bienvenida -->
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
+
+    <!-- 🔐 Filtro para proteger páginas privadas con JWT -->
     <filter>
         <filter-name>JWTAuthFilter</filter-name>
         <filter-class>utils.JWTAuthFilter</filter-class>
     </filter>
 
+    <!-- 🚫 Filtro para evitar que logueados entren a login/register -->
+    <filter>
+        <filter-name>AlreadyLoggedInFilter</filter-name>
+        <filter-class>utils.AlreadyLoggedInFilter</filter-class>
+    </filter>
+
     <filter-mapping>
         <filter-name>JWTAuthFilter</filter-name>
         <url-pattern>/perfil</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>AlreadyLoggedInFilter</filter-name>
+        <url-pattern>/users/login</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>AlreadyLoggedInFilter</filter-name>
+        <url-pattern>/users/register</url-pattern>
     </filter-mapping>
 
 </web-app>
