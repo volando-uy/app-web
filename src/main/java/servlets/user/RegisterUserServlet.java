@@ -56,7 +56,7 @@ public class RegisterUserServlet extends HttpServlet {
 
             try {
                 userController.registerCustomer(customer, null);
-            } catch (UnsupportedOperationException e) {
+            } catch (Exception e) {
                 HttpSession session = req.getSession();
                 session.setAttribute("toastMessage", "Error al registrar el usuario: " + e.getMessage());
                 session.setAttribute("toastType", "error"); // también puede ser "error",
@@ -86,7 +86,7 @@ public class RegisterUserServlet extends HttpServlet {
             req.setAttribute("Airline", airline);
             try {
                 userController.registerAirline(airline, null);
-            } catch (UnsupportedOperationException e) {
+            } catch (Exception e) {
                 HttpSession session = req.getSession();
                 session.setAttribute("toastMessage", "Error al registrar el usuario: " + e.getMessage());
                 session.setAttribute("toastType", "error");
@@ -95,6 +95,7 @@ public class RegisterUserServlet extends HttpServlet {
 
         // Redirigir o reenviar
         HttpSession session = req.getSession();
+        System.out.println("Registro exitoso, redirigiendo...");
         session.setAttribute("toastMessage", "Usuario registrado exitosamente");
         session.setAttribute("toastType", "success"); // también puede ser "error", "info", "warning"
         resp.sendRedirect(req.getContextPath() + "/index");

@@ -5,7 +5,8 @@
 <%
     // Si entran directo al JSP sin pasar por el servlet, redirigimos
     if (request.getAttribute("packages") == null || request.getAttribute("flights") == null) {
-        request.getRequestDispatcher("/index").forward(request, response);
+//        request.getRequestDispatcher("/index").forward(request, response);
+        response.sendRedirect(request.getContextPath() + "/index");
         return;
     }
 %>
