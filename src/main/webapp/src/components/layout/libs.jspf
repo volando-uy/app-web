@@ -8,3 +8,14 @@
 <c:url var="profileUrl" value="/perfil"/>
 <c:url var="profileUpdateUrl" value="/perfil/update"/>
 <c:url var="logoutUrl" value="/users/logout"/>
+<c:url var="debugUrl" value="/debug"/>
+
+
+<c:choose>
+    <c:when test="${not empty usuario and not empty usuario.image}">
+        <c:url var="userImage" value="/${usuario.image}"/>
+    </c:when>
+    <c:otherwise>
+        <c:url var="userImage" value="/assets/images/default-profile.jpg"/>
+    </c:otherwise>
+</c:choose>

@@ -13,8 +13,15 @@
 <body>
 <div class="max-w-5xl mx-auto mt-12 bg-white shadow-lg rounded-xl p-8">
     <div class="flex flex-col md:flex-row gap-8 items-center">
-        <img src="${usuario.image != null ? usuario.image : '/images/default-avatar.png'}"
-             alt="Avatar" class="w-28 h-28 rounded-full object-cover border">
+        <div class="text-white p-6 flex flex-col items-center">
+            <div class="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-lg mb-4">
+                <img src="${userImage}" alt="Foto de perfil"
+                     class="w-full h-full object-cover"/>
+            </div>
+        </div>
+
+        <!--        C:\Users\Josec\OneDrive\Escritorio\LabPAA\app-web-jsp\target\cargo\configurations\tomcat10x\images\users\customers\nickname.jpg //Aca funca
+                C:\Users\Josec\OneDrive\Escritorio\LabPAA\app-web-jsp\target\cargo\configurations\tomcat10x\webapps\app-web-jsp\images\users\customers\nickname.jpg-->
 
         <div>
             <h1 class="text-3xl font-bold text-gray-800">${usuario.name}</h1>
