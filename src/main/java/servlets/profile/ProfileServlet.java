@@ -1,5 +1,6 @@
 package servlets.profile;
 
+import controllers.file.FileController;
 import controllers.user.IUserController;
 import domain.dtos.user.*;
 import factory.ControllerFactory;
@@ -8,7 +9,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import shared.constants.Images;
+import utils.ImageFunctions;
 
+import java.io.File;
 import java.io.IOException;
 
 @WebServlet("/perfil")
@@ -25,6 +29,10 @@ public class ProfileServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/users/login");
             return;
         }
+
+        String imagePath = ImageFunctions.getImage(usuario.getImage());
+        System.out.println("📸 Ruta imagen usuario: " + imagePath);
+        req.setAttribute("imageUrl", imagePath);
 
         // Refrescamos los datos completos del usuario según su tipo
         if (usuario instanceof BaseCustomerDTO) {

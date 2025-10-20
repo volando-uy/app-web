@@ -5,15 +5,28 @@ import domain.dtos.user.*;
 import domain.models.enums.EnumTipoDocumento;
 import factory.ControllerFactory;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
+import shared.constants.Images;
 
+import utils.ImageStorageUtils;
+import utils.PathResolver;
+
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.util.UUID;
 
+
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024,  // 1MB
+        maxFileSize = 1024 * 1024 * 10,   // 10MB
+        maxRequestSize = 1024 * 1024 * 50 // 50MB
+)
 @WebServlet("/perfil/update")
 public class UpdateProfileServlet extends HttpServlet {
 
@@ -40,16 +53,27 @@ public class UpdateProfileServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        HttpSession session = req.getSession(false);
+        HttpSession session = req.getSession();
         if (session == null || session.getAttribute("nickname") == null) {
             resp.sendRedirect(req.getContextPath() + "/users/login");
             return;
         }
 
         String nickname = (String) session.getAttribute("nickname");
-        UserDTO userDetails = userController.getCustomerDetailsByNickname(nickname);
+        UserDTO userDetails = userController.getUserSimpleDetailsByNickname(nickname);
 
-        if (userDetails instanceof CustomerDTO customer) {
+        Part imagePart = req.getPart("profileImage");
+
+
+        if (userDetails instanceof BaseCustomerDTO customer) {
+            File finalImage = ImageStorageUtils.saveImage(
+                    getServletContext(),
+                    imagePart,
+                    Images.IMAGES_PATH + Images.CUSTOMERS_PATH,
+                    nickname
+            );
+
+
             BaseCustomerDTO dto = new BaseCustomerDTO();
             dto.setName(req.getParameter("name"));
             dto.setSurname(req.getParameter("surname"));
@@ -58,19 +82,33 @@ public class UpdateProfileServlet extends HttpServlet {
             dto.setDocType(EnumTipoDocumento.valueOf(req.getParameter("docType")));
             dto.setNumDoc(req.getParameter("numDoc"));
 
-            userController.updateUser(customer.getNickname(), dto, null);
+            UserDTO newUser = userController.updateUser(customer.getNickname(), dto, finalImage);
+            System.out.println(newUser);
 
-        } else if (userDetails instanceof AirlineDTO airline) {
+        } else if (userDetails instanceof BaseAirlineDTO airline) {
+            File finalImage = ImageStorageUtils.saveImage(
+                    getServletContext(),
+                    imagePart,
+                    Images.IMAGES_PATH + Images.AIRLINES_PATH,
+                    nickname
+            );
+
+
             BaseAirlineDTO dto = new BaseAirlineDTO();
             dto.setName(req.getParameter("name"));
             dto.setDescription(req.getParameter("description"));
             dto.setWeb(req.getParameter("web"));
 
-            userController.updateUser(airline.getNickname(), dto, null);
+
+            UserDTO newUser = userController.updateUser(airline.getNickname(), dto, finalImage);
+            System.out.println(newUser);
         }
 
+        // ✅ Confirmación y redirección
         session.setAttribute("toastMessage", "Perfil actualizado con éxito");
         session.setAttribute("toastType", "success");
         resp.sendRedirect(req.getContextPath() + "/perfil");
     }
 }
+
+
