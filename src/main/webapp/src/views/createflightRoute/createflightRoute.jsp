@@ -41,7 +41,9 @@
                 <p class="px-3 py-2 bg-gray-100 border rounded-md text-gray-600 text-sm">
                     <%= (session.getAttribute("airlineNickname") != null)
                             ? session.getAttribute("airlineNickname")
-                            : "Mi Aerolínea" %>
+                            : (session.getAttribute("nickname") != null
+                            ? session.getAttribute("nickname")
+                            : "Mi Aerolínea") %>
                 </p>
             </div>
 
