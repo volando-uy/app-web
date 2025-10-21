@@ -1,6 +1,5 @@
 package servlets.profile;
 
-import controllers.file.FileController;
 import controllers.user.IUserController;
 import domain.dtos.user.*;
 import factory.ControllerFactory;
