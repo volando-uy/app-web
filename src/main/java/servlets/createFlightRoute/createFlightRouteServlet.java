@@ -61,20 +61,32 @@ public class createFlightRouteServlet extends HttpServlet {
             String originAeroCode = trimToNull(req.getParameter("originAeroCode"));
             String destinationAeroCode = trimToNull(req.getParameter("destinationAeroCode"));
 
-            // Aerolínea desde sesión
-            String airlineNickname = (String) req.getSession().getAttribute("airlineNickname");
-            if (airlineNickname == null) {
-                airlineNickname = trimToNull(req.getParameter("airlineNickname"));
+            // === Aerolínea desde sesión ===
+            HttpSession session = req.getSession(false);
+            String airlineNickname = null;
+
+            if (session != null) {
+                airlineNickname = (String) session.getAttribute("airlineNickname");
+
+                // Si no existe con ese nombre, usar el nickname general
+                if (airlineNickname == null) {
+                    airlineNickname = (String) session.getAttribute("nickname");
+                }
             }
 
-            // Categorías seleccionadas
+            // Validar que no esté nulo
+            if (airlineNickname == null) {
+                throw new IllegalArgumentException("El usuario de aerolínea no está identificado en la sesión.");
+            }
+
+            // === Categorías seleccionadas ===
             String[] cats = req.getParameterValues("categories");
             List<String> categories = new ArrayList<>();
             if (cats != null) {
                 categories = Arrays.asList(cats);
             }
 
-            // Procesoimagen
+            // === Procesar imagen (opcional) ===
             Part imagePart = req.getPart("image");
             File imageFile = null;
             if (imagePart != null && imagePart.getSize() > 0) {
@@ -94,7 +106,7 @@ public class createFlightRouteServlet extends HttpServlet {
                 }
             }
 
-            // Parseos
+            // === Parseos ===
             LocalDate createdAt = null;
             if (createdAtStr != null && !createdAtStr.isEmpty()) {
                 createdAt = LocalDate.parse(createdAtStr);
@@ -103,7 +115,7 @@ public class createFlightRouteServlet extends HttpServlet {
             Double priceTourist = parseDouble(priceTouristStr);
             Double priceBusiness = parseDouble(priceBusinessStr);
 
-            // Construir DTO
+            // === Construir DTO ===
             BaseFlightRouteDTO dto = new BaseFlightRouteDTO();
             dto.setName(name);
             dto.setDescription(description);
@@ -114,7 +126,7 @@ public class createFlightRouteServlet extends HttpServlet {
             dto.setImage((imageFile != null) ? imageFile.getName() : null);
             dto.setStatus(null);
 
-            // Crear ruta de vuelo
+            // === Crear ruta de vuelo ===
             controller.createFlightRoute(dto, originAeroCode, destinationAeroCode, airlineNickname, categories, imageFile);
 
             resp.getWriter().write("{\"status\":\"ok\",\"message\":\"Ruta creada correctamente.\"}");
