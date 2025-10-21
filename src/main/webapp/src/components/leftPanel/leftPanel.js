@@ -121,7 +121,7 @@
     addLink('Panel aerolínea','adminPanel/adminPanel.html','🛠️');
     addLink('Rutas de vuelo','checkflightroute/checkflightroute.jsp','🧭');
     addLink('Crear vuelo','createFlight/createFlight.jsp','✈️');
-    addLink('Crear ruta de vuelo','createFlightRoute/createflightRoute.html','🧭');
+    addLink('Crear ruta de vuelo','createFlightRoute/createflightRoute.jsp','🧭');
     addLink('Crear paquete','createPackage/createPackage.html','🆕');
     addLink('Mis paquetes','checkPackage/checkPackage.html','📦');
     addLink('Panel Reservas','reservationPanel/reservationPanel.html','🧾');
