@@ -1,10 +1,19 @@
-<%-- Usa taglibs de package.jsp --%>
-<c:if test="${not empty modalPackage}">
-    <c:set var="mp" value="${modalPackage}" />
+<%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-    <c:url var="backUrl" value="/packages/list">
-        <c:if test="${not empty param.q}"><c:param name="q" value="${param.q}" /></c:if>
-    </c:url>
+<c:if test="${not empty modalPkgName}">
+    <!-- Buscar el paquete seleccionado -->
+    <c:set var="selectedPkg" value="${null}"/>
+    <c:forEach var="p" items="${pkgs}">
+        <c:if test="${p.name == modalPkgName}">
+            <c:set var="selectedPkg" value="${p}"/>
+        </c:if>
+    </c:forEach>
+
+    <!-- Rutas confirmadas del paquete -->
+    <c:set var="routes" value="${pkgRoutes[modalPkgName]}"/>
+
+    <c:url var="backUrl" value="/packages/list"/>
 
     <div id="modal-package" class="fixed inset-0 z-[50] flex items-center justify-center">
         <a href="${backUrl}" class="absolute inset-0 bg-black/40" aria-label="Cerrar modal"></a>
@@ -20,22 +29,34 @@
 
             <div class="bg-gradient-to-r from-brand to-[#0b3d59] text-white p-6">
                 <h2 id="modal-package-title" class="text-2xl font-extrabold tracking-wide">
-                    <c:out value="${mp.name}"/>
+                    <c:out value="${selectedPkg.name}"/>
                 </h2>
-                <div class="text-sm opacity-90 mt-2"><c:out value="${mp.description}"/></div>
+                <div class="text-sm opacity-90 mt-2"><c:out value="${selectedPkg.description}"/></div>
 
                 <div class="flex flex-wrap gap-2 mt-3 text-xs">
-                    <c:if test="${not empty mp.seatType}">
-                        <span class="px-3 py-1 bg-white/15 rounded-full">Asiento: <c:out value="${mp.seatType}"/></span>
+                    <c:if test="${not empty selectedPkg.seatType}">
+                        <span class="px-3 py-1 bg-white/15 rounded-full">Asiento:
+                            <c:out value="${selectedPkg.seatType}"/></span>
                     </c:if>
                 </div>
             </div>
 
             <div class="p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <div class="text-3xl font-bold text-emerald-600"><c:out value="${mp.totalStr}"/></div>
+                    <div class="text-3xl font-bold text-emerald-600">
+                        <fmt:formatNumber value="${empty selectedPkg.totalPrice ? 0 : selectedPkg.totalPrice}"
+                                          type="currency" currencySymbol="US$ " minFractionDigits="2"/>
+                    </div>
                     <div class="text-xs text-gray-500 uppercase tracking-wider">Suma rutas (ref.)</div>
-                    <div class="text-right text-lg font-semibold text-gray-700"><c:out value="${mp.totalStr}"/></div>
+                    <div class="text-right text-lg font-semibold text-gray-700">
+                        <c:set var="sumRef" value="0"/>
+                        <c:forEach var="r" items="${routes}">
+                            <c:if test="${not empty r.priceTouristClass}">
+                                <c:set var="sumRef" value="${sumRef + r.priceTouristClass}"/>
+                            </c:if>
+                        </c:forEach>
+                        <fmt:formatNumber value="${sumRef}" type="currency" currencySymbol="US$ " minFractionDigits="2"/>
+                    </div>
                 </div>
 
                 <div class="border rounded-xl overflow-hidden">
@@ -49,22 +70,24 @@
                         </thead>
                         <tbody>
                         <c:choose>
-                            <c:when test="${not empty mp.routes}">
-                                <c:forEach var="r" items="${mp.routes}">
+                            <c:when test="${not empty routes}">
+                                <c:forEach var="r" items="${routes}">
                                     <c:url var="urlRoute" value="/packages/list">
-                                        <c:param name="modal" value="${mp.name}" />
-                                        <c:param name="route" value="${r.code}" />
-                                        <c:if test="${not empty param.q}"><c:param name="q" value="${param.q}" /></c:if>
+                                        <c:param name="modal" value="${selectedPkg.name}" />
+                                        <c:param name="route" value="${r.name}" />
                                     </c:url>
                                     <tr class="border-t">
                                         <td class="px-3 py-2">
                                             <a href="${urlRoute}#modal-route" class="text-brand hover:underline">
-                                                <c:out value="${r.origin}"/> &rarr; <c:out value="${r.destination}"/>
-                                                <span class="text-gray-400 ml-1">(<c:out value="${r.code}"/>)</span>
+                                                <c:out value="${r.originAeroCode}"/> &rarr; <c:out value="${r.destinationAeroCode}"/>
+                                                <span class="text-gray-400 ml-1">(<c:out value="${r.name}"/>)</span>
                                             </a>
                                         </td>
-                                        <td class="px-3 py-2"><c:out value="${r.airline}"/></td>
-                                        <td class="px-3 py-2 text-right"><c:out value="${r.priceTouristStr}"/></td>
+                                        <td class="px-3 py-2"><c:out value="${r.airlineNickname}"/></td>
+                                        <td class="px-3 py-2 text-right">
+                                            <fmt:formatNumber value="${empty r.priceTouristClass ? 0 : r.priceTouristClass}"
+                                                              type="currency" currencySymbol="US$ " minFractionDigits="2"/>
+                                        </td>
                                     </tr>
                                 </c:forEach>
                             </c:when>
@@ -81,9 +104,8 @@
                 <div class="flex items-center justify-end gap-2 mt-4">
                     <a href="${backUrl}" class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50">Cerrar</a>
 
-                        <%-- TODO: cambiá el destino si tu flujo real de compra es otro --%>
                     <c:url var="buyUrl" value="/buypackage">
-                        <c:param name="pkg" value="${mp.name}" />
+                        <c:param name="pkg" value="${selectedPkg.name}" />
                     </c:url>
                     <a href="${buyUrl}" class="px-4 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600">
                         Comprar paquete
