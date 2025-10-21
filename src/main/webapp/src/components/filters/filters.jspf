@@ -1,0 +1,93 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+
+<form method="get" action="${filtersAction}"
+      class="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 mb-6">
+
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+
+        <!-- Aerolínea -->
+        <div class="flex flex-col">
+            <label class="font-bold text-[#ff8000] mb-2 uppercase">AEROL&Iacute;NEA</label>
+            <div class="flex items-center bg-[#f5f6fa] rounded-lg px-3 border border-gray-200 h-[48px]">
+                <span class="text-[#ff8000] mr-2"><i class="fa-solid fa-plane"></i></span>
+                <select name="airline" class="bg-transparent outline-none flex-1 text-gray-700">
+                    <option value="">Todas</option>
+                    <c:forEach var="a" items="${airlines}">
+                        <option value="${fn:escapeXml(a)}"
+                                <c:if test="${a == selectedAirline}">selected</c:if>>
+                                ${fn:escapeXml(a)}
+                        </option>
+                    </c:forEach>
+                </select>
+            </div>
+        </div>
+
+        <!-- Categoría -->
+        <div class="flex flex-col">
+            <label class="font-bold text-[#ff8000] mb-2 uppercase">CATEGOR&Iacute;A</label>
+            <div class="flex items-center bg-[#f5f6fa] rounded-lg px-3 border border-gray-200 h-[48px]">
+                <span class="text-[#ff8000] mr-2"><i class="fa-solid fa-tags"></i></span>
+                <select name="category" class="bg-transparent outline-none flex-1 text-gray-700">
+                    <option value="">Todas</option>
+                    <c:forEach var="categ" items="${categories}">
+                        <option value="${fn:escapeXml(categ)}"
+                                <c:if test="${categ == selectedCategory}">selected</c:if>>
+                                ${fn:escapeXml(categ)}
+                        </option>
+                    </c:forEach>
+                </select>
+            </div>
+        </div>
+
+        <!-- Ruta confirmada -->
+        <div class="flex flex-col">
+            <label class="font-bold text-[#ff8000] mb-2 uppercase">RUTA CONFIRMADA</label>
+            <div class="flex items-center bg-[#f5f6fa] rounded-lg px-3 border border-gray-200 h-[48px]">
+                <span class="text-[#ff8000] mr-2"><i class="fa-solid fa-route"></i></span>
+                <select name="route" class="bg-transparent outline-none flex-1 text-gray-700">
+                    <option value="">Seleccionar</option>
+                    <c:forEach var="r" items="${routes}">
+                        <c:set var="routeDisplay" value="${fn:replace(r.name, '→', '->')}"/>
+                        <option value="${fn:escapeXml(r.name)}"
+                                <c:if test="${r.name == selectedRouteName}">selected</c:if>>
+                                ${fn:escapeXml(routeDisplay)}
+                            (${fn:escapeXml(r.originAeroCode)} -&gt; ${fn:escapeXml(r.destinationAeroCode)})
+                        </option>
+                    </c:forEach>
+                </select>
+            </div>
+        </div>
+
+        <!-- Vuelo -->
+        <div class="flex flex-col">
+            <label class="font-bold text-[#ff8000] mb-2 uppercase">VUELO</label>
+            <div class="flex items-center bg-[#f5f6fa] rounded-lg px-3 border border-gray-200 h-[48px]">
+                <span class="text-[#ff8000] mr-2"><i class="fa-solid fa-paper-plane"></i></span>
+                <select name="flight" class="bg-transparent outline-none flex-1 text-gray-700"
+                        <c:if test="${empty selectedRouteName}">disabled</c:if>>
+                    <option value="">Seleccionar</option>
+                    <c:forEach var="f" items="${flights}">
+                        <option value="${fn:escapeXml(f.name)}"
+                                <c:if test="${f.name == selectedFlightName}">selected</c:if>>
+                                ${fn:escapeXml(f.name)}
+                        </option>
+                    </c:forEach>
+                </select>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="flex gap-2 md:justify-start justify-end">
+            <button type="submit"
+                    class="h-[48px] px-4 rounded-lg bg-brand text-white font-semibold hover:brightness-110">
+                Aplicar filtros
+            </button>
+            <a class="h-[48px] flex items-center justify-center px-4 rounded-lg border bg-white hover:bg-gray-50 text-sm font-semibold"
+               href="${filtersAction}">
+                Limpiar filtros
+            </a>
+        </div>
+
+    </div>
+</form>

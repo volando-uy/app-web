@@ -1,0 +1,38 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+
+<form method="get" action="${pageContext.request.contextPath}/reservas"
+      class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end mb-4">
+    <input type="hidden" name="flight" value="${fn:escapeXml(flight.name)}"/>
+
+    <div>
+        <label class="text-xs text-gray-500 block">Clase</label>
+        <select name="seatType" class="w-full border rounded px-3 py-2 text-sm">
+            <option value="TURISTA"
+            ${seatTypePreview=='TURISTA' ? 'selected' : ''}
+            ${availTurista <= 0 ? 'disabled' : ''}>
+                TURISTA — disp: ${availTurista}
+            </option>
+            <option value="EJECUTIVO"
+            ${seatTypePreview=='EJECUTIVO' ? 'selected' : ''}
+            ${availEjecutivo <= 0 ? 'disabled' : ''}>
+                EJECUTIVO — disp: ${availEjecutivo}
+            </option>
+        </select>
+        <c:if test="${(seatTypePreview=='TURISTA' and availTurista<=0) or (seatTypePreview=='EJECUTIVO' and availEjecutivo<=0)}">
+            <p class="text-xs text-red-600 mt-1">Sin cupo en la clase seleccionada.</p>
+        </c:if>
+    </div>
+
+    <div>
+        <label class="text-xs text-gray-500">Pasajeros</label>
+        <input type="number" min="1" max="${passengersMax}"
+               name="passengersCount" value="${passengersCount}"
+               class="w-full border rounded px-3 py-2 text-sm"/>
+    </div>
+
+    <div class="flex items-end">
+        <button type="submit" class="px-4 py-2 bg-gray-100 border rounded hover:bg-gray-200 text-sm">Aplicar</button>
+    </div>
+</form>
