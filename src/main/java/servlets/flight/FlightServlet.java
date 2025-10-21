@@ -137,8 +137,8 @@ public class FlightServlet extends HttpServlet {
             if (r == null || r.getStatus() != EnumEstatusRuta.CONFIRMADA) continue;
 
             boolean okCategory = (selectedCategory == null || selectedCategory.isBlank());
-            if (!okCategory && r.getCategories() != null) {
-                for (String c : r.getCategories()) {
+            if (!okCategory && r.getCategoriesNames() != null) {
+                for (String c : r.getCategoriesNames() ) {
                     if (c != null && c.equalsIgnoreCase(selectedCategory)) { okCategory = true; break; }
                 }
             }

@@ -2,18 +2,22 @@ package servlets.packageservlet;
 
 import controllers.flightRoute.IFlightRouteController;
 import controllers.flightRoutePackage.IFlightRoutePackageController;
+
 import domain.dtos.flightRoute.FlightRouteDTO;
 import domain.dtos.flightRoutePackage.BaseFlightRoutePackageDTO;
 import domain.models.enums.EnumEstatusRuta;
+
 import factory.ControllerFactory;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @WebServlet("/packages/list")
 public class PackageServlet extends HttpServlet {
@@ -23,26 +27,21 @@ public class PackageServlet extends HttpServlet {
     private final IFlightRouteController routeCtrl =
             ControllerFactory.getFlightRouteController();
 
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException { process(req, resp); }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException { process(req, resp); }
-
-    private void process(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
         req.setCharacterEncoding("UTF-8");
-        resp.setCharacterEncoding("UTF-8");
+
+        final String qParam     = trimLower(opt(req.getParameter("q")));
+        final String modalParam = opt(req.getParameter("modal"));
+        final String routeParam = opt(req.getParameter("route"));
 
         boolean hadError = false;
 
-        final String modalParam = opt(req.getParameter("modal"));  // nombre del paquete
-        final String routeParam = opt(req.getParameter("route"));  // ruta
-
-         List<BaseFlightRoutePackageDTO> pkgs;
+        // 1) Paquetes "simples con rutas" (tu método que ya venías usando)
+        List<BaseFlightRoutePackageDTO> pkgs;
         try {
             pkgs = packageController.getAllFlightRoutesPackagesSimpleDetailsWithFlightRoutes();
             if (pkgs == null) pkgs = Collections.emptyList();
@@ -52,6 +51,7 @@ public class PackageServlet extends HttpServlet {
             pkgs = Collections.emptyList();
         }
 
+        // 2) Rutas por paquete
         Map<String, List<FlightRouteDTO>> pkgRoutes = new HashMap<>();
         for (BaseFlightRoutePackageDTO p : pkgs) {
             if (p == null) continue;
@@ -68,34 +68,56 @@ public class PackageServlet extends HttpServlet {
                 routes = Collections.emptyList();
             }
 
-            List<FlightRouteDTO> confirmed = new ArrayList<>();
-            for (FlightRouteDTO r : routes) {
-                if (r != null && r.getStatus() == EnumEstatusRuta.CONFIRMADA) {
-                    confirmed.add(r);
-                }
-            }
-            confirmed.sort(Comparator.comparing(
-                    FlightRouteDTO::getName,
-                    String.CASE_INSENSITIVE_ORDER
-            ));
+            List<FlightRouteDTO> confirmed = routes.stream()
+                    .filter(r -> r != null && r.getStatus() == EnumEstatusRuta.CONFIRMADA)
+                    .sorted(Comparator.comparing(FlightRouteDTO::getName, String.CASE_INSENSITIVE_ORDER))
+                    .collect(Collectors.toList());
 
             pkgRoutes.put(pkgName, confirmed);
         }
 
-        String modalPkgName = modalParam.isEmpty() ? null : modalParam;
+        // 3) Sacar paquetes sin rutas confirmadas
+        List<BaseFlightRoutePackageDTO> withConfirmed = pkgs.stream()
+                .filter(p -> !pkgRoutes.getOrDefault(opt(p.getName()), Collections.emptyList()).isEmpty())
+                .collect(Collectors.toList());
+
+        // 4) Filtro
+        List<BaseFlightRoutePackageDTO> filtered = withConfirmed;
+        if (!qParam.isEmpty()) {
+            filtered = withConfirmed.stream().filter(p -> {
+                String haystack = (opt(p.getName()) + " " + opt(p.getDescription())).toLowerCase();
+                if (haystack.contains(qParam)) return true;
+
+                List<FlightRouteDTO> rs = pkgRoutes.getOrDefault(opt(p.getName()), Collections.emptyList());
+                for (FlightRouteDTO r : rs) {
+                    String rStr = (opt(r.getName()) + " " + opt(r.getAirlineNickname()) + " "
+                            + opt(r.getOriginAeroCode()) + " " + opt(r.getDestinationAeroCode())).toLowerCase();
+                    if (rStr.contains(qParam)) return true;
+                }
+                return false;
+            }).collect(Collectors.toList());
+        }
+
+        // 5) Modal: solo si el paquete existe en el resultado filtrado
+        String modalPkgName = null;
         String safeRouteParam = null;
-        if (modalPkgName != null && !routeParam.isEmpty()) {
-            List<FlightRouteDTO> routes = pkgRoutes.getOrDefault(modalPkgName, Collections.emptyList());
-            for (FlightRouteDTO r : routes) {
-                if (r != null && routeParam.equalsIgnoreCase(r.getName())) {
-                    safeRouteParam = routeParam;
-                    break;
+
+        if (!modalParam.isEmpty() && filtered.stream().anyMatch(p -> opt(p.getName()).equals(modalParam))) {
+            modalPkgName = modalParam;
+            if (!routeParam.isEmpty()) {
+                List<FlightRouteDTO> routes = pkgRoutes.getOrDefault(modalPkgName, Collections.emptyList());
+                for (FlightRouteDTO r : routes) {
+                    if (r != null && routeParam.equalsIgnoreCase(opt(r.getName()))) {
+                        safeRouteParam = routeParam;
+                        break;
+                    }
                 }
             }
         }
 
-        req.setAttribute("pkgs", pkgs);
-        req.setAttribute("pkgRoutes", pkgRoutes);
+
+        req.setAttribute("pkgs", filtered);
+        req.setAttribute("pkgRoutes", pkgRoutes); // ya son solo confirmadas
         req.setAttribute("modalPkgName", modalPkgName);
         req.setAttribute("routeParam", safeRouteParam);
         req.setAttribute("hadError", hadError);
@@ -103,6 +125,22 @@ public class PackageServlet extends HttpServlet {
         req.getRequestDispatcher("/src/views/package/package.jsp").forward(req, resp);
     }
 
+    // POST: buscador → GET con ?q=
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        req.setCharacterEncoding("UTF-8");
+        final String q = opt(req.getParameter("q"));
+
+        StringBuilder target = new StringBuilder(req.getContextPath()).append("/packages/list");
+        if (!q.isBlank()) {
+            target.append("?q=").append(URLEncoder.encode(q, StandardCharsets.UTF_8));
+        }
+        resp.sendRedirect(target.toString());
+    }
+
     private static String opt(String s) { return s == null ? "" : s.trim(); }
     private static boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
+    private static String trimLower(String s) { return opt(s).toLowerCase(); }
 }

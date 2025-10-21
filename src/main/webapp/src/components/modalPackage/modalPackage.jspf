@@ -104,8 +104,8 @@
                 <div class="flex items-center justify-end gap-2 mt-4">
                     <a href="${backUrl}" class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50">Cerrar</a>
 
-                    <c:url var="buyUrl" value="/buypackage">
-                        <c:param name="pkg" value="${selectedPkg.name}" />
+                    <<c:url var="buyUrl" value="/package/buypackage">
+                    <c:param name="pkg" value="${selectedPkg.name}" />
                     </c:url>
                     <a href="${buyUrl}" class="px-4 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600">
                         Comprar paquete
