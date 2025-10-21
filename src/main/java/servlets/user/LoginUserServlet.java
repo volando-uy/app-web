@@ -1,6 +1,8 @@
 package servlets.user;
 
 import controllers.auth.IAuthController;
+import domain.dtos.user.LoginResponseDTO;
+import domain.dtos.user.UserDTO;
 import factory.ControllerFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -29,32 +31,37 @@ public class LoginUserServlet extends HttpServlet {
         String nickname = req.getParameter("nickname");
         String password = req.getParameter("password");
 
-        // Validación básica de inputs
         if (nickname == null || password == null || nickname.isBlank() || password.isBlank()) {
             handleLoginError(req, resp, "", "Debes ingresar usuario y contraseña.");
             return;
         }
 
         try {
-            String token = authController.login(nickname, password);
 
-            if (token != null) {
-                // Invalidar sesión anterior y crear una nueva
+            LoginResponseDTO loginResponse = authController.login(nickname, password);
+
+            if (loginResponse != null) {
+                UserDTO usuario = loginResponse.getUser();
+
                 HttpSession oldSession = req.getSession(false);
                 if (oldSession != null) {
                     oldSession.invalidate();
                 }
 
                 HttpSession newSession = req.getSession(true);
-                newSession.setAttribute("jwt", token);
+                newSession.setAttribute("jwt", loginResponse.getToken());
                 newSession.setAttribute("nickname", nickname);
+                newSession.setAttribute("usuario", usuario);
+
                 newSession.setAttribute("toastMessage", nickname + " logueado con éxito");
                 newSession.setAttribute("toastType", "success");
 
-                // 🔁 Redirección condicional si hay una URL previa almacenada
+                System.out.println("Usuario " + nickname + " ha iniciado sesión.");
+                System.out.println("Usuario details: " + usuario);
+
                 String redirectUrl = (String) newSession.getAttribute("redirectAfterLogin");
                 if (redirectUrl != null) {
-                    newSession.removeAttribute("redirectAfterLogin"); // Evitar redirección infinita
+                    newSession.removeAttribute("redirectAfterLogin");
                     resp.sendRedirect(redirectUrl);
                 } else {
                     resp.sendRedirect(req.getContextPath() + "/perfil");

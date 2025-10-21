@@ -27,23 +27,19 @@ public class IndexServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
-
-        resp.setCharacterEncoding("UTF-8");
-        resp.setContentType("text/html; charset=UTF-8");
-        try { req.setCharacterEncoding("UTF-8"); }
-        catch (Exception e) { log("No se pudo setear encoding UTF-8", e); }
-
-
-        HttpSession session = req.getSession(false);
+        HttpSession session = req.getSession();
         if (session != null) {
-            String toast = (String) session.getAttribute("toastMessage");
-            String toastType = (String) session.getAttribute("toastType");
+            String toast = (String) req.getSession().getAttribute("toastMessage");
+            String toastType = (String) req.getSession().getAttribute("toastType");
+            System.out.println("Toastr en IndexServlet: " + toast + " (type: " + toastType + ")");
+
             if (toast != null) {
                 req.setAttribute("toastMessage", toast);
                 req.setAttribute("toastType", (toastType != null) ? toastType : "success");
-                session.removeAttribute("toastMessage");
-                session.removeAttribute("toastType");
+
+//                // limpiar para que no se muestre de nuevo en reloads
+//                req.getSession().removeAttribute("toastMessage");
+//                req.getSession().removeAttribute("toastType");
             }
         }
 

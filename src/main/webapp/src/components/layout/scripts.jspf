@@ -33,17 +33,26 @@
 <%
     String toastMessage = (String) session.getAttribute("toastMessage");
     String toastType = (String) session.getAttribute("toastType");
+    System.out.println("Toast message: " + session.getAttribute("toastMessage"));
+    System.out.println("Toast toastType: " + session.getAttribute("toastType"));
+
     if (toastMessage != null) {
 %>
 <script>
-    const type = "<%= toastType != null ? toastType : "success" %>";
-    notyf[type]("<%= toastMessage.replace("\"", "\\\"") %>");
+    window.addEventListener("DOMContentLoaded", function() {
+        const notyf = new Notyf({
+            duration: 3000,
+            position: { x: 'right', y: 'bottom' }
+        });
+        notyf["<%= toastType != null ? toastType : "success" %>"]("<%= toastMessage.replace("\"", "\\\"") %>");
+    });
 </script>
 <%
         session.removeAttribute("toastMessage");
         session.removeAttribute("toastType");
     }
 %>
+
 
 <c:if test="${not empty pageScript}">
     <script src="${pageContext.request.contextPath}/${pageScript}"></script>
