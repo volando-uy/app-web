@@ -27,10 +27,18 @@ public class createFlightServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        List<String> airlines = userController.getAllAirlinesNicknames();
-        req.setAttribute("airlines", airlines);
+
+        String airlineNickname = (String) req.getSession().getAttribute("nickname");
+
+        List<BaseFlightRouteDTO> routes =
+                flightRouteController.getAllFlightRoutesSimpleDetailsByAirlineNickname(airlineNickname);
+
+        req.setAttribute("airlineNickname", airlineNickname);
+        req.setAttribute("flightRoutes", routes);
+
         req.getRequestDispatcher("/src/views/createFlight/createFlight.jsp").forward(req, resp);
     }
+
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
