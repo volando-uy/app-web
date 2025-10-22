@@ -1,3 +1,5 @@
+
+
 package servlets.packageservlet;
 
 import controllers.buypackage.IBuyPackageController;
@@ -26,7 +28,6 @@ public class BuyPackageServlet extends HttpServlet {
     private final IFlightRoutePackageController pkgCtrl =
             ControllerFactory.getFlightRoutePackageController();
 
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -34,7 +35,7 @@ public class BuyPackageServlet extends HttpServlet {
         setupEncoding(resp, req);
 
         HttpSession s = req.getSession(false);
-        String nick = (s == null) ? null : (String) s.getAttribute("nickname"); // mismo patrón que reservas
+        String nick = (s == null) ? null : (String) s.getAttribute("nickname");
 
         if (nick == null || nick.isBlank()) {
             String current = req.getRequestURI() + (req.getQueryString() != null ? "?" + req.getQueryString() : "");
@@ -99,15 +100,18 @@ public class BuyPackageServlet extends HttpServlet {
 
         try {
             BaseBuyPackageDTO purchase = buyCtrl.createBuyPackage(nick, pkgName);
-
             toast(req, "Compra realizada (ID " + (purchase != null ? purchase.getId() : "-") + ")", "success");
             resp.sendRedirect(req.getContextPath() + "/perfil");
+
         } catch (Exception e) {
-            String msg = (e.getMessage() != null && e.getMessage().toLowerCase().contains("ya"))
-                    ? "Ya compraste este paquete."
-                    : "No se pudo registrar la compra.";
+            // No adivinar por texto. Mostrar el mensaje real si existe.
+            getServletContext().log("createBuyPackage error", e);
+            String raw = e.getMessage();
+            String msg = (raw == null || raw.isBlank()) ? "No se pudo registrar la compra." : raw.trim();
+
+            // Volver a la pantalla de confirmación, no al listado
             toast(req, msg, "warning");
-            resp.sendRedirect(req.getContextPath() + "/packages/list");
+            resp.sendRedirect(req.getContextPath() + "/package/buypackage?pkg=" + url(pkgName));
         }
     }
 

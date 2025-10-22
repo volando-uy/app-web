@@ -1,3 +1,4 @@
+
 package servlets.reservations;
 
 import controllers.booking.IBookingController;
@@ -12,7 +13,6 @@ import domain.dtos.flightroute.FlightRouteDTO;
 import domain.dtos.luggage.BaseBasicLuggageDTO;
 import domain.dtos.luggage.BaseExtraLuggageDTO;
 import domain.dtos.luggage.LuggageDTO;
-import domain.dtos.seat.SeatDTO;
 import domain.dtos.ticket.BaseTicketDTO;
 
 import domain.models.enums.EnumTipoAsiento;
@@ -32,31 +32,25 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
 
-
 @WebServlet("/reservas")
 public class BookFlightServlet extends HttpServlet {
 
     private final IBookingController booking    = ControllerFactory.getBookingController();
-    private final IFlightController flights     = ControllerFactory.getFlightController();
+    private final IFlightController  flights    = ControllerFactory.getFlightController();
     private final IFlightRouteController routes = ControllerFactory.getFlightRouteController();
-    private final ISeatController seats         = ControllerFactory.getSeatController();
-
-
+    private final ISeatController    seats      = ControllerFactory.getSeatController();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-
-        setupEncoding(resp, req);
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html; charset=UTF-8");
 
         HttpSession s = req.getSession(false);
         String nick = (s == null) ? null : (String) s.getAttribute("nickname");
-        if (nick == null || nick.isBlank()) {
-
-            req.getSession(true).setAttribute(
-                    "redirectAfterLogin",
-                    req.getRequestURI() + (req.getQueryString() != null ? "?" + req.getQueryString() : "")
-            );
+        if (isBlank(nick)) {
+            req.getSession(true).setAttribute("redirectAfterLogin",
+                    req.getRequestURI() + (req.getQueryString() != null ? "?" + req.getQueryString() : ""));
             resp.sendRedirect(req.getContextPath() + "/users/login");
             return;
         }
@@ -64,98 +58,53 @@ public class BookFlightServlet extends HttpServlet {
         String flightName = req.getParameter("flight");
         if (isBlank(flightName)) { resp.sendError(400); return; }
 
+        FlightDTO flight = flights.getFlightDetailsByName(flightName);
+        if (flight == null) { resp.sendError(404); return; }
+        FlightRouteDTO route = routes.getFlightRouteDetailsByName(flight.getFlightRouteName());
+
         boolean already = hasExistingBookingForFlight(nick, flightName);
         boolean proceedAllowed = "1".equals(req.getParameter("proceed"));
 
-        FlightDTO flight = flights.getFlightDetailsByName(flightName);
-        if (flight == null) { resp.sendError(404); return; }
+        EnumTipoAsiento seatType = parseSeatType(req.getParameter("seatType"));
+        int passengersCount = Math.max(1, i(req.getParameter("passengersCount"), 1));
 
-        FlightRouteDTO route = routes.getFlightRouteDetailsByName(flight.getFlightRouteName());
+        SeatAvailability avail = availability(flightName, flight);
+        int maxSel = (seatType == EnumTipoAsiento.EJECUTIVO) ? avail.ejecutivo : avail.turista;
+        if (maxSel > 0 && passengersCount > maxSel) passengersCount = maxSel;
 
-        String seatTypePreview = nz(req.getParameter("seatType"), "TURISTA");
-        int passengersCount = parseInt(req.getParameter("passengersCount"), 1);
-        if (passengersCount < 1) passengersCount = 1;
-
-        // Disponibilidad por clase (capacidad - tickets emitidos)
-        SeatAvailability avail = getAvailabilityForFlight(flightName, flight);
-        int maxForSelected = "EJECUTIVO".equalsIgnoreCase(seatTypePreview) ? avail.ejecutivo : avail.turista;
-        if (passengersCount > maxForSelected) passengersCount = maxForSelected;
-        if (maxForSelected <= 0) {
-            passengersCount = 0;
-            req.setAttribute("pageAlertType", "warning");
-            req.setAttribute("pageAlertMsg",
-                    "No hay asientos disponibles en " + seatTypePreview + " para este vuelo.");
-        }
-
-
-        // Precio por asiento según clase
-        Double unitPrice = "EJECUTIVO".equalsIgnoreCase(seatTypePreview)
-                ? route.getPriceBusinessClass()
-                : route.getPriceTouristClass();
-        if (unitPrice == null) unitPrice = 0.0;
-
-        // Catálogos para selects
-        req.setAttribute("docTypes", EnumTipoDocumento.values());
-        req.setAttribute("basicLuggages", EnumEquipajeBasico.values());
-        req.setAttribute("extraLuggages", EnumEquipajeExtra.values());
-
-        // Datos base para la vista
-        req.setAttribute("flight", flight);
-        req.setAttribute("route", route);
-        req.setAttribute("seatTypePreview", seatTypePreview);
-        req.setAttribute("passengersCount", passengersCount);
-        req.setAttribute("unitPrice", unitPrice);
-
-        // Disponibilidad / límites UI
-        req.setAttribute("availTurista", avail.turista);
-        req.setAttribute("availEjecutivo", avail.ejecutivo);
-        req.setAttribute("passengersMax", Math.max(0, maxForSelected));
-
-        // Flags de UX
-        req.setAttribute("existingBooking", already);
-        req.setAttribute("proceedAllowed", proceedAllowed);
-
-        if (already && !proceedAllowed) {
-            toast(req, "Ya tienes una reserva para este vuelo.", "warning");
-        }
+        setView(req, flight, route, seatType.name(), passengersCount, unitPrice(route, seatType),
+                avail, already, proceedAllowed, false);
 
         req.getRequestDispatcher("/src/views/bookFlight/bookflight.jsp").forward(req, resp);
     }
 
-
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-
-        setupEncoding(resp, req);
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html; charset=UTF-8");
 
         HttpSession s = req.getSession(false);
         String nick = (s == null) ? null : (String) s.getAttribute("nickname");
-        if (nick == null || nick.isBlank()) {
-            resp.sendRedirect(req.getContextPath() + "/users/login");
-            return;
-        }
+        if (isBlank(nick)) { resp.sendRedirect(req.getContextPath() + "/users/login"); return; }
 
-        String flightName   = req.getParameter("flight");
-        String seatTypeStr  = req.getParameter("seatType");
-        int passengersCount = parseInt(req.getParameter("passengersCount"), 0);
-        boolean proceedAllowed = "1".equals(req.getParameter("proceed"));
-        String action = nz(req.getParameter("action"), "confirm");
-
+        String flightName = req.getParameter("flight");
         if (isBlank(flightName)) { resp.sendError(400); return; }
 
+        String action = req.getParameter("action");
+        boolean proceedAllowed = "1".equals(req.getParameter("proceed"));
+        EnumTipoAsiento seatType = parseSeatType(req.getParameter("seatType"));
+        int passengersCount = i(req.getParameter("passengersCount"), 0);
 
-        // -   CALCULAR costo
-        // - Bloquea CONFIRMAR salvo que venga proceed=1.
         boolean exists = hasExistingBookingForFlight(nick, flightName);
         if ("confirm".equalsIgnoreCase(action) && exists && !proceedAllowed) {
-            resp.sendRedirect(req.getContextPath() + "/reservas?flight=" + url(flightName));
+            toast(req, "Ya tenés una reserva para este vuelo.", "warning");
+            resp.sendRedirect(req.getContextPath() + "/reservas?flight=" + enc(flightName));
             return;
         }
-
         if (passengersCount < 1) {
             toast(req, "Debes indicar al menos 1 pasajero.", "error");
-            resp.sendRedirect(req.getContextPath() + "/reservas?flight=" + url(flightName));
+            resp.sendRedirect(req.getContextPath() + "/reservas?flight=" + enc(flightName));
             return;
         }
 
@@ -163,119 +112,70 @@ public class BookFlightServlet extends HttpServlet {
         if (flight == null) { resp.sendError(404); return; }
         FlightRouteDTO route = routes.getFlightRouteDetailsByName(flight.getFlightRouteName());
 
-        // Validación de disponibilidad
-        SeatAvailability avail = getAvailabilityForFlight(flightName, flight);
-        EnumTipoAsiento st = EnumTipoAsiento.valueOf(seatTypeStr);
-        int maxForSelected = (st == EnumTipoAsiento.EJECUTIVO) ? avail.ejecutivo : avail.turista;
-        if (passengersCount > maxForSelected) {
-            toast(req, "Quedan " + maxForSelected + " asientos en " + st + ". Ajustá la cantidad.", "error");
-            String back = req.getContextPath() + "/reservas?flight=" + url(flightName)
-                    + "&seatType=" + url(seatTypeStr)
-                    + "&passengersCount=" + maxForSelected
-                    + (proceedAllowed ? "&proceed=1" : "");
-            resp.sendRedirect(back);
+        SeatAvailability avail = availability(flightName, flight);
+        int maxSel = (seatType == EnumTipoAsiento.EJECUTIVO) ? avail.ejecutivo : avail.turista;
+        boolean capConocida = (maxSel != Integer.MAX_VALUE);
+        if (capConocida && (maxSel <= 0 || passengersCount > maxSel)) {
+            toast(req, "Quedan " + Math.max(0, maxSel) + " asientos en " + seatType + ". Ajustá la cantidad.", "error");
+            resp.sendRedirect(req.getContextPath() + "/reservas?flight=" + enc(flightName)
+                    + "&seatType=" + seatType.name()
+                    + "&passengersCount=" + Math.max(0, maxSel)
+                    + (proceedAllowed ? "&proceed=1" : ""));
             return;
         }
 
-        // Precio por asiento según clase
-        Double unitPrice = (st == EnumTipoAsiento.EJECUTIVO)
-                ? route.getPriceBusinessClass()
-                : route.getPriceTouristClass();
-        if (unitPrice == null) unitPrice = 0.0;
+        double unitPrice = unitPrice(route, seatType);
 
         if ("calc".equalsIgnoreCase(action)) {
-
-
-            for (int i = 0; i < passengersCount; i++) {
-                String pfx = "passengers[" + i + "]";
-                String name         = req.getParameter(pfx + ".name");
-                String surname      = req.getParameter(pfx + ".surname");
-                String docTypeStr   = req.getParameter(pfx + ".docType");
-                String doc          = req.getParameter(pfx + ".numDoc");
-                String basicTypeStr = req.getParameter(pfx + ".basicLuggageType");
-                String extraTypeStr = req.getParameter(pfx + ".extraLuggageType");
-
-                if (isBlank(name) || isBlank(surname) || isBlank(docTypeStr) || isBlank(doc)
-                        || isBlank(basicTypeStr) || isBlank(extraTypeStr)) {
-
-                    toast(req, "Completa los datos de todos los pasajeros para calcular.", "error");
-
-                    req.setAttribute("docTypes", EnumTipoDocumento.values());
-                    req.setAttribute("basicLuggages", EnumEquipajeBasico.values());
-                    req.setAttribute("extraLuggages", EnumEquipajeExtra.values());
-
-                    req.setAttribute("flight", flight);
-                    req.setAttribute("route", route);
-                    req.setAttribute("seatTypePreview", seatTypeStr);
-                    req.setAttribute("passengersCount", passengersCount);
-                    req.setAttribute("unitPrice", unitPrice);
-
-                    req.setAttribute("availTurista", avail.turista);
-                    req.setAttribute("availEjecutivo", avail.ejecutivo);
-                    req.setAttribute("passengersMax", Math.max(0, maxForSelected));
-
-                    req.setAttribute("existingBooking", exists);
-                    req.setAttribute("proceedAllowed", proceedAllowed);
-                    req.setAttribute("suppressExistingBanner", true);
-
+            // forward (pero igual usamos sesión para que lo capte scripts.jspf)
+            for (int k = 0; k < passengersCount; k++) {
+                String p = "passengers[" + k + "]";
+                if (isBlank(req.getParameter(p + ".name")) ||
+                        isBlank(req.getParameter(p + ".surname")) ||
+                        isBlank(req.getParameter(p + ".docType")) ||
+                        isBlank(req.getParameter(p + ".numDoc")) ||
+                        isBlank(req.getParameter(p + ".extraLuggageType"))) {
+                    toast(req, "Completá los datos básicos de todos los pasajeros para calcular.", "error");
+                    setView(req, flight, route, seatType.name(), passengersCount, unitPrice,
+                            avail, exists, proceedAllowed, true);
                     req.getRequestDispatcher("/src/views/bookFlight/bookflight.jsp").forward(req, resp);
                     return;
                 }
             }
 
             CostBreakdown cb = computeCost(req, passengersCount, unitPrice, route);
-
-
-            req.setAttribute("docTypes", EnumTipoDocumento.values());
-            req.setAttribute("basicLuggages", EnumEquipajeBasico.values());
-            req.setAttribute("extraLuggages", EnumEquipajeExtra.values());
-
-            req.setAttribute("flight", flight);
-            req.setAttribute("route", route);
-            req.setAttribute("seatTypePreview", seatTypeStr);
-            req.setAttribute("passengersCount", passengersCount);
-            req.setAttribute("unitPrice", unitPrice);
-
-            req.setAttribute("availTurista", avail.turista);
-            req.setAttribute("availEjecutivo", avail.ejecutivo);
-            req.setAttribute("passengersMax", Math.max(0, maxForSelected));
-
+            setView(req, flight, route, seatType.name(), passengersCount, unitPrice,
+                    avail, exists, proceedAllowed, true);
             req.setAttribute("calcSeatSubtotal", cb.seatSubtotal);
             req.setAttribute("calcExtraSubtotal", cb.extraSubtotal);
+            req.setAttribute("priceExtraUnit", route.getPriceExtraUnitBaggage() == null ? 0.0 : route.getPriceExtraUnitBaggage());
             req.setAttribute("calcTotal", cb.total());
             req.setAttribute("calcDone", true);
-            req.setAttribute("priceExtraUnit", route.getPriceExtraUnitBaggage());
-
-            req.setAttribute("existingBooking", exists);
-            req.setAttribute("proceedAllowed", proceedAllowed);
-            req.setAttribute("suppressExistingBanner", true);
-
             req.getRequestDispatcher("/src/views/bookFlight/bookflight.jsp").forward(req, resp);
             return;
         }
 
-
+        // Confirmar
         Map<BaseTicketDTO, List<LuggageDTO>> ticketMap = new LinkedHashMap<>();
+        for (int k = 0; k < passengersCount; k++) {
+            String p = "passengers[" + k + "]";
 
-        for (int i = 0; i < passengersCount; i++) {
-            String pfx = "passengers[" + i + "]";
+            String name    = req.getParameter(p + ".name");
+            String surname = req.getParameter(p + ".surname");
+            String dtStr   = req.getParameter(p + ".docType");
+            String doc     = req.getParameter(p + ".numDoc");
 
-            String name         = req.getParameter(pfx + ".name");
-            String surname      = req.getParameter(pfx + ".surname");
-            String docTypeStr   = req.getParameter(pfx + ".docType");
-            String doc          = req.getParameter(pfx + ".numDoc");
+            String basicTypeStr = req.getParameter(p + ".basicLuggageType");
+            double basicWeight  = d(req.getParameter(p + ".basicLuggageWeight"), 0.0);
 
-            String basicTypeStr = req.getParameter(pfx + ".basicLuggageType");
-            double basicWeight  = parseDouble(req.getParameter(pfx + ".basicLuggageWeight"), 0.0);
+            String extraTypeStr = req.getParameter(p + ".extraLuggageType");
+            int    extraUnits   = i(req.getParameter(p + ".extraLuggageUnits"), 0);
+            double extraWeight  = d(req.getParameter(p + ".extraLuggageWeight"), 0.0);
 
-            String extraTypeStr = req.getParameter(pfx + ".extraLuggageType");
-            int    extraUnits   = parseInt(req.getParameter(pfx + ".extraLuggageUnits"), 0);
-            double extraWeight  = parseDouble(req.getParameter(pfx + ".extraLuggageWeight"), 0.0);
-
-            if (isBlank(name) || isBlank(surname) || isBlank(docTypeStr) || isBlank(doc)
-                    || isBlank(basicTypeStr) || isBlank(extraTypeStr)) {
+            if (isBlank(name) || isBlank(surname) || isBlank(dtStr) || isBlank(doc) ||
+                    isBlank(basicTypeStr) || isBlank(extraTypeStr)) {
                 toast(req, "Completa los datos de todos los pasajeros.", "error");
-                resp.sendRedirect(req.getContextPath() + "/reservas?flight=" + url(flightName));
+                resp.sendRedirect(req.getContextPath() + "/reservas?flight=" + enc(flightName));
                 return;
             }
 
@@ -283,7 +183,7 @@ public class BookFlightServlet extends HttpServlet {
             t.setName(name);
             t.setSurname(surname);
             t.setNumDoc(doc);
-            t.setDocType(EnumTipoDocumento.valueOf(docTypeStr));
+            t.setDocType(EnumTipoDocumento.valueOf(dtStr));
 
             List<LuggageDTO> l = new ArrayList<>();
 
@@ -299,16 +199,15 @@ public class BookFlightServlet extends HttpServlet {
                 ex.setWeight(extraWeight);
                 l.add(ex);
             }
-
             ticketMap.put(t, l);
         }
 
-        CostBreakdown confirmCost = computeCost(req, passengersCount, unitPrice, route);
+        CostBreakdown cbConfirm = computeCost(req, passengersCount, unitPrice, route);
 
         BaseBookFlightDTO bookingDTO = new BaseBookFlightDTO();
-        bookingDTO.setSeatType(st);
+        bookingDTO.setSeatType(seatType);
         bookingDTO.setCreatedAt(LocalDateTime.now());
-        bookingDTO.setTotalPrice(confirmCost.total()); // ← ahora sí guardamos el total
+        bookingDTO.setTotalPrice(cbConfirm.total());
 
         try {
             booking.createBooking(bookingDTO, ticketMap, nick, flightName);
@@ -317,35 +216,84 @@ public class BookFlightServlet extends HttpServlet {
         } catch (Exception e) {
             getServletContext().log("createBooking error", e);
             toast(req, "No se pudo crear la reserva: " + e.getMessage(), "error");
-            resp.sendRedirect(req.getContextPath() + "/reservas?flight=" + url(flightName) + "&proceed=1");
+            resp.sendRedirect(req.getContextPath() + "/reservas?flight=" + enc(flightName) + "&proceed=1");
         }
     }
 
+    private SeatAvailability availability(String flightName, FlightDTO f) {
+        int capT = (f.getMaxEconomySeats()  == null) ? 0 : f.getMaxEconomySeats();
+        int capE = (f.getMaxBusinessSeats() == null) ? 0 : f.getMaxBusinessSeats();
 
-    /** Disponibilidad por clase: capacidad del vuelo menos tickets emitidos por clase. */
-    private SeatAvailability getAvailabilityForFlight(String flightName, FlightDTO flight) {
-        int capTurista   = safeInt(flight.getMaxEconomySeats());
-        int capEjecutivo = safeInt(flight.getMaxBusinessSeats());
-
-        int occTurista = 0, occEjecutivo = 0;
+        int occT = 0, occE = 0;
         try {
-            List<BookFlightDTO> bookings = booking.getBookFlightsDetailsByFlightName(flightName);
-            if (bookings != null) {
-                for (BookFlightDTO bf : bookings) {
+            List<BookFlightDTO> list = booking.getBookFlightsDetailsByFlightName(flightName);
+            if (list != null) {
+                for (BookFlightDTO bf : list) {
                     if (bf == null || bf.getTicketIds() == null) continue;
-                    int cant = bf.getTicketIds().size();
-                    if (bf.getSeatType() == EnumTipoAsiento.TURISTA)   occTurista   += cant;
-                    if (bf.getSeatType() == EnumTipoAsiento.EJECUTIVO) occEjecutivo += cant;
+                    int n = bf.getTicketIds().size();
+                    if (bf.getSeatType() == EnumTipoAsiento.TURISTA)   occT += n;
+                    if (bf.getSeatType() == EnumTipoAsiento.EJECUTIVO) occE += n;
                 }
             }
         } catch (Exception ex) {
             getServletContext().log("avail lookup failed for flight=" + flightName, ex);
         }
 
-        int dispTurista   = Math.max(0, capTurista   - occTurista);
-        int dispEjecutivo = Math.max(0, capEjecutivo - occEjecutivo);
-        return new SeatAvailability(dispTurista, dispEjecutivo);
+        int dispT = (capT > 0) ? Math.max(0, capT - occT) : Integer.MAX_VALUE;
+        int dispE = (capE > 0) ? Math.max(0, capE - occE) : Integer.MAX_VALUE;
+        return new SeatAvailability(dispT, dispE);
     }
+
+    private static final class CostBreakdown {
+        double seatSubtotal, extraSubtotal;
+        double total() { return seatSubtotal + extraSubtotal; }
+    }
+
+    private CostBreakdown computeCost(HttpServletRequest req, int pax, double unitSeatPrice, FlightRouteDTO route) {
+        CostBreakdown cb = new CostBreakdown();
+        cb.seatSubtotal = unitSeatPrice * Math.max(pax, 0);
+
+        double perExtra = (route.getPriceExtraUnitBaggage() == null) ? 0.0 : route.getPriceExtraUnitBaggage();
+        double extra = 0.0;
+        for (int k = 0; k < pax; k++) {
+            int u = i(req.getParameter("passengers[" + k + "].extraLuggageUnits"), 0);
+            if (u > 0) extra += perExtra * u;
+        }
+        cb.extraSubtotal = extra;
+        return cb;
+    }
+
+    private void setView(HttpServletRequest req, FlightDTO flight, FlightRouteDTO route,
+                         String seatType, int pax, double unitPrice,
+                         SeatAvailability avail, boolean exists, boolean proceed, boolean suppressBanner) {
+
+        req.setAttribute("docTypes", EnumTipoDocumento.values());
+        req.setAttribute("basicLuggages", EnumEquipajeBasico.values());
+        req.setAttribute("extraLuggages", EnumEquipajeExtra.values());
+
+        req.setAttribute("flight", flight);
+        req.setAttribute("route", route);
+        req.setAttribute("seatTypePreview", seatType);
+        req.setAttribute("passengersCount", pax);
+        req.setAttribute("unitPrice", unitPrice);
+
+        int maxT = (avail.turista   == Integer.MAX_VALUE) ? 9 : avail.turista;
+        int maxE = (avail.ejecutivo == Integer.MAX_VALUE) ? 9 : avail.ejecutivo;
+        req.setAttribute("availTurista", maxT);
+        req.setAttribute("availEjecutivo", maxE);
+        req.setAttribute("passengersMax", "EJECUTIVO".equalsIgnoreCase(seatType) ? maxE : maxT);
+
+        req.setAttribute("existingBooking", exists);
+        req.setAttribute("proceedAllowed", proceed);
+        if (suppressBanner) req.setAttribute("suppressExistingBanner", true);
+    }
+
+    // util mínimos
+    private static final class SeatAvailability { final int turista, ejecutivo; SeatAvailability(int t, int e){this.turista=t; this.ejecutivo=e;} }
+    private static boolean isBlank(String s){ return s == null || s.trim().isEmpty(); }
+    private static int i(String s, int d){ try { return Integer.parseInt(s); } catch (Exception e) { return d; } }
+    private static double d(String s, double v){ try { return Double.parseDouble(s.replace(',', '.')); } catch (Exception e) { return v; } }
+    private static String enc(String s){ try { return URLEncoder.encode(s, StandardCharsets.UTF_8); } catch (Exception e) { return s; } }
 
     private boolean hasExistingBookingForFlight(String nickname, String flightName) {
         try {
@@ -358,11 +306,10 @@ public class BookFlightServlet extends HttpServlet {
                 for (Long tid : bf.getTicketIds()) {
                     if (tid == null) continue;
                     try {
-                        SeatDTO seat = seats.getSeatDetailsByTicketId(tid);
-                        if (seat != null && seat.getFlightName() != null) {
-                            if (seat.getFlightName().trim().equalsIgnoreCase(target)) {
-                                return true;
-                            }
+                        var seat = seats.getSeatDetailsByTicketId(tid);
+                        if (seat != null && seat.getFlightName() != null &&
+                                seat.getFlightName().trim().equalsIgnoreCase(target)) {
+                            return true;
                         }
                     } catch (Exception ex) {
                         getServletContext().log("Seat lookup failed for ticketId=" + tid, ex);
@@ -375,71 +322,20 @@ public class BookFlightServlet extends HttpServlet {
         return false;
     }
 
-
-    /**   asientos + extra   */
-    private static final class CostBreakdown {
-        double seatSubtotal;
-        double extraSubtotal;
-        double total() { return seatSubtotal + extraSubtotal; }
+    private static EnumTipoAsiento parseSeatType(String s){
+        try { return EnumTipoAsiento.valueOf(isBlank(s) ? "TURISTA" : s); }
+        catch (Exception e) { return EnumTipoAsiento.TURISTA; }
     }
-
-    /**
-     * Calcula el total
-     * - Asientos = unitSeatPrice * pasajeros
-     * - Extra= (suma de unidades) * route.priceExtraUnitBaggage
-     */
-    private CostBreakdown computeCost(HttpServletRequest req,
-                                      int passengersCount,
-                                      double unitSeatPrice,
-                                      FlightRouteDTO route) {
-        CostBreakdown cb = new CostBreakdown();
-        cb.seatSubtotal = unitSeatPrice * Math.max(passengersCount, 0);
-
-        double extra = 0.0;
-        double pricePerExtraUnit = route.getPriceExtraUnitBaggage() == null ? 0.0
-                : route.getPriceExtraUnitBaggage();
-
-        for (int i = 0; i < passengersCount; i++) {
-            String pfx = "passengers[" + i + "]";
-            int extraUnits = parseInt(req.getParameter(pfx + ".extraLuggageUnits"), 0);
-            if (extraUnits > 0) extra += pricePerExtraUnit * extraUnits;
-        }
-        cb.extraSubtotal = extra;
-        return cb;
-    }
-
-
-    private static final class SeatAvailability {
-        final int turista;
-        final int ejecutivo;
-        SeatAvailability(int t, int e) { this.turista = t; this.ejecutivo = e; }
-    }
-
-    private static void setupEncoding(HttpServletResponse resp , HttpServletRequest req  ) {
-        try {
-            req.setCharacterEncoding("UTF-8");
-        } catch (Exception ignored) {
-        }
-        resp.setCharacterEncoding("UTF-8");
-        resp.setContentType("text/html; charset=UTF-8");
-    }
-
-    private static int parseInt(String s, int d){
-        try { return Integer.parseInt(s); } catch (Exception e) { return d; }
-    }
-
-    private static double parseDouble(String s, double d){
-        try { return Double.parseDouble(s.replace(',', '.')); } catch (Exception e) { return d; }
-    }
-
-    private static int safeInt(Integer x){ return x == null ? 0 : x; }
-    private static String nz(String s, String d){ return (s==null || s.isBlank()) ? d : s.trim(); }
-    private static String url(String s){ try{ return URLEncoder.encode(s, StandardCharsets.UTF_8);}catch(Exception e){ return s; } }
-    private static boolean isBlank(String s){ return s==null || s.trim().isEmpty(); }
 
     private static void toast(HttpServletRequest req, String msg, String type) {
         HttpSession session = req.getSession();
         session.setAttribute("toastMessage", msg);
         session.setAttribute("toastType", type);
     }
+
+    private static double unitPrice(FlightRouteDTO route, EnumTipoAsiento st){
+        Double v = (st == EnumTipoAsiento.EJECUTIVO) ? route.getPriceBusinessClass() : route.getPriceTouristClass();
+        return v == null ? 0.0 : v;
+    }
 }
+
