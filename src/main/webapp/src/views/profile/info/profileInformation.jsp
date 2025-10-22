@@ -15,7 +15,7 @@
     <div class="flex flex-col md:flex-row gap-8 items-center">
         <div class="text-white p-6 flex flex-col items-center">
             <div class="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-lg mb-4">
-                <img src="${userImage}" alt="Foto de perfil"
+                <img src="image?resourceClassName=${usuario.getClass().getSimpleName()}&key=${usuario.getNickname()}" alt="Foto de perfil"
                      class="w-full h-full object-cover"/>
             </div>
         </div>

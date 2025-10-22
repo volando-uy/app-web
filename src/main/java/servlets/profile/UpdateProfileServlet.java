@@ -9,17 +9,11 @@ import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import shared.constants.Images;
-
 import utils.ImageStorageUtils;
-import utils.PathResolver;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
-import java.util.UUID;
 
 
 @MultipartConfig(
@@ -65,44 +59,52 @@ public class UpdateProfileServlet extends HttpServlet {
         Part imagePart = req.getPart("profileImage");
 
 
-        if (userDetails instanceof BaseCustomerDTO customer) {
-            File finalImage = ImageStorageUtils.saveImage(
-                    getServletContext(),
-                    imagePart,
-                    Images.IMAGES_PATH + Images.CUSTOMERS_PATH,
-                    nickname
-            );
+        File finalImage = null;
+        try {
+
+            if (userDetails instanceof BaseCustomerDTO customer) {
+                finalImage = ImageStorageUtils.saveImage(
+                        getServletContext(),
+                        imagePart,
+                        Images.IMAGES_PATH + Images.CUSTOMERS_PATH,
+                        nickname
+                );
 
 
-            BaseCustomerDTO dto = new BaseCustomerDTO();
-            dto.setName(req.getParameter("name"));
-            dto.setSurname(req.getParameter("surname"));
-            dto.setBirthDate(LocalDate.parse(req.getParameter("birthDate")));
-            dto.setCitizenship(req.getParameter("citizenship"));
-            dto.setDocType(EnumTipoDocumento.valueOf(req.getParameter("docType")));
-            dto.setNumDoc(req.getParameter("numDoc"));
+                BaseCustomerDTO dto = new BaseCustomerDTO();
+                dto.setName(req.getParameter("name"));
+                dto.setSurname(req.getParameter("surname"));
+                dto.setBirthDate(LocalDate.parse(req.getParameter("birthDate")));
+                dto.setCitizenship(req.getParameter("citizenship"));
+                dto.setDocType(EnumTipoDocumento.valueOf(req.getParameter("docType")));
+                dto.setNumDoc(req.getParameter("numDoc"));
 
-            UserDTO newUser = userController.updateUser(customer.getNickname(), dto, finalImage);
-            System.out.println(newUser);
+                UserDTO newUser = userController.updateUser(customer.getNickname(), dto, finalImage);
+                System.out.println(newUser);
 
-        } else if (userDetails instanceof BaseAirlineDTO airline) {
-            File finalImage = ImageStorageUtils.saveImage(
-                    getServletContext(),
-                    imagePart,
-                    Images.IMAGES_PATH + Images.AIRLINES_PATH,
-                    nickname
-            );
-
-
-            BaseAirlineDTO dto = new BaseAirlineDTO();
-            dto.setName(req.getParameter("name"));
-            dto.setDescription(req.getParameter("description"));
-            dto.setWeb(req.getParameter("web"));
+            } else if (userDetails instanceof BaseAirlineDTO airline) {
+                finalImage = ImageStorageUtils.saveImage(
+                        getServletContext(),
+                        imagePart,
+                        Images.IMAGES_PATH + Images.AIRLINES_PATH,
+                        nickname
+                );
 
 
-            UserDTO newUser = userController.updateUser(airline.getNickname(), dto, finalImage);
-            System.out.println(newUser);
+                BaseAirlineDTO dto = new BaseAirlineDTO();
+                dto.setName(req.getParameter("name"));
+                dto.setDescription(req.getParameter("description"));
+                dto.setWeb(req.getParameter("web"));
+
+
+                UserDTO newUser = userController.updateUser(airline.getNickname(), dto, finalImage);
+                System.out.println(newUser);
+            }
+        } catch (Exception e) {
+
         }
+
+        ImageStorageUtils.deleteImage(finalImage);
 
         // ✅ Confirmación y redirección
         session.setAttribute("toastMessage", "Perfil actualizado con éxito");

@@ -37,4 +37,15 @@ public class ImageStorageUtils {
         int dot = fileName.lastIndexOf(".");
         return (dot >= 0) ? fileName.substring(dot) : "";
     }
+
+    public static void deleteImage(File finalImage) {
+        if (finalImage != null && finalImage.exists()) {
+            System.out.println("🗑️ Borrando imagen temporal: " + finalImage.getAbsolutePath());
+            if (finalImage.delete()) {
+                System.out.println("🗑 Imagen temporal borrada...");
+            } else {
+                System.out.println("⚠️ No se pudo borrar la imagen temporal...");
+            }
+        }
+    }
 }

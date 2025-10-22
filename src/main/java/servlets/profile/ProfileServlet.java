@@ -8,10 +8,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import shared.constants.Images;
-import utils.ImageFunctions;
 
-import java.io.File;
 import java.io.IOException;
 
 @WebServlet("/perfil")
@@ -29,10 +26,6 @@ public class ProfileServlet extends HttpServlet {
             return;
         }
 
-        String imagePath = ImageFunctions.getImage(usuario.getImage());
-        System.out.println("📸 Ruta imagen usuario: " + imagePath);
-        req.setAttribute("imageUrl", imagePath);
-
         // Refrescamos los datos completos del usuario según su tipo
         if (usuario instanceof BaseCustomerDTO) {
             CustomerDTO cliente = userController.getCustomerDetailsByNickname(usuario.getNickname());
@@ -46,6 +39,7 @@ public class ProfileServlet extends HttpServlet {
             req.setAttribute("aerolinea", aerolinea);
             req.setAttribute("tipoUsuario", "aerolinea");
             req.setAttribute("usuario", aerolinea);
+
             req.getSession().setAttribute("usuario", aerolinea);
         }
 
