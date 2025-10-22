@@ -1,7 +1,9 @@
 package servlets.checkFlightRoute;
 
 import controllers.flightRoute.IFlightRouteController;
+import controllers.flight.IFlightController;
 import controllers.user.IUserController;
+import domain.dtos.flight.FlightDTO;
 import domain.dtos.flightRoute.FlightRouteDTO;
 import domain.dtos.user.AirlineDTO;
 import domain.dtos.user.UserDTO;
@@ -21,6 +23,7 @@ import java.util.List;
 public class FlightRouteServlet extends HttpServlet {
 
     private final IFlightRouteController flightRouteController = ControllerFactory.getFlightRouteController();
+    private final IFlightController flightController = ControllerFactory.getFlightController();
     private final IUserController userController = ControllerFactory.getUserController();
 
     @Override
@@ -38,13 +41,28 @@ public class FlightRouteServlet extends HttpServlet {
         }
 
         String nickname = (String) session.getAttribute("nickname");
-        UserDTO user = userController.getCustomerDetailsByNickname(nickname);
+
+        // Detectar tipo de usuario logueado
+        Object user = null;
+        try {
+            // Intenta obtenerlo como cliente
+            user = userController.getCustomerDetailsByNickname(nickname);
+        } catch (IllegalArgumentException e) {
+            try {
+                // Si no es cliente, intentar como aerolínea
+                user = userController.getAirlineDetailsByNickname(nickname);
+            } catch (IllegalArgumentException ignored) {
+                resp.sendRedirect(req.getContextPath() + "/users/login");
+                return;
+            }
+        }
+
         req.setAttribute("user", user);
 
         String airlineParam = req.getParameter("airline");
-        String selectedRoute = req.getParameter("route");
+        String routeParam = req.getParameter("route");
+        String flightParam = req.getParameter("flight");
 
-        // Si no hay aerolínea seleccionada aún mostrar aerolíneas disponibles
         if (airlineParam == null) {
             List<AirlineDTO> airlines = userController.getAllAirlinesDetails();
             req.setAttribute("airlines", airlines);
@@ -52,11 +70,9 @@ public class FlightRouteServlet extends HttpServlet {
             return;
         }
 
-        // Si hay aerolínea, pero no rutalistar rutas confirmadas de esa aerolínea
-        if (selectedRoute == null) {
+        if (routeParam == null) {
             List<FlightRouteDTO> routes = flightRouteController.getAllFlightRoutesDetailsByAirlineNickname(airlineParam);
 
-            // Filtrar por estado CONFIRMADA (seguro frente a null)
             routes = routes.stream()
                     .filter(r -> r.getStatus() != null && r.getStatus() == EnumEstatusRuta.CONFIRMADA)
                     .toList();
@@ -67,8 +83,13 @@ public class FlightRouteServlet extends HttpServlet {
             return;
         }
 
-        FlightRouteDTO route = flightRouteController.getFlightRouteDetailsByName(selectedRoute);
+        FlightRouteDTO route = flightRouteController.getFlightRouteDetailsByName(routeParam);
         req.setAttribute("route", route);
+
+        if (flightParam != null) {
+            FlightDTO flight = flightController.getFlightDetailsByName(flightParam);
+            req.setAttribute("flight", flight);
+        }
 
         req.getRequestDispatcher("/src/views/checkflightroute/checkflightroute.jsp").forward(req, resp);
     }

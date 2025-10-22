@@ -164,14 +164,7 @@ public class IndexServlet extends HttpServlet {
                 writeNumOrNull(out, "priceBusiness", r.getPriceBusinessClass());
                 out.append(',');
                 // categorías (si vienen)
-                out.append("\"categories\":[");
-                List<String> cats = r.getCategories();
-                if (cats != null) {
-                    for (int i = 0; i < cats.size(); i++) {
-                        if (i > 0) out.append(',');
-                        out.append('"').append(esc(nvl(cats.get(i)))).append('"');
-                    }
-                }
+
                 out.append("]");
 
                 out.append('}');

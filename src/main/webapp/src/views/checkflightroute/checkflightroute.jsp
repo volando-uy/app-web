@@ -24,6 +24,7 @@
 <jsp:include page="../header/header.jsp" />
 
 <main class="flex-1 max-w-5xl mx-auto p-6 md:p-10">
+
     <!-- Seleccionar aerolínea -->
     <c:if test="${empty param.airline}">
         <section class="bg-white shadow-md rounded-2xl p-8 border border-gray-200">
@@ -100,7 +101,7 @@
     </c:if>
 
     <!-- Detalle de ruta -->
-    <c:if test="${not empty param.route}">
+    <c:if test="${not empty param.route and empty param.flight}">
         <section class="bg-white shadow-md rounded-2xl p-8 border border-gray-200">
             <h2 class="text-3xl font-semibold mb-4 text-brand text-center">${route.name}</h2>
 
@@ -112,7 +113,7 @@
                 <div>
                     <strong>Categorías:</strong>
                     <div class="mt-1 flex flex-wrap gap-2">
-                        <c:forEach var="cat" items="${route.categories}">
+                        <c:forEach var="cat" items="${route.categoriesNames}">
                             <span class="bg-brand text-white px-3 py-1 rounded-full text-xs">${cat}</span>
                         </c:forEach>
                     </div>
@@ -131,7 +132,12 @@
                         <c:when test="${not empty route.flightsNames}">
                             <ul class="list-disc list-inside space-y-1">
                                 <c:forEach var="f" items="${route.flightsNames}">
-                                    <li>${f}</li>
+                                    <li>
+                                        <a href="${pageContext.request.contextPath}/flightRoute?airline=${param.airline}&route=${param.route}&flight=${f}"
+                                           class="text-brand hover:underline">
+                                                ${f}
+                                        </a>
+                                    </li>
                                 </c:forEach>
                             </ul>
                         </c:when>
@@ -150,6 +156,12 @@
             </div>
         </section>
     </c:if>
+
+    <!-- Detalle del vuelo (JSPF incluido dinámicamente) -->
+    <c:if test="${not empty param.flight}">
+        <jsp:include page="../../components/flightDetails/flightDetails.jsp" />
+    </c:if>
+
 </main>
 
 <jsp:include page="../footer/footer.jspf" />
