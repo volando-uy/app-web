@@ -4,6 +4,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
 
 public class JWTAuthFilter implements Filter {
@@ -18,8 +19,9 @@ public class JWTAuthFilter implements Filter {
 
         if (SessionUtils.isUserAuthenticated(session)) {
             // Refrescar nickname si no está
-            SessionUtils.getNickname(session);
-            chain.doFilter(request, response); // sigue a /perfil o lo que sea
+            String nickname = SessionUtils.getNickname(session);
+            session.setAttribute("jwt_nick", nickname);
+            chain.doFilter(request, response); // sigue a /perfil o recurso protegido
         } else {
             if (session == null) session = req.getSession(true);
 

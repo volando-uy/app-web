@@ -6,7 +6,7 @@
 
 <script>
     // Context Path global para tus JS
-    window.__BASE__ = "${pageContext.request.contextPath}";
+        window.__BASE__ = "${pageContext.request.contextPath}";
     console.log("Context Path:", window.__BASE__);
 
     // Notyf Configuración

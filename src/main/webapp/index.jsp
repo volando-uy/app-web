@@ -3,6 +3,7 @@
 <%@ include file="/src/components/layout/libs.jspf" %>
 
 <%
+
     if (request.getAttribute("packages") == null || request.getAttribute("flights") == null) {
 //        request.getRequestDispatcher("/index").forward(request, response);
         response.sendRedirect(request.getContextPath() + "/index");
@@ -11,7 +12,12 @@
 %>
 
 <html lang="es">
-<jsp:include page="/src/components/layout/head.jspf"/>
+<%
+    request.setAttribute("pageTitle", "Volando.uy");
+%>
+
+<html lang="es">
+<%@ include file="/src/components/layout/head.jspf" %>
 
 <body class="min-h-screen bg-brand/10 flex flex-col">
 
