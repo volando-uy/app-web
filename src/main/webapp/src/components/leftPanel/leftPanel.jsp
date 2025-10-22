@@ -17,17 +17,17 @@
 <div id="mobilePanel"
      class="fixed bottom-20 right-6 bg-brand text-white rounded-2xl shadow-lg p-4 flex flex-col gap-2 w-[180px] hidden z-50">
     <% if (tipoUsuario.contains("airline")) { %>
-    <a href="/app-web-jsp/createFlight" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">✈️ Crear vuelo</a>
-    <a href="/app-web-jsp/createFlightRoute" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">🧭 Crear ruta</a>
-    <a href="/app-web-jsp/createPackage" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">🎒 Crear paquete</a>
-    <a href="/app-web-jsp/packages/list" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">📦 Mis paquetes</a>
-    <a href="" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">🧾 Reservas</a>
+    <a href="${createFlightUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">✈️ Crear vuelo</a>
+    <a href="${createFlightRouteUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">🧭 Crear ruta</a>
+    <a href="${createPackageUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">🎒 Crear paquete</a>
+    <a href="${listPackageUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">📦 Mis paquetes</a>
+    <a href="${checkBookingUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">🧾 Reservas</a>
 
     <% } else if (tipoUsuario.contains("customer")) { %>
-    <a href="/app-web-jsp/perfil" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">ℹ️ Mi perfil</a>
-    <a href="/app-web-jsp/flight/list" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">✈️ Buscar vuelos</a>
-    <a href="" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">🧾 Mis reservas</a>
-    <a href="/app-web-jsp/packages/list" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">🎒 Paquetes</a>
+    <a href="${profileUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">ℹ️ Mi perfil</a>
+    <a href="${flightsUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">✈️ Buscar vuelos</a>
+    <a href="${checkBookingUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">🧾 Mis reservas</a>
+    <a href="${listPackageUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">🎒 Paquetes</a>
     <% } %>
 </div>
 

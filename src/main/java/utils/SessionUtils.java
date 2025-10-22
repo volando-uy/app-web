@@ -30,4 +30,19 @@ public class SessionUtils {
 
         return null;
     }
+
+
+    public static boolean isAirline(HttpSession session) {
+        if (session == null) return false;
+
+        String token = (String) session.getAttribute("jwt");
+        return token != null && authController.isAirline(token);
+    }
+
+    public static boolean isCustomer(HttpSession session) {
+        if (session == null) return false;
+
+        String token = (String) session.getAttribute("jwt");
+        return token != null && authController.isCustomer(token);
+    }
 }

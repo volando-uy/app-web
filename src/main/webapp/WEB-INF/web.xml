@@ -21,10 +21,15 @@
         <filter-class>utils.AlreadyLoggedInFilter</filter-class>
     </filter>
 
-    <filter-mapping>
-        <filter-name>JWTAuthFilter</filter-name>
-        <url-pattern>/perfil</url-pattern>
-    </filter-mapping>
+    <filter>
+        <filter-name>IsAirline</filter-name>
+        <filter-class>utils.IsAirlineFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>IsCustomer</filter-name>
+        <filter-class>utils.IsCustomerFilter</filter-class>
+    </filter>
 
     <filter-mapping>
         <filter-name>AlreadyLoggedInFilter</filter-name>
@@ -35,5 +40,70 @@
         <filter-name>AlreadyLoggedInFilter</filter-name>
         <url-pattern>/users/register</url-pattern>
     </filter-mapping>
+
+
+
+    <filter-mapping>
+        <filter-name>JWTAuthFilter</filter-name>
+        <url-pattern>/perfil</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>JWTAuthFilter</filter-name>
+        <url-pattern>/perfil/update</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JWTAuthFilter</filter-name>
+        <url-pattern>/createFlight</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JWTAuthFilter</filter-name>
+        <url-pattern>/createFlightRoute</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JWTAuthFilter</filter-name>
+        <url-pattern>/createCityAndCategory</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JWTAuthFilter</filter-name>
+        <url-pattern>/flightRoute</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JWTAuthFilter</filter-name>
+        <url-pattern>/reservas</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>JWTAuthFilter</filter-name>
+        <url-pattern>/package/buypackage</url-pattern>
+    </filter-mapping>
+
+
+
+    <filter-mapping>
+        <filter-name>IsAirline</filter-name>
+        <url-pattern>/createFlight</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>IsAirline</filter-name>
+        <url-pattern>/createFlightRoute</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>IsAirline</filter-name>
+        <url-pattern>/createCityAndCategory</url-pattern>
+    </filter-mapping>
+
+
+
+    <filter-mapping>
+        <filter-name>IsCustomer</filter-name>
+        <url-pattern>/package/buypackage</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>IsCustomer</filter-name>
+        <url-pattern>/reservas</url-pattern>
+    </filter-mapping>
+
+
 
 </web-app>
