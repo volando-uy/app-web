@@ -8,12 +8,6 @@
             <span class="text-xl font-bold">Volando<span class="text-yellow-300">.uy</span></span>
         </a>
 
-        <button id="btnMenu" type="button" class="md:hidden p-2 rounded hover:bg-white/10"
-                aria-expanded="false" aria-controls="mobileMenu" aria-label="Abrir menú">
-            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-linecap="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
-        </button>
 
         <nav id="nav-desktop" class="hidden md:flex items-center gap-6">
             <a href="${flightsUrl}" class="hover:text-yellow-300">Vuelos</a>
@@ -47,11 +41,4 @@
         </c:choose>
     </div>
 
-    <div id="mobileMenu" class="md:hidden hidden border-t border-white/10 bg-brand">
-        <nav id="nav-mobile" class="container mx-auto px-4 py-3 flex flex-col gap-1">
-            <a href="${flightsUrl}" class="block px-2 py-3 rounded">Vuelos</a>
-            <a href="${packagesUrl}" class="block px-2 py-3 rounded">Paquetes</a>
-            <a href="${loginUrl}" class="block px-2 py-3 rounded">Iniciar sesión</a>
-        </nav>
-    </div>
 </header>
