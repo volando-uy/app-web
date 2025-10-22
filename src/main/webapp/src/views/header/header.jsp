@@ -16,8 +16,6 @@
             <span class="text-xl font-bold">Volando<span class="text-yellow-300">.uy</span></span>
         </a>
 
-        <%=isCustomer %> es clliente
-        <%=isAirline%> es areirneai
         <nav id="nav-desktop" class="hidden md:flex items-center gap-6">
             <a href="${flightsUrl}" class="hover:text-yellow-300">Vuelos</a>
             <a href="${packagesUrl}" class="hover:text-yellow-300">Paquetes</a>

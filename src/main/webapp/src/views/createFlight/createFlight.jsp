@@ -101,7 +101,7 @@
                 const nickname = <%= nickname != null ? "\"" + nickname.replace("\"", "\\\"") + "\"" : "null" %>;
                 const encodedNickname = encodeURIComponent(nickname);
 
-                const res = await fetch("${rootUrl}/api/flight-routes?airlineNickname="+encodedNickname);
+                const res = await fetch("${rootUrl}api/flight-routes?airlineNickname="+encodedNickname);
                 const routes = await res.json();
 
                 if (!Array.isArray(routes)) throw new Error("Respuesta inesperada");
