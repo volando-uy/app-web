@@ -43,25 +43,22 @@
                 <input name="departureTime" type="datetime-local" class="w-full border rounded-lg px-3 py-2" required>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Aerolínea *</label>
-                <select name="airlineNickname" required
+                <label class="block text-sm font-medium text-gray-700 mb-1">Aerolínea</label>
+                <input type="text" value="${airlineNickname}" disabled
+                       class="w-full border rounded-md px-3 py-2 text-sm bg-gray-100 text-gray-600 cursor-not-allowed" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Ruta de vuelo *</label>
+                <select name="flightRouteName" required
                         class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-brand">
-                    <option value="" disabled selected>Selecciona una aerolínea</option>
-                    <c:forEach var="airline" items="${airlines}">
-                        <option value="${airline}">${airline}</option>
+                    <option value="" disabled selected>Selecciona una ruta de vuelo</option>
+                    <c:forEach var="route" items="${flightRoutes}">
+                        <option value="${route.name}">${route.name}</option>
                     </c:forEach>
                 </select>
             </div>
 
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Ruta de vuelo *</label>
-                <select id="flightRouteName" name="flightRouteName" required
-                        class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-brand">
-                    <option value="" disabled selected>Selecciona una aerolínea primero</option>
-                </select>
-
-            </div>
 
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Imagen</label>
@@ -80,45 +77,4 @@
 
 </body>
 </html>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const airlineSelect = document.querySelector('select[name="airlineNickname"]');
-        const routeSelect = document.getElementById('flightRouteName');
-
-        airlineSelect.addEventListener('change', async function () {
-            const nickname = this.value;
-            if (!nickname) return;
-
-            // Limpiamos el select anterior
-            routeSelect.innerHTML = '<option disabled selected>Cargando rutas...</option>';
-
-            try {
-                <%
-                    String nickname = (String) session.getAttribute("nickname");
-                %>
-
-                const nickname = <%= nickname != null ? "\"" + nickname.replace("\"", "\\\"") + "\"" : "null" %>;
-                const encodedNickname = encodeURIComponent(nickname);
-
-                const res = await fetch("${rootUrl}api/flight-routes?airlineNickname="+encodedNickname);
-                const routes = await res.json();
-
-                if (!Array.isArray(routes)) throw new Error("Respuesta inesperada");
-
-                // Limpiar y rellenar
-                routeSelect.innerHTML = '<option value="" disabled selected>Selecciona una ruta</option>';
-                routes.forEach(route => {
-                    const option = document.createElement('option');
-                    option.value = route.name;
-                    option.textContent = route.name;
-                    routeSelect.appendChild(option);
-                });
-            } catch (err) {
-                routeSelect.innerHTML = '<option disabled selected>Error al cargar rutas</option>';
-                console.error("Error cargando rutas:", err);
-            }
-        });
-    });
-</script>
 
