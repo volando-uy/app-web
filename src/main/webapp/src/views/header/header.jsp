@@ -1,6 +1,14 @@
+<%@ page import="domain.dtos.user.BaseAirlineDTO" %>
+<%@ page import="domain.dtos.user.BaseCustomerDTO" %>
+<%@ page import="domain.dtos.user.UserDTO" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ include file="/src/components/layout/libs.jspf" %>
 <!-- Taglibs aquí una sola vez -->
+<%
+    UserDTO user = (UserDTO) session.getAttribute("usuario");
+    boolean isCustomer = user instanceof BaseCustomerDTO;
+    boolean isAirline = user instanceof BaseAirlineDTO;
+%>
 
 <header class="sticky top-0 z-50 bg-brand text-white shadow-md">
     <div class="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -8,11 +16,32 @@
             <span class="text-xl font-bold">Volando<span class="text-yellow-300">.uy</span></span>
         </a>
 
-
+        <%=isCustomer %> es clliente
+        <%=isAirline%> es areirneai
         <nav id="nav-desktop" class="hidden md:flex items-center gap-6">
             <a href="${flightsUrl}" class="hover:text-yellow-300">Vuelos</a>
             <a href="${packagesUrl}" class="hover:text-yellow-300">Paquetes</a>
             <a href="${listUsersUrl}" class="hover:text-yellow-300"> Usuarios </a>
+
+            <%
+                if (isCustomer) {
+            %>
+            <!--Vuelos, paquetes, y consulta de reserva -->
+            <a href="${listPackageUrl}" class="hover:text-yellow-300">Mis paquetes</a>
+            <a href="${checkBookingUrl}" class="hover:text-yellow-300">Mis reservas</a>
+
+            <%} else if (isAirline) {%>
+            <!--Crear vuelo, crear ruta de vuelo, crear cuidad y categoria, consulta de reserva -->
+            <a href="${createFlightUrl}" class="hover:text-yellow-300">Crear vuelo</a>
+            <a href="${createFlightRouteUrl}" class="hover:text-yellow-300">Crear ruta</a>
+            <a href="${createCityAndCategoryUrl}" class="hover:text-yellow-300">Crear ciudad / categoría</a>
+            <a href="${checkBookingUrl}" class="hover:text-yellow-300">Reservas</a>
+
+
+            <%
+                }
+            %>
+
         </nav>
 
         <c:choose>
@@ -37,8 +66,8 @@
 
                 </div>
             </c:otherwise>
-
         </c:choose>
+
     </div>
 
 </header>

@@ -129,13 +129,23 @@ public class createFlightRouteServlet extends HttpServlet {
             // === Crear ruta de vuelo ===
             controller.createFlightRoute(dto, originAeroCode, destinationAeroCode, airlineNickname, categories, imageFile);
 
-            resp.getWriter().write("{\"status\":\"ok\",\"message\":\"Ruta creada correctamente.\"}");
+
+            session.setAttribute("toastMessage", "Ruta de vuelo creada correctamente.");
+            session.setAttribute("toastType", "error");
+            resp.sendRedirect(req.getContextPath() + "/createFlightRoute");
 
         } catch (Exception e) {
             e.printStackTrace();
             resp.setStatus(500);
-            resp.getWriter().write("{\"status\":\"error\",\"message\":\"" + escapeJson(e.getMessage()) + "\"}");
+            handleError(req, resp, e.getMessage());
         }
+    }
+
+    private void handleError(HttpServletRequest req, HttpServletResponse resp, String message) throws IOException {
+        HttpSession session = req.getSession();
+        session.setAttribute("toastMessage", message);
+        session.setAttribute("toastType", "error");
+        resp.sendRedirect(req.getContextPath() + "/createFlight");
     }
 
     private static Double parseDouble(String v) {

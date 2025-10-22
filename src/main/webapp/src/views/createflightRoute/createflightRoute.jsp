@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="domain.dtos.airport.BaseAirportDTO" %>
-
+<%@ include file="/src/components/layout/libs.jspf" %>
 <%
     List<BaseAirportDTO> airports = (List<BaseAirportDTO>) request.getAttribute("airports");
     List<String> categories = (List<String>) request.getAttribute("categories");
@@ -9,17 +9,11 @@
 
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Crear Ruta de Vuelo</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: { extend: { colors: { brand: "#0B4C73" } } }
-        }
-    </script>
-</head>
+<%
+    request.setAttribute("pageTitle", "Crear Ruta de Vuelo - Volando.uy");
+%>
+<%@ include file="/src/components/layout/head.jspf" %>
+
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
 <jsp:include page="../header/header.jsp" />
@@ -30,7 +24,7 @@
             Crear ruta de vuelo
         </h1>
 
-        <form action="${pageContext.request.contextPath}/createFlightRoute"
+        <form action="${createFlightRouteUrl}"
               method="post"
               enctype="multipart/form-data"
               class="space-y-6">
@@ -140,6 +134,6 @@
 </main>
 
 <jsp:include page="../footer/footer.jspf" flush="true" />
-
+<%@ include file="/src/components/layout/scripts.jspf" %>
 </body>
 </html>

@@ -40,7 +40,7 @@ public class createCityCategoryServlet extends HttpServlet {
         String action = request.getParameter("action");
 
         if (action == null) {
-            out.print("{\"status\":\"error\", \"message\":\"Falta el parámetro 'action'\"}");
+            handleError(request, response, "La acción es obligatoria");
             return;
         }
 
@@ -50,12 +50,15 @@ public class createCityCategoryServlet extends HttpServlet {
                     String name = request.getParameter("name");
 
                     if (name == null || name.trim().isEmpty()) {
-                        out.print("{\"status\":\"error\", \"message\":\"El nombre de la categoría es obligatorio\"}");
+                        handleError(request, response, "El nombre de la categoría es obligatorio");
                         return;
                     }
 
                     CategoryDTO created = categoryController.createCategory(new CategoryDTO(name));
-                    out.print("{\"status\":\"ok\", \"message\":\"Categoría creada correctamente: " + created.getName() + "\"}");
+                    HttpSession session = request.getSession();
+                    session.setAttribute("toastMessage", "Categoría creada correctamente: " + created.getName());
+                    session.setAttribute("toastType", "success");
+                    response.sendRedirect(request.getContextPath() + "/createFlight");
                 }
 
                 case "createCity" -> {
@@ -65,7 +68,7 @@ public class createCityCategoryServlet extends HttpServlet {
                     String longitude = request.getParameter("longitude");
 
                     if (name == null || name.trim().isEmpty()) {
-                        out.print("{\"status\":\"error\", \"message\":\"El nombre de la ciudad es obligatorio\"}");
+                        handleError(request, response, "El nombre de la ciudad es obligatorio");
                         return;
                     }
 
@@ -76,18 +79,29 @@ public class createCityCategoryServlet extends HttpServlet {
                     dto.setLongitude(longitude != null && !longitude.isEmpty() ? Double.parseDouble(longitude) : null);
 
                     BaseCityDTO created = cityController.createCity(dto);
-                    out.print("{\"status\":\"ok\", \"message\":\"Ciudad creada correctamente: " + created.getName() + "\"}");
+                    HttpSession session = request.getSession();
+                    session.setAttribute("toastMessage", "Ciudad creada correctamente: " + created.getName());
+                    session.setAttribute("toastType", "success");
+                    response.sendRedirect(request.getContextPath() + "/createFlight");
                 }
 
-                default -> out.print("{\"status\":\"error\", \"message\":\"Acción no reconocida: " + action + "\"}");
+                default -> handleError(request, response, "Acción desconocida: " + action);
             }
 
         } catch (IllegalArgumentException e) {
-            out.print("{\"status\":\"error\", \"message\":\"" + e.getMessage() + "\"}");
+            handleError(request, response, e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            out.print("{\"status\":\"error\", \"message\":\"Error interno del servidor\"}");
+            handleError(request, response, e.getMessage());
         }
+
     }
+    private void handleError(HttpServletRequest req, HttpServletResponse resp, String message) throws IOException {
+        HttpSession session = req.getSession();
+        session.setAttribute("toastMessage", message);
+        session.setAttribute("toastType", "error");
+        resp.sendRedirect(req.getContextPath() + "/createFlight");
+    }
+
 }
 

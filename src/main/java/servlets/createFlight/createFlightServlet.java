@@ -1,7 +1,11 @@
 package servlets.createFlight;
 
 import controllers.flight.IFlightController;
+import controllers.flightroute.IFlightRouteController;
+import controllers.user.IUserController;
 import domain.dtos.flight.BaseFlightDTO;
+import domain.dtos.flightroute.BaseFlightRouteDTO;
+import domain.dtos.user.BaseAirlineDTO;
 import factory.ControllerFactory;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -10,6 +14,7 @@ import jakarta.servlet.http.*;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 
 @WebServlet("/createFlight")
@@ -17,10 +22,13 @@ import java.time.format.DateTimeFormatter;
 public class createFlightServlet extends HttpServlet {
 
     private final IFlightController ctrl = ControllerFactory.getFlightController();
-
+    private final IFlightRouteController flightRouteController = ControllerFactory.getFlightRouteController();
+    private final IUserController userController = ControllerFactory.getUserController();
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        List<String> airlines = userController.getAllAirlinesNicknames();
+        req.setAttribute("airlines", airlines);
         req.getRequestDispatcher("/src/views/createFlight/createFlight.jsp").forward(req, resp);
     }
 
@@ -30,6 +38,7 @@ public class createFlightServlet extends HttpServlet {
 
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
+
 
         try {
             String name = req.getParameter("name");
@@ -72,15 +81,29 @@ public class createFlightServlet extends HttpServlet {
             // Crear vuelo
             ctrl.createFlight(dto, airlineNickname, flightRouteName, imageFile);
 
-            resp.getWriter().write("{\"status\":\"ok\",\"message\":\"Vuelo creado correctamente.\"}");
+            HttpSession newSession = req.getSession(true);
+
+            newSession.setAttribute("toastMessage", "Ruta creada correctamente.");
+            newSession.setAttribute("toastType", "success");
+
+            resp.sendRedirect(req.getContextPath() + "/createFlight");
+
 
         } catch (Exception e) {
             e.printStackTrace();
             resp.setStatus(500);
-            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Error: " + e.getMessage() + "\"}");
+            handleError(req, resp, e.getMessage());
+
         }
     }
 
+
+    private void handleError(HttpServletRequest req, HttpServletResponse resp, String message) throws IOException {
+        HttpSession session = req.getSession();
+        session.setAttribute("toastMessage", message);
+        session.setAttribute("toastType", "error");
+        resp.sendRedirect(req.getContextPath() + "/createFlight");
+    }
     private Integer parseInt(String val) {
         try {
             return (val == null || val.isEmpty()) ? null : Integer.parseInt(val);
