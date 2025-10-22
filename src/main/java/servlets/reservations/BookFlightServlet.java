@@ -81,8 +81,12 @@ public class BookFlightServlet extends HttpServlet {
         int maxForSelected = "EJECUTIVO".equalsIgnoreCase(seatTypePreview) ? avail.ejecutivo : avail.turista;
         if (passengersCount > maxForSelected) passengersCount = maxForSelected;
         if (maxForSelected <= 0) {
-            toast(req, "No hay asientos disponibles en " + seatTypePreview + " para este vuelo.", "warning");
+            passengersCount = 0;
+            req.setAttribute("pageAlertType", "warning");
+            req.setAttribute("pageAlertMsg",
+                    "No hay asientos disponibles en " + seatTypePreview + " para este vuelo.");
         }
+
 
         // Precio por asiento según clase
         Double unitPrice = "EJECUTIVO".equalsIgnoreCase(seatTypePreview)
@@ -136,7 +140,7 @@ public class BookFlightServlet extends HttpServlet {
         String seatTypeStr  = req.getParameter("seatType");
         int passengersCount = parseInt(req.getParameter("passengersCount"), 0);
         boolean proceedAllowed = "1".equals(req.getParameter("proceed"));
-        String action = nz(req.getParameter("action"), "confirm"); // "calc" | "confirm"
+        String action = nz(req.getParameter("action"), "confirm");
 
         if (isBlank(flightName)) { resp.sendError(400); return; }
 
@@ -159,7 +163,7 @@ public class BookFlightServlet extends HttpServlet {
         if (flight == null) { resp.sendError(404); return; }
         FlightRouteDTO route = routes.getFlightRouteDetailsByName(flight.getFlightRouteName());
 
-        // Validación de disponibilidad en runtime
+        // Validación de disponibilidad
         SeatAvailability avail = getAvailabilityForFlight(flightName, flight);
         EnumTipoAsiento st = EnumTipoAsiento.valueOf(seatTypeStr);
         int maxForSelected = (st == EnumTipoAsiento.EJECUTIVO) ? avail.ejecutivo : avail.turista;
@@ -309,7 +313,7 @@ public class BookFlightServlet extends HttpServlet {
         try {
             booking.createBooking(bookingDTO, ticketMap, nick, flightName);
             toast(req, "Reserva creada correctamente", "success");
-            resp.sendRedirect(req.getContextPath() + "/flight/list");
+            resp.sendRedirect(req.getContextPath() + "/perfil");
         } catch (Exception e) {
             getServletContext().log("createBooking error", e);
             toast(req, "No se pudo crear la reserva: " + e.getMessage(), "error");
