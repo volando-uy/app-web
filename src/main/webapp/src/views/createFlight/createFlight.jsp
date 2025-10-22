@@ -44,7 +44,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Aerolínea</label>
-                <input type="text" value="${airlineNickname}" disabled
+                <input type="text" name="airlineNickname" value="${airlineNickname}" disabled
                        class="w-full border rounded-md px-3 py-2 text-sm bg-gray-100 text-gray-600 cursor-not-allowed" />
             </div>
 
