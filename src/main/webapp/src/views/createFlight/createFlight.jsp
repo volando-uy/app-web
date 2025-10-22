@@ -1,15 +1,17 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="domain.dtos.user.BaseAirlineDTO" %>
+<%@ page import="java.util.List" %>
+<%@ page import="domain.dtos.flightroute.BaseFlightRouteDTO" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ include file="/src/components/layout/libs.jspf" %>
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="utf-8"/>
-    <title>Crear Vuelo</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config={theme:{extend:{colors:{brand:"#0B4C73"}}}};</script>
-</head>
+<%
+    request.setAttribute("pageTitle", "Crear Vuelo - Volando.uy");
+%>
+<%@ include file="/src/components/layout/head.jspf" %>
+
 <body class="bg-gray-100 min-h-screen flex flex-col">
-<jsp:include page="../header/header.jsp" />
+<jsp:include page="../header/header.jsp"/>
 <main class="flex-1 container mx-auto px-4 py-8">
     <h1 class="text-2xl font-bold text-brand mb-6">Crear vuelo</h1>
 
@@ -41,13 +43,26 @@
                 <input name="departureTime" type="datetime-local" class="w-full border rounded-lg px-3 py-2" required>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Aerolinea *</label>
-                <input name="airlineNickname" type="text" class="w-full border rounded-lg px-3 py-2" required>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Aerolínea *</label>
+                <select name="airlineNickname" required
+                        class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-brand">
+                    <option value="" disabled selected>Selecciona una aerolínea</option>
+                    <c:forEach var="airline" items="${airlines}">
+                        <option value="${airline}">${airline}</option>
+                    </c:forEach>
+                </select>
             </div>
+
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Ruta de vuelo *</label>
-                <input name="flightRouteName" type="text" class="w-full border rounded-lg px-3 py-2" required>
+                <select id="flightRouteName" name="flightRouteName" required
+                        class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-brand">
+                    <option value="" disabled selected>Selecciona una aerolínea primero</option>
+                </select>
+
             </div>
+
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Imagen</label>
                 <input name="image" type="file" accept="image/*" class="w-full border rounded-lg px-3 py-2">
@@ -59,7 +74,51 @@
     </form>
     <div id="responseMsg" class="mt-4 text-sm"></div>
 </main>
-<jsp:include page="../footer/footer.jspf" />
+<jsp:include page="../footer/footer.jspf"/>
+<%@ include file="/src/components/layout/scripts.jspf" %>
 <script src="createFlight.js"></script>
+
 </body>
 </html>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const airlineSelect = document.querySelector('select[name="airlineNickname"]');
+        const routeSelect = document.getElementById('flightRouteName');
+
+        airlineSelect.addEventListener('change', async function () {
+            const nickname = this.value;
+            if (!nickname) return;
+
+            // Limpiamos el select anterior
+            routeSelect.innerHTML = '<option disabled selected>Cargando rutas...</option>';
+
+            try {
+                <%
+                    String nickname = (String) session.getAttribute("nickname");
+                %>
+
+                const nickname = <%= nickname != null ? "\"" + nickname.replace("\"", "\\\"") + "\"" : "null" %>;
+                const encodedNickname = encodeURIComponent(nickname);
+
+                const res = await fetch("${rootUrl}/api/flight-routes?airlineNickname="+encodedNickname);
+                const routes = await res.json();
+
+                if (!Array.isArray(routes)) throw new Error("Respuesta inesperada");
+
+                // Limpiar y rellenar
+                routeSelect.innerHTML = '<option value="" disabled selected>Selecciona una ruta</option>';
+                routes.forEach(route => {
+                    const option = document.createElement('option');
+                    option.value = route.name;
+                    option.textContent = route.name;
+                    routeSelect.appendChild(option);
+                });
+            } catch (err) {
+                routeSelect.innerHTML = '<option disabled selected>Error al cargar rutas</option>';
+                console.error("Error cargando rutas:", err);
+            }
+        });
+    });
+</script>
+

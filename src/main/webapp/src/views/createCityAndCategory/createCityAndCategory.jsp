@@ -1,15 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ include file="/src/components/layout/libs.jspf" %>
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Crear Ciudad y Categoría</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { theme: { extend: { colors: { brand: "#0B4C73" } } } };
-    </script>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
+<%
+    request.setAttribute("pageTitle", "Crear Ciudad y Categoria - Volando.uy");
+%>
+
+<%@ include file="/src/components/layout/head.jspf" %>
+
 <body class="bg-gray-100 min-h-screen flex flex-col">
 <jsp:include page="../header/header.jsp" />
 <main class="flex-1 max-w-5xl mx-auto p-6">
@@ -65,5 +63,6 @@
     const CONTEXT_PATH = "<%= request.getContextPath() %>";
 </script>
 <script src="createCityAndCategory.js"></script>
+<%@ include file="/src/components/layout/scripts.jspf" %>
 </body>
 </html>

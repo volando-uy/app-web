@@ -39,7 +39,11 @@
             <artifactId>jakarta.servlet.jsp.jstl</artifactId>
             <version>3.0.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.13.2</version>
+        </dependency>
         <!-- Tu librería VolandoUY -->
         <dependency>
             <groupId>com.gyabisito</groupId>

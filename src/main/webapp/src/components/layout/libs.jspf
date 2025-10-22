@@ -15,6 +15,7 @@
 <c:url var="createPackageUrl" value="/createPackage"/>
 <c:url var="listPackageUrl" value="/packages/list"/>
 <c:url var="checkBookingUrl" value="/booking/check"/>
+<c:url var="createCityAndCategoryUrl" value="/createCityAndCategory"/>
 <c:url var="debugUrl" value="/debug"/>
 
 <c:choose>

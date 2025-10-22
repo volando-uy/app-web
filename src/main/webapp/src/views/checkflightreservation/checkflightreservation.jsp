@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <%
-    request.setAttribute("pageTitle", "Panel de Reservas");
+    request.setAttribute("pageTitle", "Panel de Reservas - Volando.uy");
 %>
 
 <%@ include file="/src/components/layout/libs.jspf" %>
@@ -372,5 +372,7 @@
 
 <jsp:include page="/src/views/footer/footer.jspf"/>
 <%@ include file="/src/components/layout/scripts.jspf" %>
+
+
 </body>
 </html>
