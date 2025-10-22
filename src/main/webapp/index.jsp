@@ -1,9 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" language="java" %>
 
-<%@ include file="/src/components/layout/libs.jspf" %> <!-- Taglibs aquí una sola vez -->
+<%@ include file="/src/components/layout/libs.jspf" %>
 
 <%
-    // Si entran directo al JSP sin pasar por el servlet, redirigimos
     if (request.getAttribute("packages") == null || request.getAttribute("flights") == null) {
 //        request.getRequestDispatcher("/index").forward(request, response);
         response.sendRedirect(request.getContextPath() + "/index");
@@ -33,7 +32,6 @@
 <!-- Footer -->
 <jsp:include page="/src/views/footer/footer.jspf"/>
 
-<!-- Script específico para esta página -->
 <%
     request.setAttribute("pageScript", "index.js");
 %>

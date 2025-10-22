@@ -1,0 +1,70 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+
+<form method="get" action="${pageContext.request.contextPath}/reservas" class="mb-3" novalidate>
+
+    <input type="hidden" name="flight" value="${fn:escapeXml(flight.name)}"/>
+
+    <div class="flex flex-wrap items-end gap-3">
+        <div>
+            <label class="block text-sm mb-1">Clase</label>
+            <select name="seatType" class="border rounded px-2 py-1 bg-white">
+                <option value="TURISTA"   ${seatTypePreview == 'TURISTA'   ? 'selected' : ''}>
+                    TURISTA — disp: ${availTurista}
+                </option>
+                <option value="EJECUTIVO" ${seatTypePreview == 'EJECUTIVO' ? 'selected' : ''}>
+                    EJECUTIVO — disp: ${availEjecutivo}
+                </option>
+            </select>
+            <c:if test="${passengersMax == 0}">
+                <div class="text-xs text-red-600 mt-1">Sin cupo en la clase seleccionada.</div>
+            </c:if>
+        </div>
+
+        <div>
+            <label for="paxGet" class="block text-sm mb-1">Pasajeros</label>
+            <c:choose>
+                <c:when test="${passengersMax == 0}">
+                    <input id="paxGet" name="passengersCount" type="number"
+                           min="0" max="0" value="${passengersCount}"
+                           class="border rounded px-2 py-1 w-24 bg-white" readonly />
+                </c:when>
+                <c:otherwise>
+                    <input id="paxGet" name="passengersCount" type="number"
+                           min="1" max="${passengersMax}" value="${passengersCount}"
+                           class="border rounded px-2 py-1 w-24 bg-white" />
+                </c:otherwise>
+            </c:choose>
+            <span class="text-xs text-gray-500 ml-2">(máximo ${passengersMax})</span>
+        </div>
+
+        <div>
+            <button type="submit" name="action" value="apply" class="border rounded px-3 py-2">Aplicar</button>
+        </div>
+    </div>
+
+    <c:if test="${passengersMax == 0}">
+        <div role="alert" class="mt-3 border border-yellow-300 bg-yellow-50 text-yellow-900 rounded px-3 py-2 text-sm">
+            <strong>Atención:</strong> no quedan lugares en <span class="uppercase">${seatTypePreview}</span> para este vuelo.
+            Elegí otra clase o probá con otro vuelo.
+        </div>
+    </c:if>
+</form>
+
+<c:if test="${not existingBooking and passengersMax > 0 and passengersCount > 0}">
+    <form id="postForm" method="post" accept-charset="UTF-8" action="${pageContext.request.contextPath}/reservas">
+        <input type="hidden" name="flight" value="${fn:escapeXml(flight.name)}"/>
+        <input type="hidden" name="seatType" value="${seatTypePreview}"/>
+        <input type="hidden" name="passengersCount" value="${passengersCount}"/>
+
+        <%@ include file="/src/components/bookflight/passengers_table.jspf" %>
+
+        <div class="mt-4 flex gap-2">
+            <button type="submit" name="action" value="calc" class="px-5 py-2 border rounded inline-block">
+                Calcular costo
+            </button>
+            <a class="px-5 py-2 border rounded inline-block" href="${pageContext.request.contextPath}/flight/list">Volver</a>
+        </div>
+    </form>
+</c:if>
