@@ -9,10 +9,10 @@ import java.util.Collections;
 import java.util.List;
 
 import controllers.flight.IFlightController;
-import controllers.flightRoutePackage.IFlightRoutePackageController;
+import controllers.flightroutepackage.IFlightRoutePackageController;
 
 import domain.dtos.flight.BaseFlightDTO;
-import domain.dtos.flightRoutePackage.BaseFlightRoutePackageDTO;
+import domain.dtos.flightroutepackage.BaseFlightRoutePackageDTO;
 
 import factory.ControllerFactory;
 

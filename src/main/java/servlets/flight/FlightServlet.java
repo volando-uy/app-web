@@ -7,11 +7,11 @@ import java.util.*;
 
 import controllers.category.ICategoryController;
 import controllers.flight.IFlightController;
-import controllers.flightRoute.IFlightRouteController;
+import controllers.flightroute.IFlightRouteController;
 import controllers.user.IUserController;
 
 import domain.dtos.flight.FlightDTO;
-import domain.dtos.flightRoute.FlightRouteDTO;
+import domain.dtos.flightroute.FlightRouteDTO;
 import domain.models.enums.EnumEstatusRuta;
 
 import factory.ControllerFactory;

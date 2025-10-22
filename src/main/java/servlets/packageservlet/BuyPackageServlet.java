@@ -1,11 +1,10 @@
 package servlets.packageservlet;
 
-import controllers.buyPackage.IBuyPackageController;
-import controllers.flightRoutePackage.IFlightRoutePackageController;
-import controllers.user.IUserController;
+import controllers.buypackage.IBuyPackageController;
+import controllers.flightroutepackage.IFlightRoutePackageController;
 
-import domain.dtos.buyPackage.BaseBuyPackageDTO;
-import domain.dtos.flightRoutePackage.BaseFlightRoutePackageDTO;
+import domain.dtos.buypackage.BaseBuyPackageDTO;
+import domain.dtos.flightroutepackage.BaseFlightRoutePackageDTO;
 
 import factory.ControllerFactory;
 import jakarta.servlet.ServletException;

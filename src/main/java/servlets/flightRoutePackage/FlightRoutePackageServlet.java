@@ -7,8 +7,8 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 
-import controllers.flightRoutePackage.IFlightRoutePackageController;
-import domain.dtos.flightRoutePackage.FlightRoutePackageDTO;
+import controllers.flightroutepackage.IFlightRoutePackageController;
+import domain.dtos.flightroutepackage.FlightRoutePackageDTO;
 import factory.ControllerFactory;
 
 

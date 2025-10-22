@@ -2,9 +2,9 @@ package servlets.createFlightRoute;
 
 import controllers.airport.IAirportController;
 import controllers.category.ICategoryController;
-import controllers.flightRoute.IFlightRouteController;
+import controllers.flightroute.IFlightRouteController;
 import domain.dtos.airport.BaseAirportDTO;
-import domain.dtos.flightRoute.BaseFlightRouteDTO;
+import domain.dtos.flightroute.BaseFlightRouteDTO;
 import factory.ControllerFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;

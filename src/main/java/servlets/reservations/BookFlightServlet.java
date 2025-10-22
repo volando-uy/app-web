@@ -2,13 +2,13 @@ package servlets.reservations;
 
 import controllers.booking.IBookingController;
 import controllers.flight.IFlightController;
-import controllers.flightRoute.IFlightRouteController;
+import controllers.flightroute.IFlightRouteController;
 import controllers.seat.ISeatController;
 
-import domain.dtos.bookFlight.BaseBookFlightDTO;
-import domain.dtos.bookFlight.BookFlightDTO;
+import domain.dtos.bookflight.BaseBookFlightDTO;
+import domain.dtos.bookflight.BookFlightDTO;
 import domain.dtos.flight.FlightDTO;
-import domain.dtos.flightRoute.FlightRouteDTO;
+import domain.dtos.flightroute.FlightRouteDTO;
 import domain.dtos.luggage.BaseBasicLuggageDTO;
 import domain.dtos.luggage.BaseExtraLuggageDTO;
 import domain.dtos.luggage.LuggageDTO;
