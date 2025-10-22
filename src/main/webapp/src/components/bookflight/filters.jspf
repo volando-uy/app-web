@@ -3,7 +3,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <form method="get" action="${pageContext.request.contextPath}/reservas" class="mb-3" novalidate>
-
     <input type="hidden" name="flight" value="${fn:escapeXml(flight.name)}"/>
 
     <div class="flex flex-wrap items-end gap-3">
@@ -52,7 +51,8 @@
     </c:if>
 </form>
 
-<c:if test="${not existingBooking and passengersMax > 0 and passengersCount > 0}">
+<%-- Mostrar SIEMPRE el form de POST si hay cupo y pax > 0 (aunque exista reserva previa) --%>
+<c:if test="${passengersMax > 0 and passengersCount > 0}">
     <form id="postForm" method="post" accept-charset="UTF-8" action="${pageContext.request.contextPath}/reservas">
         <input type="hidden" name="flight" value="${fn:escapeXml(flight.name)}"/>
         <input type="hidden" name="seatType" value="${seatTypePreview}"/>

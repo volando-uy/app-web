@@ -111,7 +111,7 @@ public class BuyPackageServlet extends HttpServlet {
 
             // Volver a la pantalla de confirmación, no al listado
             toast(req, msg, "warning");
-            resp.sendRedirect(req.getContextPath() + "/package/buypackage?pkg=" + url(pkgName));
+            resp.sendRedirect(req.getContextPath() + "/packages/list");
         }
     }
 

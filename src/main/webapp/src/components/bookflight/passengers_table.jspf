@@ -8,6 +8,7 @@
             <col class="w-[12%]"/><col class="w-[12%]"/><col class="w-[10%]"/><col class="w-[12%]"/>
             <col class="w-[14%]"/><col class="w-[10%]"/><col class="w-[14%]"/><col class="w-[8%]"/><col class="w-[8%]"/>
         </colgroup>
+
         <thead class="bg-gray-50">
         <tr>
             <th class="p-2 text-left">Nombre</th>
@@ -21,6 +22,7 @@
             <th class="p-2 text-left">Peso extra <span class="text-xs opacity-70">(kg)</span></th>
         </tr>
         </thead>
+
         <tbody>
         <c:if test="${pCount gt 0}">
             <c:forEach var="i" begin="0" end="${pCount - 1}">
@@ -35,8 +37,23 @@
                 <c:set var="kExtraWeight" value="${'passengers['}${i}${'].extraLuggageWeight'}"/>
 
                 <tr class="border-t align-middle">
-                    <td class="p-2"><input name="passengers[${i}].name"    value="${param[kName]}"    class="w-full border rounded px-2 py-1" required /></td>
-                    <td class="p-2"><input name="passengers[${i}].surname" value="${param[kSurname]}" class="w-full border rounded px-2 py-1" required /></td>
+
+                    <td class="p-2">
+                        <input type="text" name="passengers[${i}].name" value="${param[kName]}"
+                               class="w-full border rounded px-2 py-1" required maxlength="60"
+                               autocomplete="given-name" autocapitalize="words" spellcheck="false"
+                               pattern="^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ' -]{2,60}$"
+                               title="Usá solo letras. Se permiten espacios, guiones y apóstrofes (2–60)."/>
+                    </td>
+
+                    <td class="p-2">
+                        <input type="text" name="passengers[${i}].surname" value="${param[kSurname]}"
+                               class="w-full border rounded px-2 py-1" required maxlength="60"
+                               autocomplete="family-name" autocapitalize="words" spellcheck="false"
+                               pattern="^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ' -]{2,60}$"
+                               title="Usá solo letras. Se permiten espacios, guiones y apóstrofes (2–60)."/>
+                    </td>
+
                     <td class="p-2">
                         <select name="passengers[${i}].docType" class="w-full border rounded px-2 py-1" required>
                             <c:forEach var="dt" items="${docTypes}">
@@ -44,7 +61,24 @@
                             </c:forEach>
                         </select>
                     </td>
-                    <td class="p-2"><input name="passengers[${i}].numDoc"  value="${param[kNumDoc]}"  class="w-full border rounded px-2 py-1" required /></td>
+
+                    <td class="p-2">
+                        <c:choose>
+                            <c:when test="${param[kDocType] == 'CI'}">
+                                <input type="text" name="passengers[${i}].numDoc" value="${param[kNumDoc]}"
+                                       class="w-full border rounded px-2 py-1" required inputmode="numeric"
+                                       minlength="8" maxlength="8" pattern="^\d{8}$"
+                                       placeholder="Ej: 01234567" title="Cédula uruguaya: 8 dígitos, sin puntos ni guion."/>
+                            </c:when>
+                            <c:otherwise>
+                                <input type="text" name="passengers[${i}].numDoc" value="${param[kNumDoc]}"
+                                       class="w-full border rounded px-2 py-1" required maxlength="20"
+                                       pattern="^[A-Za-z0-9-]{4,20}$" placeholder="Nº documento"
+                                       title="4–20 caracteres alfanuméricos (se permite guion)."/>
+                            </c:otherwise>
+                        </c:choose>
+                    </td>
+
                     <td class="p-2">
                         <select name="passengers[${i}].basicLuggageType" class="w-full border rounded px-2 py-1" required>
                             <c:forEach var="b" items="${basicLuggages}">
@@ -52,9 +86,14 @@
                             </c:forEach>
                         </select>
                     </td>
-                    <td class="p-2"><input type="number" step="0.1" min="0" name="passengers[${i}].basicLuggageWeight"
-                                           value="${empty param[kBasicWeight] ? 0 : param[kBasicWeight]}"
-                                           class="w-full border rounded px-2 py-1 text-right" placeholder="0.0" required/></td>
+
+                    <td class="p-2">
+                        <input type="number" step="0.1" min="0" name="passengers[${i}].basicLuggageWeight"
+                               value="${empty param[kBasicWeight] ? 0 : param[kBasicWeight]}"
+                               class="w-full border rounded px-2 py-1 text-right"
+                               placeholder="0.0" required/>
+                    </td>
+
                     <td class="p-2">
                         <select name="passengers[${i}].extraLuggageType" class="w-full border rounded px-2 py-1" required>
                             <c:forEach var="e" items="${extraLuggages}">
@@ -62,15 +101,23 @@
                             </c:forEach>
                         </select>
                     </td>
-                    <td class="p-2"><input type="number" min="0" name="passengers[${i}].extraLuggageUnits"
-                                           value="${empty param[kExtraUnits] ? 0 : param[kExtraUnits]}"
-                                           class="w-full border rounded px-2 py-1 text-right" required/></td>
-                    <td class="p-2"><input type="number" step="0.1" min="0" name="passengers[${i}].extraLuggageWeight"
-                                           value="${empty param[kExtraWeight] ? 0 : param[kExtraWeight]}"
-                                           class="w-full border rounded px-2 py-1 text-right" placeholder="0.0" required/></td>
+
+                    <td class="p-2">
+                        <input type="number" min="0" name="passengers[${i}].extraLuggageUnits"
+                               value="${empty param[kExtraUnits] ? 0 : param[kExtraUnits]}"
+                               class="w-full border rounded px-2 py-1 text-right" required/>
+                    </td>
+
+                    <td class="p-2">
+                        <input type="number" step="0.1" min="0" name="passengers[${i}].extraLuggageWeight"
+                               value="${empty param[kExtraWeight] ? 0 : param[kExtraWeight]}"
+                               class="w-full border rounded px-2 py-1 text-right"
+                               placeholder="0.0" required/>
+                    </td>
                 </tr>
             </c:forEach>
         </c:if>
+
         <c:if test="${pCount eq 0}">
             <tr><td colspan="9" class="p-3 text-center opacity-70">Sin pasajeros.</td></tr>
         </c:if>

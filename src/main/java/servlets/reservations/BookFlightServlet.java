@@ -1,4 +1,3 @@
-
 package servlets.reservations;
 
 import controllers.booking.IBookingController;
@@ -62,9 +61,6 @@ public class BookFlightServlet extends HttpServlet {
         if (flight == null) { resp.sendError(404); return; }
         FlightRouteDTO route = routes.getFlightRouteDetailsByName(flight.getFlightRouteName());
 
-        boolean already = hasExistingBookingForFlight(nick, flightName);
-        boolean proceedAllowed = "1".equals(req.getParameter("proceed"));
-
         EnumTipoAsiento seatType = parseSeatType(req.getParameter("seatType"));
         int passengersCount = Math.max(1, i(req.getParameter("passengersCount"), 1));
 
@@ -72,9 +68,9 @@ public class BookFlightServlet extends HttpServlet {
         int maxSel = (seatType == EnumTipoAsiento.EJECUTIVO) ? avail.ejecutivo : avail.turista;
         if (maxSel > 0 && passengersCount > maxSel) passengersCount = maxSel;
 
-        setView(req, flight, route, seatType.name(), passengersCount, unitPrice(route, seatType),
-                avail, already, proceedAllowed, false);
+        boolean existing = hasUserBookingForFlight(nick, flightName);
 
+        setView(req, flight, route, seatType.name(), passengersCount, unitPrice(route, seatType), avail, existing);
         req.getRequestDispatcher("/src/views/bookFlight/bookflight.jsp").forward(req, resp);
     }
 
@@ -92,18 +88,11 @@ public class BookFlightServlet extends HttpServlet {
         if (isBlank(flightName)) { resp.sendError(400); return; }
 
         String action = req.getParameter("action");
-        boolean proceedAllowed = "1".equals(req.getParameter("proceed"));
         EnumTipoAsiento seatType = parseSeatType(req.getParameter("seatType"));
         int passengersCount = i(req.getParameter("passengersCount"), 0);
 
-        boolean exists = hasExistingBookingForFlight(nick, flightName);
-        if ("confirm".equalsIgnoreCase(action) && exists && !proceedAllowed) {
-            toast(req, "Ya tenés una reserva para este vuelo.", "warning");
-            resp.sendRedirect(req.getContextPath() + "/reservas?flight=" + enc(flightName));
-            return;
-        }
         if (passengersCount < 1) {
-            toast(req, "Debes indicar al menos 1 pasajero.", "error");
+            toast(req, "Indicá al menos 1 pasajero.", "error");
             resp.sendRedirect(req.getContextPath() + "/reservas?flight=" + enc(flightName));
             return;
         }
@@ -119,15 +108,15 @@ public class BookFlightServlet extends HttpServlet {
             toast(req, "Quedan " + Math.max(0, maxSel) + " asientos en " + seatType + ". Ajustá la cantidad.", "error");
             resp.sendRedirect(req.getContextPath() + "/reservas?flight=" + enc(flightName)
                     + "&seatType=" + seatType.name()
-                    + "&passengersCount=" + Math.max(0, maxSel)
-                    + (proceedAllowed ? "&proceed=1" : ""));
+                    + "&passengersCount=" + Math.max(0, maxSel));
             return;
         }
 
+        boolean existing = hasUserBookingForFlight(nick, flightName);
         double unitPrice = unitPrice(route, seatType);
 
         if ("calc".equalsIgnoreCase(action)) {
-            // forward (pero igual usamos sesión para que lo capte scripts.jspf)
+            // Validación mínima antes de calcular
             for (int k = 0; k < passengersCount; k++) {
                 String p = "passengers[" + k + "]";
                 if (isBlank(req.getParameter(p + ".name")) ||
@@ -136,16 +125,14 @@ public class BookFlightServlet extends HttpServlet {
                         isBlank(req.getParameter(p + ".numDoc")) ||
                         isBlank(req.getParameter(p + ".extraLuggageType"))) {
                     toast(req, "Completá los datos básicos de todos los pasajeros para calcular.", "error");
-                    setView(req, flight, route, seatType.name(), passengersCount, unitPrice,
-                            avail, exists, proceedAllowed, true);
+                    setView(req, flight, route, seatType.name(), passengersCount, unitPrice, avail, existing);
                     req.getRequestDispatcher("/src/views/bookFlight/bookflight.jsp").forward(req, resp);
                     return;
                 }
             }
 
             CostBreakdown cb = computeCost(req, passengersCount, unitPrice, route);
-            setView(req, flight, route, seatType.name(), passengersCount, unitPrice,
-                    avail, exists, proceedAllowed, true);
+            setView(req, flight, route, seatType.name(), passengersCount, unitPrice, avail, existing);
             req.setAttribute("calcSeatSubtotal", cb.seatSubtotal);
             req.setAttribute("calcExtraSubtotal", cb.extraSubtotal);
             req.setAttribute("priceExtraUnit", route.getPriceExtraUnitBaggage() == null ? 0.0 : route.getPriceExtraUnitBaggage());
@@ -155,7 +142,7 @@ public class BookFlightServlet extends HttpServlet {
             return;
         }
 
-        // Confirmar
+        // confirm: continuar aunque exista una reserva previa
         Map<BaseTicketDTO, List<LuggageDTO>> ticketMap = new LinkedHashMap<>();
         for (int k = 0; k < passengersCount; k++) {
             String p = "passengers[" + k + "]";
@@ -174,7 +161,7 @@ public class BookFlightServlet extends HttpServlet {
 
             if (isBlank(name) || isBlank(surname) || isBlank(dtStr) || isBlank(doc) ||
                     isBlank(basicTypeStr) || isBlank(extraTypeStr)) {
-                toast(req, "Completa los datos de todos los pasajeros.", "error");
+                toast(req, "Completá los datos de todos los pasajeros.", "error");
                 resp.sendRedirect(req.getContextPath() + "/reservas?flight=" + enc(flightName));
                 return;
             }
@@ -211,13 +198,31 @@ public class BookFlightServlet extends HttpServlet {
 
         try {
             booking.createBooking(bookingDTO, ticketMap, nick, flightName);
-            toast(req, "Reserva creada correctamente", "success");
+            toast(req, "Reserva creada correctamente.", "success");
             resp.sendRedirect(req.getContextPath() + "/perfil");
         } catch (Exception e) {
             getServletContext().log("createBooking error", e);
-            toast(req, "No se pudo crear la reserva: " + e.getMessage(), "error");
-            resp.sendRedirect(req.getContextPath() + "/reservas?flight=" + enc(flightName) + "&proceed=1");
+            toast(req, "No se pudo crear la reserva: " + safeMsg(e), "error");
+            resp.sendRedirect(req.getContextPath() + "/reservas?flight=" + enc(flightName));
         }
+    }
+
+    private boolean hasUserBookingForFlight(String nickname, String flightName) {
+        if (isBlank(nickname) || isBlank(flightName)) return false;
+        try {
+            List<BookFlightDTO> list = booking.getBookFlightsDetailsByFlightName(flightName);
+            if (list == null) return false;
+            for (BookFlightDTO bf : list) {
+                if (bf == null) continue;
+                String who = bf.getCustomerNickname();
+                if (who != null && who.trim().equalsIgnoreCase(nickname.trim())) {
+                    return true;
+                }
+            }
+        } catch (Exception ex) {
+            getServletContext().log("hasUserBookingForFlight failed", ex);
+        }
+        return false;
     }
 
     private SeatAvailability availability(String flightName, FlightDTO f) {
@@ -265,7 +270,7 @@ public class BookFlightServlet extends HttpServlet {
 
     private void setView(HttpServletRequest req, FlightDTO flight, FlightRouteDTO route,
                          String seatType, int pax, double unitPrice,
-                         SeatAvailability avail, boolean exists, boolean proceed, boolean suppressBanner) {
+                         SeatAvailability avail, boolean existingBooking) {
 
         req.setAttribute("docTypes", EnumTipoDocumento.values());
         req.setAttribute("basicLuggages", EnumEquipajeBasico.values());
@@ -283,9 +288,7 @@ public class BookFlightServlet extends HttpServlet {
         req.setAttribute("availEjecutivo", maxE);
         req.setAttribute("passengersMax", "EJECUTIVO".equalsIgnoreCase(seatType) ? maxE : maxT);
 
-        req.setAttribute("existingBooking", exists);
-        req.setAttribute("proceedAllowed", proceed);
-        if (suppressBanner) req.setAttribute("suppressExistingBanner", true);
+        req.setAttribute("existingBooking", existingBooking);
     }
 
     // util mínimos
@@ -295,31 +298,10 @@ public class BookFlightServlet extends HttpServlet {
     private static double d(String s, double v){ try { return Double.parseDouble(s.replace(',', '.')); } catch (Exception e) { return v; } }
     private static String enc(String s){ try { return URLEncoder.encode(s, StandardCharsets.UTF_8); } catch (Exception e) { return s; } }
 
-    private boolean hasExistingBookingForFlight(String nickname, String flightName) {
-        try {
-            List<BookFlightDTO> list = booking.getBookFlightsDetailsByCustomerNickname(nickname);
-            if (list == null || list.isEmpty()) return false;
-            String target = flightName == null ? "" : flightName.trim();
-
-            for (BookFlightDTO bf : list) {
-                if (bf == null || bf.getTicketIds() == null) continue;
-                for (Long tid : bf.getTicketIds()) {
-                    if (tid == null) continue;
-                    try {
-                        var seat = seats.getSeatDetailsByTicketId(tid);
-                        if (seat != null && seat.getFlightName() != null &&
-                                seat.getFlightName().trim().equalsIgnoreCase(target)) {
-                            return true;
-                        }
-                    } catch (Exception ex) {
-                        getServletContext().log("Seat lookup failed for ticketId=" + tid, ex);
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            getServletContext().log("existing booking check failed", ex);
-        }
-        return false;
+    private static String safeMsg(Exception e) {
+        String m = e.getMessage();
+        if (m == null) return "Error inesperado.";
+        return m.length() > 180 ? m.substring(0, 180) + "…" : m;
     }
 
     private static EnumTipoAsiento parseSeatType(String s){
@@ -338,4 +320,3 @@ public class BookFlightServlet extends HttpServlet {
         return v == null ? 0.0 : v;
     }
 }
-
