@@ -10,6 +10,11 @@
 <c:url var="profileUpdateUrl" value="/perfil/update"/>
 <c:url var="logoutUrl" value="/users/logout"/>
 <c:url var="listUsersUrl" value="/users/list"/>
+<c:url var="createFlightUrl" value="/createFlight"/>
+<c:url var="createFlightRouteUrl" value="/createFlightRoute"/>
+<c:url var="createPackageUrl" value="/createPackage"/>
+<c:url var="listPackageUrl" value="/packages/list"/>
+<c:url var="checkBookingUrl" value="/booking/check"/>
 <c:url var="debugUrl" value="/debug"/>
 
 <c:choose>

@@ -190,6 +190,7 @@
             </div>
         </div>
     </c:if>
+    <jsp:include page="/src/components/leftPanel/leftPanel.jsp"/>
 </main>
 
 <jsp:include page="/src/views/footer/footer.jspf"/>
