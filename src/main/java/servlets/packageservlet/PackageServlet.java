@@ -1,10 +1,10 @@
 package servlets.packageservlet;
 
-import controllers.flightRoute.IFlightRouteController;
-import controllers.flightRoutePackage.IFlightRoutePackageController;
+import controllers.flightroute.IFlightRouteController;
+import controllers.flightroutepackage.IFlightRoutePackageController;
 
-import domain.dtos.flightRoute.FlightRouteDTO;
-import domain.dtos.flightRoutePackage.BaseFlightRoutePackageDTO;
+import domain.dtos.flightroute.FlightRouteDTO;
+import domain.dtos.flightroutepackage.BaseFlightRoutePackageDTO;
 import domain.models.enums.EnumEstatusRuta;
 
 import factory.ControllerFactory;

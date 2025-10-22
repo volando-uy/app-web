@@ -1,13 +1,5 @@
 package servlets.image;
 
-import controllers.category.ICategoryController;
-import controllers.flight.IFlightController;
-import controllers.flightRoute.IFlightRouteController;
-import controllers.user.IUserController;
-import domain.dtos.flight.FlightDTO;
-import domain.dtos.flightRoute.FlightRouteDTO;
-import domain.models.enums.EnumEstatusRuta;
-import factory.ControllerFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,8 +11,6 @@ import shared.utils.ImageProcessor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @WebServlet("/image")

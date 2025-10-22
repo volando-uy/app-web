@@ -1,12 +1,11 @@
 package servlets.checkFlightRoute;
 
-import controllers.flightRoute.IFlightRouteController;
+import controllers.flightroute.IFlightRouteController;
 import controllers.flight.IFlightController;
 import controllers.user.IUserController;
 import domain.dtos.flight.FlightDTO;
-import domain.dtos.flightRoute.FlightRouteDTO;
+import domain.dtos.flightroute.FlightRouteDTO;
 import domain.dtos.user.AirlineDTO;
-import domain.dtos.user.UserDTO;
 import domain.models.enums.EnumEstatusRuta;
 import factory.ControllerFactory;
 import jakarta.servlet.ServletException;
