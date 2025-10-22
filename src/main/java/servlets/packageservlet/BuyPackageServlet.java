@@ -102,7 +102,7 @@ public class BuyPackageServlet extends HttpServlet {
             BaseBuyPackageDTO purchase = buyCtrl.createBuyPackage(nick, pkgName);
 
             toast(req, "Compra realizada (ID " + (purchase != null ? purchase.getId() : "-") + ")", "success");
-            resp.sendRedirect(req.getContextPath() + "/packages/list?modal=" + url(pkgName));
+            resp.sendRedirect(req.getContextPath() + "/perfil");
         } catch (Exception e) {
             String msg = (e.getMessage() != null && e.getMessage().toLowerCase().contains("ya"))
                     ? "Ya compraste este paquete."

@@ -1,95 +1,79 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>s
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<c:set var="pCount" value="${passengersCount}" />
 
-<table class="w-full text-sm border rounded overflow-hidden">
-    <thead class="bg-gray-50">
-    <tr>
-        <th class="p-2 text-left">Nombre</th>
-        <th class="p-2 text-left">Apellido</th>
-        <th class="p-2 text-left">Tipo doc</th>
-        <th class="p-2 text-left">N° doc</th>
-        <th class="p-2 text-left">Básico</th>
-        <th class="p-2 text-left">Peso básico (kg)</th>
-        <th class="p-2 text-left">Extra</th>
-        <th class="p-2 text-left">Unidades extra</th>
-        <th class="p-2 text-left">Peso extra (kg)</th>
-    </tr>
-    </thead>
-    <tbody>
-    <c:forEach var="i" begin="0" end="${passengersCount - 1}">
-
-        <!-- Claves cómodas para leer param[...] -->
-        <c:set var="kName"         value="${'passengers['}${i}${'].name'}"/>
-        <c:set var="kSurname"      value="${'passengers['}${i}${'].surname'}"/>
-        <c:set var="kDocType"      value="${'passengers['}${i}${'].docType'}"/>
-        <c:set var="kNumDoc"       value="${'passengers['}${i}${'].numDoc'}"/>
-        <c:set var="kBasicType"    value="${'passengers['}${i}${'].basicLuggageType'}"/>
-        <c:set var="kBasicWeight"  value="${'passengers['}${i}${'].basicLuggageWeight'}"/>
-        <c:set var="kExtraType"    value="${'passengers['}${i}${'].extraLuggageType'}"/>
-        <c:set var="kExtraUnits"   value="${'passengers['}${i}${'].extraLuggageUnits'}"/>
-        <c:set var="kExtraWeight"  value="${'passengers['}${i}${'].extraLuggageWeight'}"/>
-
-        <tr class="border-t">
-            <td class="p-2">
-                <input name="passengers[${i}].name"
-                       value="${param[kName]}"
-                       class="w-full border rounded px-2 py-1" required />
-            </td>
-            <td class="p-2">
-                <input name="passengers[${i}].surname"
-                       value="${param[kSurname]}"
-                       class="w-full border rounded px-2 py-1" required />
-            </td>
-            <td class="p-2">
-                <select name="passengers[${i}].docType"
-                        class="w-full border rounded px-2 py-1" required>
-                    <c:forEach var="dt" items="${docTypes}">
-                        <option value="${dt}" ${dt == param[kDocType] ? 'selected' : ''}>${dt}</option>
-                    </c:forEach>
-                </select>
-            </td>
-            <td class="p-2">
-                <input name="passengers[${i}].numDoc"
-                       value="${param[kNumDoc]}"
-                       class="w-full border rounded px-2 py-1" required />
-            </td>
-
-            <td class="p-2">
-                <select name="passengers[${i}].basicLuggageType"
-                        class="w-full border rounded px-2 py-1" required>
-                    <c:forEach var="b" items="${basicLuggages}">
-                        <option value="${b}" ${b == param[kBasicType] ? 'selected' : ''}>${b}</option>
-                    </c:forEach>
-                </select>
-            </td>
-            <td class="p-2">
-                <input type="number" step="0.1" min="0"
-                       name="passengers[${i}].basicLuggageWeight"
-                       value="${param[kBasicWeight]}"
-                       class="w-full border rounded px-2 py-1" placeholder="0.0" required/>
-            </td>
-
-            <td class="p-2">
-                <select name="passengers[${i}].extraLuggageType"
-                        class="w-full border rounded px-2 py-1" required>
-                    <c:forEach var="e" items="${extraLuggages}">
-                        <option value="${e}" ${e == param[kExtraType] ? 'selected' : ''}>${e}</option>
-                    </c:forEach>
-                </select>
-            </td>
-            <td class="p-2">
-                <input type="number" min="0"
-                       name="passengers[${i}].extraLuggageUnits"
-                       value="${empty param[kExtraUnits] ? 0 : param[kExtraUnits]}"
-                       class="w-full border rounded px-2 py-1" required/>
-            </td>
-            <td class="p-2">
-                <input type="number" step="0.1" min="0"
-                       name="passengers[${i}].extraLuggageWeight"
-                       value="${param[kExtraWeight]}"
-                       class="w-full border rounded px-2 py-1" placeholder="0.0" required/>
-            </td>
+<div class="overflow-x-auto">
+    <table class="w-full table-fixed text-sm border rounded">
+        <colgroup>
+            <col class="w-[12%]"/><col class="w-[12%]"/><col class="w-[10%]"/><col class="w-[12%]"/>
+            <col class="w-[14%]"/><col class="w-[10%]"/><col class="w-[14%]"/><col class="w-[8%]"/><col class="w-[8%]"/>
+        </colgroup>
+        <thead class="bg-gray-50">
+        <tr>
+            <th class="p-2 text-left">Nombre</th>
+            <th class="p-2 text-left">Apellido</th>
+            <th class="p-2 text-left">Tipo doc</th>
+            <th class="p-2 text-left">N° doc</th>
+            <th class="p-2 text-left">Básico</th>
+            <th class="p-2 text-left">Peso básico <span class="text-xs opacity-70">(kg)</span></th>
+            <th class="p-2 text-left">Extra</th>
+            <th class="p-2 text-left">Unidades extra</th>
+            <th class="p-2 text-left">Peso extra <span class="text-xs opacity-70">(kg)</span></th>
         </tr>
-    </c:forEach>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        <c:if test="${pCount gt 0}">
+            <c:forEach var="i" begin="0" end="${pCount - 1}">
+                <c:set var="kName"        value="${'passengers['}${i}${'].name'}"/>
+                <c:set var="kSurname"     value="${'passengers['}${i}${'].surname'}"/>
+                <c:set var="kDocType"     value="${'passengers['}${i}${'].docType'}"/>
+                <c:set var="kNumDoc"      value="${'passengers['}${i}${'].numDoc'}"/>
+                <c:set var="kBasicType"   value="${'passengers['}${i}${'].basicLuggageType'}"/>
+                <c:set var="kBasicWeight" value="${'passengers['}${i}${'].basicLuggageWeight'}"/>
+                <c:set var="kExtraType"   value="${'passengers['}${i}${'].extraLuggageType'}"/>
+                <c:set var="kExtraUnits"  value="${'passengers['}${i}${'].extraLuggageUnits'}"/>
+                <c:set var="kExtraWeight" value="${'passengers['}${i}${'].extraLuggageWeight'}"/>
+
+                <tr class="border-t align-middle">
+                    <td class="p-2"><input name="passengers[${i}].name"    value="${param[kName]}"    class="w-full border rounded px-2 py-1" required /></td>
+                    <td class="p-2"><input name="passengers[${i}].surname" value="${param[kSurname]}" class="w-full border rounded px-2 py-1" required /></td>
+                    <td class="p-2">
+                        <select name="passengers[${i}].docType" class="w-full border rounded px-2 py-1" required>
+                            <c:forEach var="dt" items="${docTypes}">
+                                <option value="${dt}" ${dt == param[kDocType] ? 'selected' : ''}>${dt}</option>
+                            </c:forEach>
+                        </select>
+                    </td>
+                    <td class="p-2"><input name="passengers[${i}].numDoc"  value="${param[kNumDoc]}"  class="w-full border rounded px-2 py-1" required /></td>
+                    <td class="p-2">
+                        <select name="passengers[${i}].basicLuggageType" class="w-full border rounded px-2 py-1" required>
+                            <c:forEach var="b" items="${basicLuggages}">
+                                <option value="${b}" ${b == param[kBasicType] ? 'selected' : ''}>${b}</option>
+                            </c:forEach>
+                        </select>
+                    </td>
+                    <td class="p-2"><input type="number" step="0.1" min="0" name="passengers[${i}].basicLuggageWeight"
+                                           value="${empty param[kBasicWeight] ? 0 : param[kBasicWeight]}"
+                                           class="w-full border rounded px-2 py-1 text-right" placeholder="0.0" required/></td>
+                    <td class="p-2">
+                        <select name="passengers[${i}].extraLuggageType" class="w-full border rounded px-2 py-1" required>
+                            <c:forEach var="e" items="${extraLuggages}">
+                                <option value="${e}" ${e == param[kExtraType] ? 'selected' : ''}>${e}</option>
+                            </c:forEach>
+                        </select>
+                    </td>
+                    <td class="p-2"><input type="number" min="0" name="passengers[${i}].extraLuggageUnits"
+                                           value="${empty param[kExtraUnits] ? 0 : param[kExtraUnits]}"
+                                           class="w-full border rounded px-2 py-1 text-right" required/></td>
+                    <td class="p-2"><input type="number" step="0.1" min="0" name="passengers[${i}].extraLuggageWeight"
+                                           value="${empty param[kExtraWeight] ? 0 : param[kExtraWeight]}"
+                                           class="w-full border rounded px-2 py-1 text-right" placeholder="0.0" required/></td>
+                </tr>
+            </c:forEach>
+        </c:if>
+        <c:if test="${pCount eq 0}">
+            <tr><td colspan="9" class="p-3 text-center opacity-70">Sin pasajeros.</td></tr>
+        </c:if>
+        </tbody>
+    </table>
+</div>
