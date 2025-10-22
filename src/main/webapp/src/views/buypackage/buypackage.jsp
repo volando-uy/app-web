@@ -1,17 +1,13 @@
+
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false" %>
 <%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>Confirmar compra de paquete</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config={theme:{extend:{colors:{brand:"#0B4C73"}}}}</script>
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-</head>
+
+<%@ include file="/src/components/layout/libs.jspf" %>
+<%@ include file="/src/components/layout/head.jspf" %>
+
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
 <jsp:include page="/src/views/header/header.jsp" />
@@ -43,7 +39,6 @@
                     </div>
                     <div><span class="font-semibold">Validez:</span> <c:out value="${requestScope.pkg.validityPeriodDays}"/> días</div>
 
-                    <!-- Ahora sí, java.util.Date -->
                     <div><span class="font-semibold">Compra:</span>
                         <fmt:formatDate value="${requestScope.purchaseDateLegacy}" pattern="dd/MM/yyyy"/>
                     </div>
@@ -69,5 +64,6 @@
 </main>
 
 <%@ include file="/src/views/footer/footer.jspf" %>
+<%@ include file="/src/components/layout/scripts.jspf" %>
 </body>
 </html>
