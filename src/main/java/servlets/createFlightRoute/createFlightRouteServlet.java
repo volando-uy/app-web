@@ -131,7 +131,7 @@ public class createFlightRouteServlet extends HttpServlet {
 
 
             session.setAttribute("toastMessage", "Ruta de vuelo creada correctamente.");
-            session.setAttribute("toastType", "error");
+            session.setAttribute("toastType", "success");
             resp.sendRedirect(req.getContextPath() + "/createFlightRoute");
 
         } catch (Exception e) {
