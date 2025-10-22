@@ -33,7 +33,6 @@ public class CheckFlightReservationServlet extends HttpServlet {
     private final IBookingController     books   = ControllerFactory.getBookingController();
     private final ITicketController      tickets = ControllerFactory.getTicketController();
 
-    // ===== Helpers =====
     private static Date toDate(LocalDateTime ldt) {
         if (ldt == null) return null;
         ZoneId zone = ZoneId.of("America/Montevideo");
@@ -45,7 +44,6 @@ public class CheckFlightReservationServlet extends HttpServlet {
         return t.isEmpty() ? null : t;
     }
     private static <T> List<T> safe(List<T> list) { return list == null ? List.of() : list; }
-    // ====================
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -55,7 +53,6 @@ public class CheckFlightReservationServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html; charset=UTF-8");
 
-        // Para <fmt:...> en el JSP
         req.setAttribute("uiLocale", "es_UY");
 
         UserDTO usuario = (UserDTO) req.getSession().getAttribute("usuario");
@@ -64,7 +61,6 @@ public class CheckFlightReservationServlet extends HttpServlet {
             return;
         }
 
-        // Normalizo params
         String airline = trimOrNull(req.getParameter("airline"));
         String route   = trimOrNull(req.getParameter("route"));
         String flight  = trimOrNull(req.getParameter("flight"));
@@ -90,12 +86,11 @@ public class CheckFlightReservationServlet extends HttpServlet {
         }
         req.setAttribute("tipoUsuario", tipoUsuario);
 
-        // ============ AEROLÍNEA ============
+        // -------- Rama AEROLÍNEA --------
         if ("aerolinea".equals(tipoUsuario)) {
             String airlineNick = ((AirlineDTO) req.getAttribute("usuario")).getNickname();
             req.setAttribute("airlineName", airlineNick);
 
-            // Paso 1: rutas de la aerolínea
             if (route == null) {
                 List<FlightRouteDTO> rs = safe(routes.getAllFlightRoutesDetailsByAirlineNickname(airlineNick));
                 req.setAttribute("routes", rs);
@@ -104,7 +99,6 @@ public class CheckFlightReservationServlet extends HttpServlet {
             }
             req.setAttribute("routeName", route);
 
-            // Paso 2: vuelos de la ruta
             if (flight == null) {
                 List<FlightDTO> fs = safe(flights.getAllFlightsDetailsByRouteName(route));
                 List<Map<String,Object>> flightsView = new ArrayList<>();
@@ -120,21 +114,19 @@ public class CheckFlightReservationServlet extends HttpServlet {
             }
             req.setAttribute("flightName", flight);
 
-            // Paso 3: lista de reservas del vuelo (todas las de ese vuelo)
             if (booking == null) {
                 List<BookFlightDTO> bs = safe(books.getBookFlightsDetailsByFlightName(flight));
 
-                // Para cada reserva, además de los datos base, agregamos la lista de pasajeros (tickets)
                 List<Map<String,Object>> bookingsView = new ArrayList<>();
                 for (BookFlightDTO b : bs) {
                     Map<String,Object> bm = new HashMap<>();
                     bm.put("id", b.getId());
-                    bm.put("customerNickname", b.getCustomerNickname()); // “dueño” de la reserva
+                    bm.put("customerNickname", b.getCustomerNickname());
                     bm.put("seatType", b.getSeatType());
                     bm.put("totalPrice", b.getTotalPrice());
                     bm.put("createdAt", toDate(b.getCreatedAt()));
 
-                    // Passengers (tickets de esta reserva)
+                    // Pasajeros
                     List<Map<String,Object>> passengers = new ArrayList<>();
                     if (b.getTicketIds() != null) {
                         for (Long tid : b.getTicketIds()) {
@@ -159,7 +151,7 @@ public class CheckFlightReservationServlet extends HttpServlet {
                 return;
             }
 
-            // Paso 4: detalle de reserva
+            // Detalle de una reserva (aerolínea)
             Long id;
             try { id = Long.valueOf(booking); }
             catch (Exception e) {
@@ -180,7 +172,8 @@ public class CheckFlightReservationServlet extends HttpServlet {
             return;
         }
 
-        // Paso 0: elegir aerolínea
+
+        // Elegir aerolínea
         if (airline == null) {
             List<AirlineDTO> airlines = safe(users.getAllAirlinesDetails());
             req.setAttribute("airlines", airlines);
@@ -189,7 +182,7 @@ public class CheckFlightReservationServlet extends HttpServlet {
         }
         req.setAttribute("airlineName", airline);
 
-        // Paso 1: rutas confirmadas de esa aerolínea
+        // Rutas confirmadas de esa aerolínea
         if (route == null) {
             List<FlightRouteDTO> rs = safe(
                     routes.getAllFlightRoutesDetailsByAirlineNickname(airline)
@@ -200,7 +193,7 @@ public class CheckFlightReservationServlet extends HttpServlet {
         }
         req.setAttribute("routeName", route);
 
-        // Paso 2: vuelos de la ruta
+        // Vuelos de la ruta
         if (flight == null) {
             List<FlightDTO> fs = safe(flights.getAllFlightsDetailsByRouteName(route));
             List<Map<String,Object>> flightsView = new ArrayList<>();
@@ -216,29 +209,69 @@ public class CheckFlightReservationServlet extends HttpServlet {
         }
         req.setAttribute("flightName", flight);
 
-        // Paso 3: ¿tengo reserva en ese vuelo?
+        // Listar TODAS mis reservas de ese vuelo
         String customerNick = ((CustomerDTO) req.getAttribute("usuario")).getNickname();
         List<BookFlightDTO> allForFlight = safe(books.getBookFlightsDetailsByFlightName(flight));
-        BookFlightDTO mine = allForFlight.stream()
-                .filter(b -> Objects.equals(customerNick, b.getCustomerNickname()))
-                .findFirst().orElse(null);
 
-        if (mine == null) {
+        List<BookFlightDTO> myBookings = allForFlight.stream()
+                .filter(b -> b != null && Objects.equals(customerNick, b.getCustomerNickname()))
+                .sorted(Comparator.comparing(BookFlightDTO::getCreatedAt,
+                        Comparator.nullsLast(Comparator.naturalOrder()))) // más viejas primero
+                .toList();
+
+        // Si piden ver el detalle de una en particular (booking=id), lo mostramos
+        if (booking != null) {
+            try {
+                Long id = Long.valueOf(booking);
+                BookFlightDTO bd = books.getBookFlightDetailsById(id);
+                req.setAttribute("booking", bd);
+                req.setAttribute("bookingCreatedAtDate", toDate(bd != null ? bd.getCreatedAt() : null));
+
+                List<TicketDTO> ts = new ArrayList<>();
+                if (bd != null && bd.getTicketIds() != null) {
+                    for (Long tid : bd.getTicketIds()) ts.add(tickets.getTicketDetailsById(tid));
+                }
+                req.setAttribute("tickets", ts);
+            } catch (Exception ignore) {
+            }
+        }
+
+        if (myBookings.isEmpty()) {
             req.setAttribute("noBooking", true);
-            req.setAttribute("tickets", List.of());
+            req.setAttribute("myBookingsView", List.of());
             forward(req, resp);
             return;
         }
 
-        BookFlightDTO bd = books.getBookFlightDetailsById(mine.getId());
-        req.setAttribute("booking", bd);
-        req.setAttribute("bookingCreatedAtDate", toDate(bd != null ? bd.getCreatedAt() : null));
+        // Armar lista visible de mis reservas
+        List<Map<String,Object>> myBookingsView = new ArrayList<>();
+        for (BookFlightDTO b : myBookings) {
+            Map<String,Object> bm = new HashMap<>();
+            bm.put("id", b.getId());
+            bm.put("createdAt", toDate(b.getCreatedAt()));
+            bm.put("seatType", b.getSeatType());
+            bm.put("totalPrice", b.getTotalPrice());
 
-        List<TicketDTO> ts = new ArrayList<>();
-        if (bd != null && bd.getTicketIds() != null) {
-            for (Long tid : bd.getTicketIds()) ts.add(tickets.getTicketDetailsById(tid));
+            List<Map<String,Object>> passengers = new ArrayList<>();
+            if (b.getTicketIds() != null) {
+                for (Long tid : b.getTicketIds()) {
+                    TicketDTO t = tickets.getTicketDetailsById(tid);
+                    if (t == null) continue;
+                    Map<String,Object> tm = new HashMap<>();
+                    tm.put("name", t.getName());
+                    tm.put("surname", t.getSurname());
+                    tm.put("docType", t.getDocType());
+                    tm.put("numDoc", t.getNumDoc());
+                    tm.put("seatNumber", t.getSeatNumber());
+                    passengers.add(tm);
+                }
+            }
+            bm.put("passengers", passengers);
+            bm.put("passengerCount", passengers.size());
+
+            myBookingsView.add(bm);
         }
-        req.setAttribute("tickets", ts);
+        req.setAttribute("myBookingsView", myBookingsView);
 
         forward(req, resp);
     }

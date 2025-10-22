@@ -17,22 +17,21 @@
         </div>
     </c:if>
 
-    <c:choose>
-        <c:when test="${existingBooking}">
-            <a href="${pageContext.request.contextPath}/flight/list"
-               class="w-full block text-center px-4 py-2 rounded border">
-                Volver al listado de vuelos
-            </a>
-        </c:when>
-        <c:otherwise>
-            <button type="submit"
-                    form="postForm"
-                    name="action"
-                    value="confirm"
-                    class="w-full px-4 py-2 rounded bg-brand text-white disabled:opacity-50"
-                ${passengersCount <= 0 || passengersMax == 0 ? 'disabled' : ''}>
-                Confirmar reserva
-            </button>
-        </c:otherwise>
-    </c:choose>
+    <c:if test="${existingBooking}">
+        <div class="text-xs text-yellow-800 bg-yellow-50 border border-yellow-200 rounded px-3 py-2 mb-3">
+            Ya tenés una reserva para este vuelo. Si continuás, vas a crear otra.
+        </div>
+    </c:if>
+
+    <button type="submit"
+            form="postForm"
+            name="action"
+            value="confirm"
+            class="w-full px-4 py-2 rounded bg-brand text-white disabled:opacity-50"
+    ${passengersCount <= 0 || passengersMax == 0 ? 'disabled' : ''}>
+        <c:choose>
+            <c:when test="${existingBooking}">Confirmar de todos modos</c:when>
+            <c:otherwise>Confirmar reserva</c:otherwise>
+        </c:choose>
+    </button>
 </div>

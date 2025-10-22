@@ -51,7 +51,7 @@ public class PackageServlet extends HttpServlet {
             pkgs = Collections.emptyList();
         }
 
-        // 2) Rutas por paquete
+        // Rutas por paquete
         Map<String, List<FlightRouteDTO>> pkgRoutes = new HashMap<>();
         for (BaseFlightRoutePackageDTO p : pkgs) {
             if (p == null) continue;
@@ -76,12 +76,12 @@ public class PackageServlet extends HttpServlet {
             pkgRoutes.put(pkgName, confirmed);
         }
 
-        // 3) Sacar paquetes sin rutas confirmadas
+        //  Sacar paquetes sin rutas confirmadas
         List<BaseFlightRoutePackageDTO> withConfirmed = pkgs.stream()
                 .filter(p -> !pkgRoutes.getOrDefault(opt(p.getName()), Collections.emptyList()).isEmpty())
                 .collect(Collectors.toList());
 
-        // 4) Filtro
+        //   Filtro
         List<BaseFlightRoutePackageDTO> filtered = withConfirmed;
         if (!qParam.isEmpty()) {
             filtered = withConfirmed.stream().filter(p -> {
@@ -98,7 +98,7 @@ public class PackageServlet extends HttpServlet {
             }).collect(Collectors.toList());
         }
 
-        // 5) Modal: solo si el paquete existe en el resultado filtrado
+        //   solo si el paquete existe en el resultado filtrado
         String modalPkgName = null;
         String safeRouteParam = null;
 
@@ -117,7 +117,7 @@ public class PackageServlet extends HttpServlet {
 
 
         req.setAttribute("pkgs", filtered);
-        req.setAttribute("pkgRoutes", pkgRoutes); // ya son solo confirmadas
+        req.setAttribute("pkgRoutes", pkgRoutes);
         req.setAttribute("modalPkgName", modalPkgName);
         req.setAttribute("routeParam", safeRouteParam);
         req.setAttribute("hadError", hadError);
@@ -125,7 +125,7 @@ public class PackageServlet extends HttpServlet {
         req.getRequestDispatcher("/src/views/package/package.jsp").forward(req, resp);
     }
 
-    // POST: buscador → GET con ?q=
+    // Buscador
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {

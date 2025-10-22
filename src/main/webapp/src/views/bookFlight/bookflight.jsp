@@ -23,9 +23,7 @@
 
 <main class="flex-1 container mx-auto px-4 py-8">
 
-    <c:if test="${existingBooking}">
-        <%@ include file="/src/components/bookflight/warning_existing_booking.jspf" %>
-    </c:if>
+
 
     <%@ include file="/src/components/bookflight/info.jspf" %>
 
@@ -33,7 +31,6 @@
         <section class="lg:col-span-2 space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border">
                 <h3 class="text-sm font-semibold mb-1">Detalles y pasajeros</h3>
-
                 <%@ include file="/src/components/bookflight/filters.jspf" %>
             </div>
         </section>

@@ -29,7 +29,6 @@
                 </span>
             </div>
 
-            <!-- Migas -->
             <div class="bg-white rounded-xl shadow p-4">
                 <div class="flex flex-wrap items-center gap-2 text-sm">
                     <span class="text-gray-500">Aerolínea</span>
@@ -53,7 +52,6 @@
                 </div>
             </div>
 
-            <!-- Paso 0 (cliente): elegir aerolínea -->
             <c:if test="${tipoUsuario == 'cliente' && empty airlineName}">
                 <div class="bg-white rounded-xl shadow p-6">
                     <h2 class="font-semibold mb-4">Elegí una aerolínea</h2>
@@ -82,8 +80,7 @@
                 </div>
             </c:if>
 
-            <!-- Paso 1: elegir ruta -->
-            <c:if test="${empty routeName && not empty routes}">
+            <c:if test="${not empty airlineName && empty routeName}">
                 <div class="bg-white rounded-xl shadow p-6">
                     <h2 class="font-semibold mb-4">Elegí una ruta</h2>
                     <c:choose>
@@ -113,7 +110,6 @@
                         </c:otherwise>
                     </c:choose>
 
-                    <!-- Volver (solo cliente) -->
                     <c:if test="${tipoUsuario == 'cliente'}">
                         <div class="mt-4">
                             <c:url var="back" value="/booking/check"/>
@@ -123,8 +119,7 @@
                 </div>
             </c:if>
 
-            <!-- Paso 2: elegir vuelo -->
-            <c:if test="${empty flightName && not empty flightsView}">
+            <c:if test="${not empty airlineName && not empty routeName && empty flightName}">
                 <div class="bg-white rounded-xl shadow p-6">
                     <h2 class="font-semibold mb-4">Elegí un vuelo</h2>
                     <c:choose>
@@ -164,8 +159,8 @@
                 </div>
             </c:if>
 
-            <!-- Paso 3A (aerolínea): reservas del vuelo c/ pasajeros -->
-            <c:if test="${tipoUsuario == 'aerolinea' && empty booking && not empty bookingsView}">
+            <!-- Paso 3A (aerolínea): reservas del vuelo -->
+            <c:if test="${tipoUsuario == 'aerolinea' && empty booking && not empty flightName}">
                 <div class="bg-white rounded-xl shadow p-6">
                     <h2 class="font-semibold mb-4">Reservas del vuelo <span class="font-normal">${flightName}</span></h2>
                     <c:choose>
@@ -202,15 +197,9 @@
                                                             <c:forEach var="p" items="${b.passengers}">
                                                                 <li>
                                                                         ${p.name} ${p.surname}
-                                                                    <c:if test="${not empty p.seatNumber}">
-                                                                        — asiento ${p.seatNumber}
-                                                                    </c:if>
-                                                                    <c:if test="${not empty p.docType}">
-                                                                        — ${p.docType}
-                                                                    </c:if>
-                                                                    <c:if test="${not empty p.numDoc}">
-                                                                        ${p.numDoc}
-                                                                    </c:if>
+                                                                    <c:if test="${not empty p.seatNumber}"> — asiento ${p.seatNumber}</c:if>
+                                                                    <c:if test="${not empty p.docType}"> — ${p.docType}</c:if>
+                                                                    <c:if test="${not empty p.numDoc}"> ${p.numDoc}</c:if>
                                                                 </li>
                                                             </c:forEach>
                                                         </ul>
@@ -247,21 +236,85 @@
                 </div>
             </c:if>
 
-            <!-- Paso 3B (cliente): no tiene reserva -->
-            <c:if test="${tipoUsuario == 'cliente' && noBooking}">
-                <div class="bg-yellow-50 text-yellow-800 rounded-xl p-4 shadow">
-                    No tenés reserva para este vuelo.
-                </div>
-                <div class="mt-2">
-                    <c:url var="back" value="/booking/check">
-                        <c:param name="airline" value="${airlineName}"/>
-                        <c:param name="route"   value="${routeName}"/>
-                    </c:url>
-                    <a class="text-sm text-gray-600 hover:underline" href="${back}">Volver a vuelos</a>
+            <c:if test="${tipoUsuario == 'cliente' && empty booking && not empty flightName}">
+                <div class="bg-white rounded-xl shadow p-6">
+                    <h2 class="font-semibold mb-4">Tus reservas para el vuelo <span class="font-normal">${flightName}</span></h2>
+
+                    <c:choose>
+                        <c:when test="${empty myBookingsView}">
+                            <div class="bg-yellow-50 text-yellow-800 rounded-xl p-4 shadow">
+                                No tenés reserva para este vuelo.
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="overflow-auto rounded border">
+                                <table class="w-full text-sm">
+                                    <thead class="bg-gray-50">
+                                    <tr class="text-left">
+                                        <th class="px-3 py-2">ID</th>
+                                        <th class="px-3 py-2">Pasajeros</th>
+                                        <th class="px-3 py-2">Asiento</th>
+                                        <th class="px-3 py-2">Total</th>
+                                        <th class="px-3 py-2">Creada</th>
+                                        <th class="px-3 py-2"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <c:forEach var="b" items="${myBookingsView}">
+                                        <tr class="border-t align-top">
+                                            <td class="px-3 py-2">${b.id}</td>
+                                            <td class="px-3 py-2">
+                                                <div class="text-xs text-gray-600">
+                                                    <strong>${b.passengerCount}</strong> pasajero(s)
+                                                </div>
+                                                <c:if test="${b.passengerCount > 0}">
+                                                    <details class="mt-1">
+                                                        <summary class="cursor-pointer text-xs text-blue-700">Ver lista</summary>
+                                                        <ul class="mt-1 pl-4 list-disc text-xs text-gray-700">
+                                                            <c:forEach var="p" items="${b.passengers}">
+                                                                <li>
+                                                                        ${p.name} ${p.surname}
+                                                                    <c:if test="${not empty p.seatNumber}"> — asiento ${p.seatNumber}</c:if>
+                                                                    <c:if test="${not empty p.docType}"> — ${p.docType}</c:if>
+                                                                    <c:if test="${not empty p.numDoc}"> ${p.numDoc}</c:if>
+                                                                </li>
+                                                            </c:forEach>
+                                                        </ul>
+                                                    </details>
+                                                </c:if>
+                                            </td>
+                                            <td class="px-3 py-2">${b.seatType}</td>
+                                            <td class="px-3 py-2"><fmt:formatNumber value="${b.totalPrice}" type="currency"/></td>
+                                            <td class="px-3 py-2">
+                                                <fmt:formatDate value="${b.createdAt}" type="both" dateStyle="medium" timeStyle="short"/>
+                                            </td>
+                                            <td class="px-3 py-2">
+                                                <c:url var="next" value="/booking/check">
+                                                    <c:param name="airline" value="${airlineName}"/>
+                                                    <c:param name="route"   value="${routeName}"/>
+                                                    <c:param name="flight"  value="${flightName}"/>
+                                                    <c:param name="booking" value="${b.id}"/>
+                                                </c:url>
+                                                <a class="text-blue-600 hover:underline" href="${next}">Ver detalle</a>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
+
+                    <div class="mt-4">
+                        <c:url var="back" value="/booking/check">
+                            <c:param name="airline" value="${airlineName}"/>
+                            <c:param name="route"   value="${routeName}"/>
+                        </c:url>
+                        <a class="text-sm text-gray-600 hover:underline" href="${back}">Volver a vuelos</a>
+                    </div>
                 </div>
             </c:if>
 
-            <!-- Paso final (ambos): detalle de reserva -->
             <c:if test="${not empty booking}">
                 <div class="bg-white rounded-xl shadow p-6 space-y-6">
                     <h2 class="font-semibold">Detalle de reserva</h2>
@@ -355,14 +408,13 @@
             </c:if>
         </section>
 
-        <!-- Columna derecha: ayuda -->
         <aside class="space-y-4">
             <div class="bg-white rounded-xl shadow p-4">
                 <h3 class="font-semibold mb-2">Ayuda</h3>
                 <ul class="text-sm text-gray-600 list-disc pl-5 space-y-1">
                     <li>Primero elegís Aerolínea → Ruta → Vuelo.</li>
                     <li>Si sos Aerolínea: ves todas las reservas de ese vuelo (con pasajeros).</li>
-                    <li>Si sos Cliente: se muestra tu reserva (si existe).</li>
+                    <li>Si sos Cliente: se listan todas tus reservas de ese vuelo; podés abrir el detalle.</li>
                 </ul>
             </div>
         </aside>
