@@ -12,6 +12,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet("/users/login")
 public class LoginUserServlet extends HttpServlet {
@@ -47,7 +49,6 @@ public class LoginUserServlet extends HttpServlet {
                 if (oldSession != null) {
                     oldSession.invalidate();
                 }
-
                 HttpSession newSession = req.getSession(true);
                 newSession.setAttribute("jwt", loginResponse.getToken());
                 newSession.setAttribute("nickname", nickname);

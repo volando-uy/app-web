@@ -18,6 +18,7 @@
         <nav id="nav-desktop" class="hidden md:flex items-center gap-6">
             <a href="${flightsUrl}" class="hover:text-yellow-300">Vuelos</a>
             <a href="${packagesUrl}" class="hover:text-yellow-300">Paquetes</a>
+            <a href="${listUsersUrl}" class="hover:text-yellow-300"> Usuarios </a>
         </nav>
 
         <c:choose>

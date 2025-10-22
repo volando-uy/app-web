@@ -44,6 +44,7 @@ public class ProfileServlet extends HttpServlet {
         }
 
         // Enviamos al JSP de perfil
+        req.setAttribute("pageTitle", "Perfil - Volando.uy");
         req.getRequestDispatcher("/src/views/profile/info/profileInformation.jsp").forward(req, resp);
     }
 }
