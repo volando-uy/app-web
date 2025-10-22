@@ -247,7 +247,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         <div class="flex items-center justify-end gap-2">
           <button type="button" id="pkg-cancel" class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50">Cerrar</button>
-          <a href="${(window.BASE || '') + '/packages'}" class="px-4 py-2 rounded-lg bg-[#0B4C73] text-white hover:brightness-110">Ver más paquetes</a>
+          <a href="/app-web-jsp/packages/list" class="px-4 py-2 rounded-lg bg-[#0B4C73] text-white hover:brightness-110">Ver más paquetes</a>
         </div>
       </section>
     `;
