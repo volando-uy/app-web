@@ -78,7 +78,7 @@
 
         <div class="flex items-center justify-end gap-2">
           <button type="button" id="flight-cancel" class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50">Cerrar</button>
-          <a href="${(window.BASE || '') + '/flights'}" class="px-4 py-2 rounded-lg bg-[#0B4C73] text-white hover:brightness-110">Ver todos los vuelos</a>
+          <a href="/app-web-jsp/flight/list" class="px-4 py-2 rounded-lg bg-[#0B4C73] text-white hover:brightness-110">Ver todos los vuelos</a>
         </div>
       </section>
     `;
