@@ -91,7 +91,7 @@ public class createFlightServlet extends HttpServlet {
 
             HttpSession newSession = req.getSession(true);
 
-            newSession.setAttribute("toastMessage", "Ruta creada correctamente.");
+            newSession.setAttribute("toastMessage", "Vuelo creado correctamente.");
             newSession.setAttribute("toastType", "success");
 
             resp.sendRedirect(req.getContextPath() + "/createFlight");

@@ -2,6 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
+<%@ include file="/src/components/layout/libs.jspf" %>
+
 <c:set var="depRaw" value="${v.departureTime}" />
 <c:set var="depHHmm"
        value="${empty depRaw ? '' : (fn:contains(depRaw,'T') ? fn:substring(fn:substringAfter(depRaw,'T'),0,5) : fn:substring(depRaw,0,5))}" />
@@ -25,7 +27,7 @@
             <div class="w-16 h-12 rounded-lg overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center shadow-sm">
                 <c:choose>
                     <c:when test="${not empty v.image}">
-                        <img src="${fn:escapeXml(v.image)}" alt="logo" class="w-full h-full object-contain"/>
+                        <img src="${rootUrl}image?resourceClassName=${v.getClass().getSimpleName()}&key=${v.getName()}" alt="logo" class="w-full h-full object-contain"/>
                     </c:when>
                     <c:otherwise>
                         <span class="text-sm font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded">

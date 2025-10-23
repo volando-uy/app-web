@@ -3,6 +3,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
+<%@ include file="/src/components/layout/libs.jspf" %>
+
+
 <c:set var="depRaw" value="${flight.departureTime}" />
 <c:set var="depDateStr" value="${empty depRaw ? '' : fn:substringBefore(depRaw,'T')}" />
 <c:set var="depTimeHHmm" value="${empty depRaw ? '' : (fn:contains(depRaw,'T') ? fn:substring(fn:substringAfter(depRaw,'T'),0,5) : fn:substring(depRaw,0,5))}" />
@@ -19,7 +22,7 @@
         <div class="w-14 h-14 rounded-md bg-white border flex items-center justify-center overflow-hidden">
             <c:choose>
                 <c:when test="${not empty flight.image}">
-                    <img src="${fn:escapeXml(flight.image)}" alt="logo" class="w-full h-full object-contain"/>
+                    <img src="${rootUrl}image?resourceClassName=${flight.getClass().getSimpleName()}&key=${flight.getName()}" alt="logo" class="w-full h-full object-contain"/>
                 </c:when>
                 <c:otherwise>
                     <span class="text-sm font-bold text-gray-600">

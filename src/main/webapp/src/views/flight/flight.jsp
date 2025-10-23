@@ -15,8 +15,10 @@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
+<%@ include file="/src/components/layout/libs.jspf" %>
 
 <body class="bg-[#f5f6fa] min-h-screen flex flex-col">
+
 <jsp:include page="/src/views/header/header.jsp" />
 
 <main class="flex-1 container mx-auto px-2 md:px-4 py-8">
@@ -56,7 +58,7 @@
                     <div class="aspect-video bg-gray-50 border rounded-lg overflow-hidden flex items-center justify-center">
                         <c:choose>
                             <c:when test="${not empty selectedRoute.image}">
-                                <img src="${fn:escapeXml(selectedRoute.image)}"
+                                <img src="${rootUrl}image?resourceClassName=${selectedRoute.getClass().getSimpleName()}&key=${selectedRoute.getName()}"
                                      alt="${fn:escapeXml(selectedRoute.name)}"
                                      class="w-full h-full object-cover"/>
                             </c:when>
@@ -129,7 +131,7 @@
                     <div class="w-full aspect-video bg-gray-50 border border-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
                         <c:choose>
                             <c:when test="${not empty selectedFlight.image}">
-                                <img src="${fn:escapeXml(selectedFlight.image)}"
+                                <img src="${rootUrl}image?resourceClassName=${selectedFlight.getClass().getSimpleName()}&key=${selectedFlight.getName()}"
                                      alt="Imagen del vuelo"
                                      class="w-full h-full object-contain"/>
                             </c:when>

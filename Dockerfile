@@ -26,15 +26,9 @@ FROM amazoncorretto:17-alpine
 
 WORKDIR /app
 
-# Necesario para convertir CRLF -> LF
-RUN apk add --no-cache dos2unix
-
 COPY tomcat ./tomcat/
 COPY catalina-wrapper.sh ./catalina-wrapper.sh
 RUN chmod +x /app/catalina-wrapper.sh
-
-# Corregimos los saltos de línea de Windows
-RUN find /app/tomcat/bin -name "*.sh" -exec dos2unix {} \;
 
 COPY --from=build /app/target/app-web-jsp.war ./tomcat/webapps/
 

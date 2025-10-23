@@ -51,13 +51,13 @@ public class LoginUserServlet extends HttpServlet {
                 }
                 HttpSession newSession = req.getSession(true);
                 newSession.setAttribute("jwt", loginResponse.getToken());
-                newSession.setAttribute("nickname", nickname);
+                newSession.setAttribute("nickname", usuario.getNickname());
                 newSession.setAttribute("usuario", usuario);
 
-                newSession.setAttribute("toastMessage", nickname + " logueado con éxito");
+                newSession.setAttribute("toastMessage", usuario.getNickname() + " logueado con éxito");
                 newSession.setAttribute("toastType", "success");
 
-                System.out.println("Usuario " + nickname + " ha iniciado sesión.");
+                System.out.println("Usuario " + usuario.getNickname() + " ha iniciado sesión.");
                 System.out.println("Usuario details: " + usuario);
 
                 String redirectUrl = (String) newSession.getAttribute("redirectAfterLogin");

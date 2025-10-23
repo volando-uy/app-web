@@ -50,7 +50,7 @@
                     data-created="<%= created %>"
             >
                 <div class="relative">
-                    <img src="<%= img %>" alt="<%= f.getName() %>" class="w-full h-40 object-cover" />
+                    <img src="${rootUrl}image?resourceClassName=<%= f.getClass().getSimpleName() %>&key=<%= f.getName() %>" alt="<%= f.getName() %>" class="w-full h-40 object-cover" />
                     <span class="absolute top-2 left-2 text-white/90 text-[10px] font-semibold tracking-widest">VUELO</span>
                     <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/75 via-black/20 to-transparent">
                         <h3 class="text-white font-semibold text-sm md:text-base truncate"><%= f.getName() %></h3>

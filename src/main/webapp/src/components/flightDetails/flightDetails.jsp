@@ -1,6 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
+<%@ include file="/src/components/layout/libs.jspf" %>
+
 <section class="bg-white shadow-md rounded-2xl p-8 border border-gray-200">
     <h2 class="text-2xl font-semibold mb-4 text-brand text-center">Detalles del vuelo</h2>
 
@@ -17,7 +19,7 @@
 
     <c:if test="${not empty flight.image}">
         <div class="mt-6 flex justify-center">
-            <img src="${flight.image}" alt="Imagen del vuelo"
+            <img src="${rootUrl}image?resourceClassName=${flight.getClass().getSimpleName()}&key=${flight.getName()}" alt="Imagen del vuelo"
                  class="rounded-xl shadow-lg w-full max-w-md object-cover">
         </div>
     </c:if>

@@ -1,9 +1,12 @@
 <%@ page pageEncoding="UTF-8" %>
+
+<%@ include file="/src/components/layout/libs.jspf" %>
+
 <div class="bg-white rounded-xl border border-gray-200 p-4">
     <div class="aspect-video bg-gray-50 border rounded-lg overflow-hidden mb-3 flex items-center justify-center">
         <c:choose>
             <c:when test="${not empty r.image}">
-                <img src="<c:out value='${r.image}'/>"
+                <img src="<c:out value='${rootUrl}image?resourceClassName=${r.getClass().getSimpleName()}&key=${r.getName()}'/>"
                      alt="<c:out value='${r.name}'/>"
                      class="w-full h-full object-cover"/>
             </c:when>

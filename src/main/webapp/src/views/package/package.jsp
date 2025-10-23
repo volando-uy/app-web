@@ -21,6 +21,7 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
+<%@ include file="/src/components/layout/libs.jspf" %>
 <jsp:include page="/src/views/header/header.jsp" />
 
 <main class="flex-1 container mx-auto px-4 py-8">
@@ -94,7 +95,7 @@
                         <div class="w-full h-44 bg-gray-100">
                             <c:choose>
                                 <c:when test="${not empty cover}">
-                                    <img src="${cover}" alt="${fn:escapeXml(pkg.name)}"
+                                    <img src="${rootUrl}image?resourceClassName=${pkg.getClass().getSimpleName()}&key=${pkg.getName()}" alt="${fn:escapeXml(pkg.name)}"
                                          class="w-full h-44 object-cover block"
                                          onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');"/>
                                     <div class="hidden w-full h-44 flex items-center justify-center text-gray-500 italic">
