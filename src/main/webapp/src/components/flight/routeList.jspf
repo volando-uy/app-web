@@ -1,0 +1,24 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
+<p class="text-sm text-gray-600 mb-4">
+    Rutas confirmadas encontradas:
+    <strong><c:out value="${fn:length(routes)}"/></strong>
+</p>
+
+<c:choose>
+    <c:when test="${empty routes}">
+        <div class="bg-white border rounded-xl p-6 shadow-sm text-gray-600">
+            No hay rutas para mostrar.
+        </div>
+    </c:when>
+    <c:otherwise>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <c:forEach var="r" items="${routes}">
+                <%@ include file="/src/components/routeCard/route_card.jspf" %>
+            </c:forEach>
+        </div>
+    </c:otherwise>
+</c:choose>

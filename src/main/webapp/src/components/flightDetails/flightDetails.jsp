@@ -1,8 +1,4 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-
-<%@ include file="/src/components/layout/libs.jspf" %>
-
 <section class="bg-white shadow-md rounded-2xl p-8 border border-gray-200">
     <h2 class="text-2xl font-semibold mb-4 text-brand text-center">Detalles del vuelo</h2>
 
