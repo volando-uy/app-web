@@ -1,0 +1,13 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<c:choose>
+    <c:when test="${empty requestScope.pkgs}">
+        <p class="text-center text-gray-500">No hay paquetes disponibles.</p>
+    </c:when>
+    <c:otherwise>
+        <div id="packages-list" class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <c:forEach var="pkg" items="${requestScope.pkgs}">
+                <%@ include file="/src/components/packages/packageCard.jspf" %>
+            </c:forEach>
+        </div>
+    </c:otherwise>
+</c:choose>
