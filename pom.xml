@@ -50,6 +50,27 @@
             <artifactId>VolandoUY</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
+        <!-- JAXB moderno -->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+
+        <!-- JAX-WS -->
+        <dependency>
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>jaxws-rt</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -82,7 +103,7 @@
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven3-plugin</artifactId>
-                <version>1.9.0</version> <!-- ⚠️ ¡Versión agregada! -->
+                <version>1.9.0</version> <!-- ¡Versión agregada! -->
                 <configuration>
                     <container>
                         <containerId>tomcat10x</containerId>
@@ -104,6 +125,29 @@
                     </deployables>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>com.sun.xml.ws</groupId>
+                <artifactId>jaxws-maven-plugin</artifactId>
+                <version>4.0.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>http://localhost:8086/api/userService?wsdl</wsdlUrl> <!-- Cambia a tu WSDL real -->
+                            </wsdlUrls>
+                            <packageName>com.labpa.appweb.client</packageName>
+                            <encoding>UTF-8</encoding>
+                            <verbose>true</verbose>
+                            <xnocompile>true</xnocompile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
 
         </plugins>
     </build>

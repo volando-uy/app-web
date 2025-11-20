@@ -29,20 +29,33 @@ public class RegisterUserServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String userType = req.getParameter("userType");
         System.out.println("Tipo de usuario seleccionado: " + userType);
+
+        String nickname = req.getParameter("reg-nickname");
+        String nombre = req.getParameter("reg-nombre");
+        String email = req.getParameter("reg-email");
+        String password = req.getParameter("reg-password");
+        String confirm_password=req.getParameter("reg-confirm-password");
+
+        if(!password.equals(confirm_password)){
+            HttpSession session = req.getSession();
+            session.setAttribute("toastMessage", "Las contraseñas no coinciden.");
+            session.setAttribute("toastType", "error");
+            resp.sendRedirect(req.getContextPath() + "/users/register");
+            return;
+        }
+
         if ("cliente".equals(userType)) {
             System.out.println("Registrando cliente...");
             BaseCustomerDTO customer = new BaseCustomerDTO();
 
-            String nickname = req.getParameter("reg-nickname");
-            String nombre = req.getParameter("reg-nombre");
+
             String apellido = req.getParameter("reg-apellido");
-            String email = req.getParameter("reg-email");
+
             String fechaNacimiento = req.getParameter("reg-dob");
             String tipoDocumento = req.getParameter("reg-doc-type");
             EnumTipoDocumento docType = EnumTipoDocumento.valueOf(tipoDocumento.toUpperCase());
             String nacionalidad = req.getParameter("reg-nacionalidad");
             String numeroDocumento = req.getParameter("reg-doc-number");
-            String password = req.getParameter("reg-password");
 
             customer.setNickname(nickname);
             customer.setName(nombre);
@@ -68,12 +81,10 @@ public class RegisterUserServlet extends HttpServlet {
             BaseAirlineDTO airline = new BaseAirlineDTO();
 
 
-            String nickname = req.getParameter("reg-nickname-a");
-            String nombre = req.getParameter("reg-name-a");
-            String email = req.getParameter("reg-email-a");
+
             String web = req.getParameter("reg-web-a");
             String descripcion = req.getParameter("reg-desc-a");
-            String password = req.getParameter("reg-password-a");
+
 
             airline.setNickname(nickname);
             airline.setName(nombre);
@@ -84,6 +95,7 @@ public class RegisterUserServlet extends HttpServlet {
 
             // Aquí podrías crear un objeto Aerolinea y guardarlo
             req.setAttribute("Airline", airline);
+
             try {
                 userController.registerAirline(airline, null);
             } catch (Exception e) {
