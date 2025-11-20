@@ -1,0 +1,26 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
+<p class="text-sm text-gray-600 mb-4">
+    Vuelos para
+    <strong>${fn:escapeXml(selectedRoute.name)}</strong>:
+    <strong><c:out value="${fn:length(flights)}"/></strong>
+</p>
+
+<c:choose>
+    <c:when test="${empty flights}">
+        <div class="bg-white border rounded-xl p-6 shadow-sm text-gray-600">
+            No hay vuelos para mostrar.
+        </div>
+    </c:when>
+
+    <c:otherwise>
+        <div class="space-y-3">
+            <c:forEach var="v" items="${flights}">
+                <%@ include file="/src/components/flight_card/flight_card.jspf" %>
+            </c:forEach>
+        </div>
+    </c:otherwise>
+</c:choose>
