@@ -1,8 +1,7 @@
 package servlets.user;
 
-import controllers.user.IUserController;
-import domain.dtos.user.*;
-import factory.ControllerFactory;
+import com.labpa.appweb.user.*;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,10 +12,13 @@ import java.io.IOException;
 
 @WebServlet("/users/view")
 public class ViewUserProfileServlet extends HttpServlet {
-    private final IUserController userController = ControllerFactory.getUserController();
+//    private final IUserController userController = ControllerFactory.getUserController();
 
+    UserSoapAdapterService service = new UserSoapAdapterService();
+    UserSoapAdapter port = service.getUserSoapAdapterPort();
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
         String nickname = req.getParameter("nick");
 
         if (nickname == null || nickname.isEmpty()) {
@@ -24,16 +26,20 @@ public class ViewUserProfileServlet extends HttpServlet {
             return;
         }
 
-        UserDTO baseUser = userController.getUserSimpleDetailsByNickname(nickname);
-
+//        UserDTO baseUser = userController.getUserSimpleDetailsByNickname(nickname);
+        UserDTO baseUser = port.getUserSimpleDetailsByNickname(nickname);
         if (baseUser instanceof BaseCustomerDTO) {
-            CustomerDTO cliente = userController.getCustomerDetailsByNickname(nickname);
+//            CustomerDTO cliente = userController.getCustomerDetailsByNickname(nickname);
+            CustomerDTO cliente = port.getCustomerDetailsByNickname(nickname);
+
             req.setAttribute("cliente", cliente);
             req.setAttribute("tipoUsuario", "cliente");
             req.setAttribute("usuario", cliente);
 
         } else if (baseUser instanceof BaseAirlineDTO) {
-            AirlineDTO aerolinea = userController.getAirlineDetailsByNickname(nickname);
+//            AirlineDTO aerolinea = userController.getAirlineDetailsByNickname(nickname);
+            AirlineDTO aerolinea = port.getAirlineDetailsByNickname(nickname);
+
             req.setAttribute("aerolinea", aerolinea);
             req.setAttribute("tipoUsuario", "aerolinea");
             req.setAttribute("usuario", aerolinea);

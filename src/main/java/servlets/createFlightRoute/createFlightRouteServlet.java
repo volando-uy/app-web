@@ -1,15 +1,22 @@
 package servlets.createFlightRoute;
 
-import controllers.airport.IAirportController;
-import controllers.category.ICategoryController;
-import controllers.flightroute.IFlightRouteController;
-import domain.dtos.airport.BaseAirportDTO;
-import domain.dtos.flightroute.BaseFlightRouteDTO;
-import factory.ControllerFactory;
+import adapters.LocalDateAdapter;
+import com.labpa.appweb.airport.AirportSoapAdapter;
+import com.labpa.appweb.airport.AirportSoapAdapterService;
+import com.labpa.appweb.airport.BaseAirportDTO;
+import com.labpa.appweb.category.CategorySoapAdapter;
+import com.labpa.appweb.category.CategorySoapAdapterService;
+import com.labpa.appweb.flightroute.BaseFlightRouteDTO;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
+import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapterService;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import mappers.DateMapper;
+import utils.FileBase64Util;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -19,19 +26,25 @@ import java.util.*;
 @MultipartConfig
 public class createFlightRouteServlet extends HttpServlet {
 
-    private final IFlightRouteController controller = ControllerFactory.getFlightRouteController();
+//    private final IFlightRouteController controller = ControllerFactory.getFlightRouteController();
+
+    private final FlightRouteSoapAdapter flightRouteSoapAdapter = new FlightRouteSoapAdapterService().getFlightRouteSoapAdapterPort();
+
+    private final AirportSoapAdapter airportSoapAdapter = new AirportSoapAdapterService().getAirportSoapAdapterPort();
+
+    private final CategorySoapAdapter categorySoapAdapter = new CategorySoapAdapterService().getCategorySoapAdapterPort();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
         // Controladores
-        IAirportController airportController = ControllerFactory.getAirportController();
-        ICategoryController categoryController = ControllerFactory.getCategoryController();
+//        IAirportController airportController = ControllerFactory.getAirportController();
+//        ICategoryController categoryController = ControllerFactory.getCategoryController();
 
         // Datos para los selects
-        List<BaseAirportDTO> airports = new ArrayList<>(airportController.getAllAirportsSimpleDetails());
-        List<String> categories = categoryController.getAllCategoriesNames();
+        List<BaseAirportDTO> airports = new ArrayList<>(airportSoapAdapter.getAllAirportsSimpleDetails().getItem());
+        List<String> categories = categorySoapAdapter.getAllCategoriesNames().getItem();
 
         airports.sort(Comparator.comparing(BaseAirportDTO::getCode));
 
@@ -85,7 +98,6 @@ public class createFlightRouteServlet extends HttpServlet {
             if (cats != null) {
                 categories = Arrays.asList(cats);
             }
-
             // === Procesar imagen (opcional) ===
             Part imagePart = req.getPart("image");
             File imageFile = null;
@@ -119,7 +131,9 @@ public class createFlightRouteServlet extends HttpServlet {
             BaseFlightRouteDTO dto = new BaseFlightRouteDTO();
             dto.setName(name);
             dto.setDescription(description);
-            dto.setCreatedAt(createdAt);
+
+            dto.setCreatedAt(LocalDateAdapter.toSoapLocalDate(LocalDate.parse(req.getParameter("createdAt"))));
+
             dto.setPriceExtraUnitBaggage(priceExtra);
             dto.setPriceTouristClass(priceTourist);
             dto.setPriceBusinessClass(priceBusiness);
@@ -127,8 +141,13 @@ public class createFlightRouteServlet extends HttpServlet {
             dto.setStatus(null);
 
             // === Crear ruta de vuelo ===
-            controller.createFlightRoute(dto, originAeroCode, destinationAeroCode, airlineNickname, categories, imageFile);
+            String imageBase64 = FileBase64Util.fileToBase64(imageFile);
 
+            com.labpa.appweb.flightroute.StringArray categoriesArray = new com.labpa.appweb.flightroute.StringArray();
+            categoriesArray.getItem().addAll(categories);
+
+//            controller.createFlightRoute(dto, originAeroCode, destinationAeroCode, airlineNickname, categories, imageFile);
+            flightRouteSoapAdapter.createFlightRoute(dto, originAeroCode, destinationAeroCode, airlineNickname, categoriesArray, imageBase64);
 
             session.setAttribute("toastMessage", "Ruta de vuelo creada correctamente.");
             session.setAttribute("toastType", "success");

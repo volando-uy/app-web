@@ -1,11 +1,13 @@
 package servlets.createCityCategory;
 
-import controllers.category.CategoryController;
-import controllers.city.CityController;
-import domain.dtos.category.CategoryDTO;
-import domain.dtos.city.BaseCityDTO;
-import domain.services.category.CategoryService;
-import domain.services.city.CityService;
+import com.labpa.appweb.category.CategoryDTO;
+import com.labpa.appweb.category.CategorySoapAdapter;
+import com.labpa.appweb.category.CategorySoapAdapterService;
+import com.labpa.appweb.city.BaseCityDTO;
+import com.labpa.appweb.city.CitySoapAdapter;
+import com.labpa.appweb.city.CitySoapAdapterService;
+
+
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -17,14 +19,21 @@ import java.io.PrintWriter;
 @WebServlet("/createCityAndCategory")
 public class createCityCategoryServlet extends HttpServlet {
 
-    private CategoryController categoryController;
-    private CityController cityController;
+//    private CategoryController categoryController;
+//    private CityController cityController;
 
-    @Override
-    public void init() throws ServletException {
-        categoryController = new CategoryController(new CategoryService());
-        cityController = new CityController(new CityService());
-    }
+    private CategorySoapAdapterService categorySoapAdapterService = new CategorySoapAdapterService();
+    private CategorySoapAdapter categoryController = categorySoapAdapterService.getCategorySoapAdapterPort();
+
+    private CitySoapAdapterService citySoapAdapterService = new CitySoapAdapterService();
+    private CitySoapAdapter cityController = citySoapAdapterService.getCitySoapAdapterPort();
+
+//    @Override
+//    public void init() throws ServletException {
+////        categoryController = new CategoryController(new CategoryService());
+////        cityController = new CityController(new CityService());
+//
+//    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -53,8 +62,9 @@ public class createCityCategoryServlet extends HttpServlet {
                         handleError(request, response, "El nombre de la categoría es obligatorio");
                         return;
                     }
-
-                    CategoryDTO created = categoryController.createCategory(new CategoryDTO(name));
+                    CategoryDTO dto = new CategoryDTO();
+                    dto.setName(name);
+                    CategoryDTO created = categoryController.createCategory(dto);
                     HttpSession session = request.getSession();
                     session.setAttribute("toastMessage", "Categoría creada correctamente: " + created.getName());
                     session.setAttribute("toastType", "success");

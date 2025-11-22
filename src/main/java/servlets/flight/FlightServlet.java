@@ -3,29 +3,47 @@ package servlets.flight;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.*;
 
-import controllers.category.ICategoryController;
-import controllers.flight.IFlightController;
-import controllers.flightroute.IFlightRouteController;
-import controllers.user.IUserController;
 
-import domain.dtos.flight.FlightDTO;
-import domain.dtos.flightroute.FlightRouteDTO;
-import domain.models.enums.EnumEstatusRuta;
+import adapters.LocalDateTimeWithValue;
+import com.labpa.appweb.category.CategorySoapAdapter;
+import com.labpa.appweb.category.CategorySoapAdapterService;
+import com.labpa.appweb.flight.FlightDTO;
+import com.labpa.appweb.flight.FlightSoapAdapter;
+import com.labpa.appweb.flight.FlightSoapAdapterService;
+import com.labpa.appweb.flightroute.EnumEstatusRuta;
+import com.labpa.appweb.flightroute.FlightRouteDTO;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
+import com.labpa.appweb.user.UserSoapAdapter;
+import com.labpa.appweb.user.UserSoapAdapterService;
 
-import factory.ControllerFactory;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import mappers.DateTimeMapper;
 
 @WebServlet("/flight/list")
 public class FlightServlet extends HttpServlet {
 
-    private final ICategoryController categoryController = ControllerFactory.getCategoryController();
-    private final IUserController     userController     = ControllerFactory.getUserController();
-    private final IFlightController   flightCtrl         = ControllerFactory.getFlightController();
-    private final IFlightRouteController flightRouteCtrl = ControllerFactory.getFlightRouteController();
+//    private final ICategoryController categoryController = ControllerFactory.getCategoryController();
+//    private final IUserController     userController     = ControllerFactory.getUserController();
+//    private final IFlightController   flightCtrl         = ControllerFactory.getFlightController();
+//    private final IFlightRouteController flightRouteCtrl = ControllerFactory.getFlightRouteController();
+    private CategorySoapAdapterService categorySoapAdapterService = new CategorySoapAdapterService();
+    private CategorySoapAdapter categoryController = categorySoapAdapterService.getCategorySoapAdapterPort();
+
+    private UserSoapAdapterService userSoapAdapterService = new UserSoapAdapterService();
+    private UserSoapAdapter userController = userSoapAdapterService.getUserSoapAdapterPort();
+
+    private FlightSoapAdapterService flightSoapAdapterService = new FlightSoapAdapterService();
+    private FlightSoapAdapter flightCtrl = flightSoapAdapterService.getFlightSoapAdapterPort();
+
+    private FlightRouteSoapAdapterService flightRouteSoapAdapterService = new FlightRouteSoapAdapterService();
+    private FlightRouteSoapAdapter flightRouteCtrl = flightRouteSoapAdapterService.getFlightRouteSoapAdapterPort();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -71,7 +89,7 @@ public class FlightServlet extends HttpServlet {
         // Categorías
         List<String> categories;
         try {
-            List<String> raw = categoryController.getAllCategoriesNames();
+            List<String> raw = categoryController.getAllCategoriesNames().getItem();
             categories = new ArrayList<>(raw != null ? raw : Collections.emptyList());
         } catch (Exception e) {
             log("Error cargando categorías", e);
@@ -83,7 +101,7 @@ public class FlightServlet extends HttpServlet {
 
         List<String> airlines;
         try {
-            List<String> raw = userController.getAllAirlinesNicknames();
+            List<String> raw = userController.getAllAirlinesNicknames().getItem();
             airlines = new ArrayList<>(raw != null ? raw : Collections.emptyList());
         } catch (Exception e) {
             log("Error cargando aerolíneas", e);
@@ -102,7 +120,7 @@ public class FlightServlet extends HttpServlet {
 
         List<FlightDTO> allFlights;
         try {
-            allFlights = flightCtrl.getAllFlightsDetails();
+            allFlights = flightCtrl.getAllFlightsDetails().getItem();
             if (allFlights == null) allFlights = Collections.emptyList();
         } catch (Exception e) {
             log("Error obteniendo todos los vuelos", e);
@@ -200,8 +218,19 @@ public class FlightServlet extends HttpServlet {
                 }
             }
         }
-        flightsToShow.sort(Comparator.comparing(FlightDTO::getDepartureTime,
-                Comparator.nullsLast(Comparator.naturalOrder())));
+        flightsToShow.sort(
+                Comparator.comparing(
+                        flight -> {
+                            // Paso 1: convertir JAXB LocalDateTime -> java.time.LocalDateTime
+                            return DateTimeMapper.fromSoapLocalDateTime(
+                                    new LocalDateTimeWithValue(flight.getDepartureTime().toString())
+                            );
+                        },
+                        Comparator.nullsLast(LocalDateTime::compareTo)
+                )
+        );
+
+
         req.setAttribute("flights", flightsToShow);
 
         // Vuelo seleccionado

@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
-<%@ page import="domain.dtos.airport.BaseAirportDTO" %>
+<%@ page import="com.labpa.appweb.airport.BaseAirportDTO" %>
 <%@ include file="/src/components/layout/libs.jspf" %>
 <%
     List<BaseAirportDTO> airports = (List<BaseAirportDTO>) request.getAttribute("airports");

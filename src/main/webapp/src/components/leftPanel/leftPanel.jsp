@@ -1,8 +1,9 @@
+<%@ page import="com.labpa.appweb.user.UserDTO" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/src/components/layout/libs.jspf" %>
 
 <%
-    domain.dtos.user.UserDTO usuario = (domain.dtos.user.UserDTO) session.getAttribute("usuario");
+    UserDTO usuario = (UserDTO) session.getAttribute("usuario");
 
     if (usuario != null) {
         String tipoUsuario = usuario.getClass().getSimpleName().toLowerCase();

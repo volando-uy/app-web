@@ -1,17 +1,22 @@
 package servlets.createFlight;
 
-import controllers.flight.IFlightController;
-import controllers.flightroute.IFlightRouteController;
-import controllers.user.IUserController;
-import domain.dtos.flight.BaseFlightDTO;
-import domain.dtos.flightroute.BaseFlightRouteDTO;
-import domain.dtos.user.BaseAirlineDTO;
-import factory.ControllerFactory;
+import adapters.LocalDateAdapter;
+import adapters.LocalDateTimeAdapter;
+import com.labpa.appweb.flight.BaseFlightDTO;
+import com.labpa.appweb.flight.FlightSoapAdapter;
+import com.labpa.appweb.flight.FlightSoapAdapterService;
+import com.labpa.appweb.flightroute.BaseFlightRouteDTO;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
+
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import utils.FileBase64Util;
+
 import java.io.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -21,17 +26,24 @@ import java.util.List;
 @MultipartConfig
 public class createFlightServlet extends HttpServlet {
 
-    private final IFlightController ctrl = ControllerFactory.getFlightController();
-    private final IFlightRouteController flightRouteController = ControllerFactory.getFlightRouteController();
-    private final IUserController userController = ControllerFactory.getUserController();
+//    private final IFlightController ctrl = ControllerFactory.getFlightController();
+//    private final IFlightRouteController flightRouteController = ControllerFactory.getFlightRouteController();
+    private FlightRouteSoapAdapterService flightRouteSoapAdapterService = new FlightRouteSoapAdapterService();
+    private FlightRouteSoapAdapter flightRouteController =flightRouteSoapAdapterService.getFlightRouteSoapAdapterPort();
+
+    private FlightSoapAdapterService flightSoapAdapterService = new FlightSoapAdapterService();
+    private FlightSoapAdapter flightSoapAdapter = flightSoapAdapterService.getFlightSoapAdapterPort();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
         String airlineNickname = (String) req.getSession().getAttribute("nickname");
 
+//        List<BaseFlightRouteDTO> routes =
+//                flightRouteController.getAllFlightRoutesSimpleDetailsByAirlineNickname(airlineNickname);
         List<BaseFlightRouteDTO> routes =
-                flightRouteController.getAllFlightRoutesSimpleDetailsByAirlineNickname(airlineNickname);
+                flightRouteController.getAllFlightRoutesSimpleDetailsByAirlineNickname(airlineNickname).getItem();
 
         req.setAttribute("airlineNickname", airlineNickname);
         req.setAttribute("flightRoutes", routes);
@@ -60,7 +72,19 @@ public class createFlightServlet extends HttpServlet {
 
             // Procesar imagen
             Part imagePart = req.getPart("image");
+//            if (imagePart != null && imagePart.getSize() > 0) {
+//                String uploadPath = getServletContext().getRealPath("/uploads");
+//                new File(uploadPath).mkdirs();
+//                String fileName = new File(imagePart.getSubmittedFileName()).getName();
+//                imageFile = new File(uploadPath, fileName);
+//                try (InputStream in = imagePart.getInputStream();
+//                     FileOutputStream out = new FileOutputStream(imageFile)) {
+//                    in.transferTo(out);
+//                }
+//            }
             File imageFile = null;
+            String base64Image = null;
+
             if (imagePart != null && imagePart.getSize() > 0) {
                 String uploadPath = getServletContext().getRealPath("/uploads");
                 new File(uploadPath).mkdirs();
@@ -69,6 +93,11 @@ public class createFlightServlet extends HttpServlet {
                 try (InputStream in = imagePart.getInputStream();
                      FileOutputStream out = new FileOutputStream(imageFile)) {
                     in.transferTo(out);
+                }
+                try {
+                    base64Image = FileBase64Util.fileToBase64(imageFile); // ✅ Utilizás tu clase utilitaria
+                } catch (IOException e) {
+                    e.printStackTrace(); // En producción: log + manejo elegante
                 }
             }
 
@@ -83,11 +112,14 @@ public class createFlightServlet extends HttpServlet {
             dto.setDuration(duration != null && !duration.isEmpty() ? Long.parseLong(duration) : null);
             dto.setMaxBusinessSeats(maxBusinessSeats);
             dto.setMaxEconomySeats(maxEconomySeats);
-            dto.setCreatedAt(createdAt);
-            dto.setDepartureTime(departureTime);
+
+            dto.setCreatedAt(LocalDateTimeAdapter.fromJavaTime(createdAt));
+
+            dto.setDepartureTime(LocalDateTimeAdapter.fromJavaTime(departureTime));
 
             // Crear vuelo
-            ctrl.createFlight(dto, airlineNickname, flightRouteName, imageFile);
+//            flightSoapAdapter.createFlight(dto, airlineNickname, flightRouteName, imageFile);
+            flightSoapAdapter.createFlight(dto, airlineNickname, flightRouteName, base64Image);
 
             HttpSession newSession = req.getSession(true);
 

@@ -1,50 +1,76 @@
 package servlets.profile;
 
-import controllers.user.IUserController;
-import domain.dtos.user.*;
-import factory.ControllerFactory;
+import com.labpa.appweb.user.*;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
 @WebServlet("/perfil")
 public class ProfileServlet extends HttpServlet {
 
-    private final IUserController userController = ControllerFactory.getUserController();
+    private final UserSoapAdapter port = new UserSoapAdapterService().getUserSoapAdapterPort();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        UserDTO usuario = (UserDTO) req.getSession().getAttribute("usuario");
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 
-        // Si no hay sesión, redirigimos al login
+        // Obtener el objeto del usuario desde sesión (ya es un objeto SOAP)
+        Object usuario = req.getSession().getAttribute("usuario");
+
         if (usuario == null) {
             resp.sendRedirect(req.getContextPath() + "/users/login");
             return;
         }
 
-        // Refrescamos los datos completos del usuario según su tipo
-        if (usuario instanceof BaseCustomerDTO) {
-            CustomerDTO cliente = userController.getCustomerDetailsByNickname(usuario.getNickname());
-            req.setAttribute("cliente", cliente);
-            req.setAttribute("tipoUsuario", "cliente");
-            req.setAttribute("usuario", cliente); // por si el JSP necesita datos comunes
-            req.getSession().setAttribute("usuario", cliente); // opcional, si querés mantener actualizado en sesión
-
-        } else if (usuario instanceof BaseAirlineDTO) {
-            AirlineDTO aerolinea = userController.getAirlineDetailsByNickname(usuario.getNickname());
-            req.setAttribute("aerolinea", aerolinea);
-            req.setAttribute("tipoUsuario", "aerolinea");
-            req.setAttribute("usuario", aerolinea);
-
-            req.getSession().setAttribute("usuario", aerolinea);
+        String nickname;
+        if (usuario instanceof BaseCustomerDTO customer) {
+            nickname = customer.getNickname();
+        } else if (usuario instanceof BaseAirlineDTO airline) {
+            nickname = airline.getNickname();
+        } else {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Tipo de usuario desconocido");
+            return;
         }
 
-        // Enviamos al JSP de perfil
-        req.setAttribute("pageTitle", "Perfil - Volando.uy");
-        req.getRequestDispatcher("/src/views/profile/info/profileInformation.jsp").forward(req, resp);
+        try {
+            // 🔍 Intentar obtener datos completos de Customer
+            CustomerDTO cliente = port.getCustomerDetailsByNickname(nickname);
+
+            req.setAttribute("tipoUsuario", "cliente");
+            req.setAttribute("usuario", cliente);
+            req.getSession().setAttribute("usuario", cliente);
+
+            req.getRequestDispatcher("/src/views/profile/info/profileInformation.jsp")
+                    .forward(req, resp);
+            return;
+
+        } catch (Exception ignored) {
+            // no es cliente
+        }
+
+        try {
+            // 🔍 Intentar obtener datos completos de Airline
+            AirlineDTO airline = port.getAirlineDetailsByNickname(nickname);
+
+            req.setAttribute("tipoUsuario", "aerolinea");
+            req.setAttribute("usuario", airline);
+            req.getSession().setAttribute("usuario", airline);
+
+            req.getRequestDispatcher("/src/views/profile/info/profileInformation.jsp")
+                    .forward(req, resp);
+            return;
+
+        } catch (Exception ignored) {
+            // no es aerolinea
+        }
+
+        // Si no es ni cliente ni aerolínea, enviar error
+        resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Tipo de usuario desconocido");
     }
 }

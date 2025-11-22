@@ -1,13 +1,13 @@
 package servlets.packageservlet;
 
-import controllers.flightroute.IFlightRouteController;
-import controllers.flightroutepackage.IFlightRoutePackageController;
+import com.labpa.appweb.flightroute.EnumEstatusRuta;
+import com.labpa.appweb.flightroute.FlightRouteDTO;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
+import com.labpa.appweb.flightroutepackage.BaseFlightRoutePackageDTO;
+import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapter;
+import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapterService;
 
-import domain.dtos.flightroute.FlightRouteDTO;
-import domain.dtos.flightroutepackage.BaseFlightRoutePackageDTO;
-import domain.models.enums.EnumEstatusRuta;
-
-import factory.ControllerFactory;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -22,11 +22,14 @@ import java.util.stream.Collectors;
 @WebServlet("/packages/list")
 public class PackageServlet extends HttpServlet {
 
-    private final IFlightRoutePackageController packageController =
-            ControllerFactory.getFlightRoutePackageController();
-    private final IFlightRouteController routeCtrl =
-            ControllerFactory.getFlightRouteController();
-
+//    private final IFlightRoutePackageController packageController =
+//            ControllerFactory.getFlightRoutePackageController();
+//    private final IFlightRouteController routeCtrl =
+//            ControllerFactory.getFlightRouteController();
+    private FlightRoutePackageSoapAdapterService flightRoutePackageService = new FlightRoutePackageSoapAdapterService();
+    private FlightRoutePackageSoapAdapter soapAdapter = flightRoutePackageService.getFlightRoutePackageSoapAdapterPort();
+    private FlightRouteSoapAdapterService flightRouteService = new FlightRouteSoapAdapterService();
+    private FlightRouteSoapAdapter flightRouteSoapAdapter = flightRouteService.getFlightRouteSoapAdapterPort();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -43,7 +46,8 @@ public class PackageServlet extends HttpServlet {
         // 1) Paquetes "simples con rutas" (tu método que ya venías usando)
         List<BaseFlightRoutePackageDTO> pkgs;
         try {
-            pkgs = packageController.getAllFlightRoutesPackagesSimpleDetailsWithFlightRoutes();
+//            pkgs = packageController.getAllFlightRoutesPackagesSimpleDetailsWithFlightRoutes();
+            pkgs = soapAdapter.getAllFlightRoutesPackagesSimpleDetailsWithFlightRoutes().getItem();
             if (pkgs == null) pkgs = Collections.emptyList();
         } catch (Exception e) {
             hadError = true;
@@ -60,7 +64,8 @@ public class PackageServlet extends HttpServlet {
 
             List<FlightRouteDTO> routes;
             try {
-                routes = routeCtrl.getAllFlightRoutesDetailsByPackageName(pkgName);
+//                routes = routeCtrl.getAllFlightRoutesDetailsByPackageName(pkgName);
+                routes = flightRouteSoapAdapter.getAllFlightRoutesDetailsByPackageName(pkgName).getItem();
                 if (routes == null) routes = Collections.emptyList();
             } catch (Exception ex) {
                 hadError = true;

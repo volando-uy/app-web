@@ -1,10 +1,10 @@
 package servlets.user;
 
-import controllers.user.IUserController;
-import domain.dtos.user.BaseAirlineDTO;
-import domain.dtos.user.BaseCustomerDTO;
-import domain.dtos.user.UserDTO;
-import factory.ControllerFactory;
+import com.labpa.appweb.user.UserDTO;
+import com.labpa.appweb.user.UserSoapAdapter;
+import com.labpa.appweb.user.UserSoapAdapterService;
+
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,21 +18,29 @@ import java.util.Map;
 
 @WebServlet("/users/list")
 public class ListUsersServlet extends HttpServlet {
-    private final IUserController userController = ControllerFactory.getUserController();
+    //    private final IUserController userController = ControllerFactory.getUserController();
+    UserSoapAdapterService service = new UserSoapAdapterService();
+    UserSoapAdapter port = service.getUserSoapAdapterPort();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<UserDTO> users = userController.getAllUsersSimpleDetails();
+
+        List<UserDTO> users = port.getAllUsersSimpleDetails().getItem();
 
         Map<String, String> tiposPorUsuario = new HashMap<>();
         for (UserDTO user : users) {
             String tipo;
-            if (user instanceof BaseCustomerDTO) {
-                tipo = "Cliente";
-            } else if (user instanceof BaseAirlineDTO) {
-                tipo = "Aerolínea";
-            } else {
-                tipo = "Visitante";
+            String className = user.getClass().getSimpleName();
+            switch (className) {
+                case "BaseCustomerDTO":
+                    tipo = "Cliente";
+                    break;
+                case "BaseAirlineDTO":
+                    tipo = "Aerolínea";
+                    break;
+                default:
+                    tipo = "Visitante";
+                    break;
             }
             tiposPorUsuario.put(user.getNickname(), tipo);
         }

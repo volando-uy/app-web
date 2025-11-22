@@ -1,13 +1,16 @@
 package servlets.checkFlightRoute;
 
-import controllers.flightroute.IFlightRouteController;
-import controllers.flight.IFlightController;
-import controllers.user.IUserController;
-import domain.dtos.flight.FlightDTO;
-import domain.dtos.flightroute.FlightRouteDTO;
-import domain.dtos.user.AirlineDTO;
-import domain.models.enums.EnumEstatusRuta;
-import factory.ControllerFactory;
+import com.labpa.appweb.flight.FlightDTO;
+import com.labpa.appweb.flight.FlightSoapAdapter;
+import com.labpa.appweb.flight.FlightSoapAdapterService;
+import com.labpa.appweb.flightroute.EnumEstatusRuta;
+import com.labpa.appweb.flightroute.FlightRouteDTO;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
+import com.labpa.appweb.user.AirlineDTO;
+import com.labpa.appweb.user.UserSoapAdapter;
+import com.labpa.appweb.user.UserSoapAdapterService;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -21,9 +24,18 @@ import java.util.List;
 @WebServlet("/flightRoute")
 public class FlightRouteServlet extends HttpServlet {
 
-    private final IFlightRouteController flightRouteController = ControllerFactory.getFlightRouteController();
-    private final IFlightController flightController = ControllerFactory.getFlightController();
-    private final IUserController userController = ControllerFactory.getUserController();
+//    private final IFlightRouteController flightRouteController = ControllerFactory.getFlightRouteController();
+//    private final IFlightController flightController = ControllerFactory.getFlightController();
+//    private final IUserController userController = ControllerFactory.getUserController();
+
+    private FlightRouteSoapAdapterService flightRouteSoapAdapterService = new FlightRouteSoapAdapterService();
+    private FlightRouteSoapAdapter flightRouteController = flightRouteSoapAdapterService.getFlightRouteSoapAdapterPort();
+
+    private FlightSoapAdapterService flightSoapAdapterService = new FlightSoapAdapterService();
+    private FlightSoapAdapter flightController = flightSoapAdapterService.getFlightSoapAdapterPort();
+
+    private UserSoapAdapterService userSoapAdapterService = new UserSoapAdapterService();
+    private UserSoapAdapter userController = userSoapAdapterService.getUserSoapAdapterPort();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -63,14 +75,14 @@ public class FlightRouteServlet extends HttpServlet {
         String flightParam = req.getParameter("flight");
 
         if (airlineParam == null) {
-            List<AirlineDTO> airlines = userController.getAllAirlinesDetails();
+            List<AirlineDTO> airlines = userController.getAllAirlinesDetails().getItem();
             req.setAttribute("airlines", airlines);
             req.getRequestDispatcher("/src/views/checkflightroute/checkflightroute.jsp").forward(req, resp);
             return;
         }
 
         if (routeParam == null) {
-            List<FlightRouteDTO> routes = flightRouteController.getAllFlightRoutesDetailsByAirlineNickname(airlineParam);
+            List<FlightRouteDTO> routes = flightRouteController.getAllFlightRoutesDetailsByAirlineNickname(airlineParam).getItem();
 
             routes = routes.stream()
                     .filter(r -> r.getStatus() != null && r.getStatus() == EnumEstatusRuta.CONFIRMADA)

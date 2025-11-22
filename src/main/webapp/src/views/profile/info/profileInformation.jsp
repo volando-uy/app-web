@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="domain.dtos.user.UserDTO" %>
+<%@ page import="com.labpa.appweb.user.UserDTO" %>
 
 <!DOCTYPE html>
 <html lang="es">

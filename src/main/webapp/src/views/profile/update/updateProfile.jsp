@@ -1,10 +1,23 @@
-<%@ page import="domain.dtos.user.*" %>
-<%@ page import="org.modelmapper.internal.objenesis.strategy.BaseInstantiatorStrategy" %>
+<%@ page import="com.labpa.appweb.user.*" %>
+<%@ page import="mappers.DateMapper" %>
+<%@ page import="adapters.LocalDateWithValue" %>
+<%@ page import="mappers.CustomerMapper" %>
+<%@ page import="utils.SoapDateParser" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="es">
 <%
+
     request.setAttribute("pageTitle", "Editar Perfil - Volando.uy");
+
+    UserDTO user = (UserDTO) request.getAttribute("user");
+    SoapBaseCustomerDTO c = (SoapBaseCustomerDTO) request.getAttribute("customer");
+    boolean isCustomer = user instanceof BaseCustomerDTO;
+    boolean isAirline = user instanceof BaseAirlineDTO;
+
+    String userImage = user.getImage() != null ? user.getImage() : "/public/images/users/default-user.jpg";
+    String profileUpdateUrl = request.getContextPath() + "/perfil/update";
+    String profileUrl = request.getContextPath() + "/perfil";
 %>
 
 <%@ include file="/src/components/layout/libs.jspf" %>
@@ -12,23 +25,17 @@
 
 <body class="min-h-screen bg-gradient-to-r from-blue-900 to-blue-400 flex items-center justify-center px-4 py-8">
 
-<%
-    UserDTO user = (UserDTO) request.getAttribute("user");
-    boolean isCustomer = user instanceof BaseCustomerDTO;
-    boolean isAirline = user instanceof BaseAirlineDTO;
-%>
-
 <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden">
     <!-- Encabezado con imagen -->
     <div class="bg-blue-900 text-white p-6 flex flex-col items-center">
         <div onclick="document.getElementById('profileImageInput').click()"
-             class="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-lg mb-4">
-            <img id="profileImagePreview" src="${userImage}" alt="Foto de perfil"
+             class="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-lg mb-4 cursor-pointer">
+            <img id="profileImagePreview" src="<%= userImage %>" alt="Foto de perfil"
                  class="w-full h-full object-cover"/>
         </div>
     </div>
 
-    <form action="${profileUpdateUrl}" method="post" enctype="multipart/form-data" class="p-8 space-y-6">
+    <form action="<%= profileUpdateUrl %>" method="post" enctype="multipart/form-data" class="p-8 space-y-6">
         <input type="file" id="profileImageInput" name="profileImage" accept="image/*" class="hidden"
                onchange="previewImage(event)"/>
 
@@ -46,9 +53,12 @@
                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900">
         </div>
 
-        <% if (isCustomer) {
-            BaseCustomerDTO c = (BaseCustomerDTO) user;
+        <% if (c != null || isCustomer) {
+
+
+
         %>
+
         <!-- APELLIDO -->
         <div>
             <label class="block mb-1 font-semibold text-gray-700">Apellido</label>
@@ -56,23 +66,21 @@
                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900">
         </div>
 
-        <!-- FECHA DE NACIMIENTO -->
+
         <div>
             <label class="block mb-1 font-semibold text-gray-700">Fecha de nacimiento</label>
-            <input type="date" name="birthDate"
-                   value="<%= c.getBirthDate() != null ? c.getBirthDate().toString() : "" %>"
-                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900">
 
+            <input type="date" name="birthDate"
+                   value="<%= c.getBirthDate() %>"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900">
         </div>
 
         <!-- TIPO DOCUMENTO -->
         <div>
             <label class="block mb-1 font-semibold text-gray-700">Tipo de documento</label>
             <select name="docType" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900">
-                <option value="CI" <%= c.getDocType().toString().equals("CI") ? "selected" : "" %>>CI</option>
-                <option value="PASAPORTE" <%= c.getDocType().toString().equals("PASAPORTE") ? "selected" : "" %>>
-                    Pasaporte
-                </option>
+                <option value="CI" <%= "CI".equals(c.getDocType().toString()) ? "selected" : "" %>>CI</option>
+                <option value="PASAPORTE" <%= "PASAPORTE".equals(c.getDocType().toString()) ? "selected" : "" %>>Pasaporte</option>
             </select>
         </div>
 
@@ -111,7 +119,7 @@
 
         <!-- BOTONES -->
         <div class="flex gap-4 pt-4">
-            <a href="${profileUrl}"
+            <a href="<%= profileUrl %>"
                class="w-1/2 text-center bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg transition duration-200">
                 Volver
             </a>
@@ -125,9 +133,6 @@
 
 <%@ include file="/src/components/layout/scripts.jspf" %>
 
-</body>
-</html>
-
 <script>
     function previewImage(event) {
         const reader = new FileReader();
@@ -138,3 +143,6 @@
         reader.readAsDataURL(event.target.files[0]);
     }
 </script>
+
+</body>
+</html>

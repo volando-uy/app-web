@@ -45,11 +45,11 @@
             <version>2.13.2</version>
         </dependency>
         <!-- Tu librería VolandoUY -->
-        <dependency>
-            <groupId>com.gyabisito</groupId>
-            <artifactId>VolandoUY</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.gyabisito</groupId>-->
+<!--            <artifactId>VolandoUY</artifactId>-->
+<!--            <version>1.0-SNAPSHOT</version>-->
+<!--        </dependency>-->
 
         <!-- JAXB moderno -->
         <dependency>
@@ -132,19 +132,202 @@
                 <version>4.0.0</version>
                 <executions>
                     <execution>
+                        <id>generate-userservice-service</id>
                         <goals>
                             <goal>wsimport</goal>
                         </goals>
                         <configuration>
                             <wsdlUrls>
-                                <wsdlUrl>http://localhost:8086/api/userService?wsdl</wsdlUrl> <!-- Cambia a tu WSDL real -->
+                                <wsdlUrl>http://localhost:8086/api/userService?wsdl</wsdlUrl>
                             </wsdlUrls>
-                            <packageName>com.labpa.appweb.client</packageName>
+                            <packageName>com.labpa.appweb.user</packageName>
                             <encoding>UTF-8</encoding>
                             <verbose>true</verbose>
                             <xnocompile>true</xnocompile>
                         </configuration>
                     </execution>
+                    <!-- Segunda ejecución: AuthService -->
+                    <execution>
+                        <id>generate-auth-service</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>http://localhost:8086/api/authService?wsdl</wsdlUrl>
+                            </wsdlUrls>
+                            <packageName>com.labpa.appweb.auth</packageName>
+                            <encoding>UTF-8</encoding>
+                            <verbose>true</verbose>
+                            <xnocompile>true</xnocompile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-booking-service</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>http://localhost:8086/api/bookingService?wsdl</wsdlUrl>
+                            </wsdlUrls>
+                            <packageName>com.labpa.appweb.booking</packageName>
+                            <encoding>UTF-8</encoding>
+                            <verbose>true</verbose>
+                            <xnocompile>true</xnocompile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-flight-service</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>http://localhost:8086/api/flightService?wsdl</wsdlUrl>
+                            </wsdlUrls>
+                            <packageName>com.labpa.appweb.flight</packageName>
+                            <encoding>UTF-8</encoding>
+                            <verbose>true</verbose>
+                            <xnocompile>true</xnocompile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-flightroute-service</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>http://localhost:8086/api/flightRouteService?wsdl</wsdlUrl>
+                            </wsdlUrls>
+                            <packageName>com.labpa.appweb.flightroute</packageName>
+                            <encoding>UTF-8</encoding>
+                            <verbose>true</verbose>
+                            <xnocompile>true</xnocompile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-seats-service</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>http://localhost:8086/api/seatService?wsdl</wsdlUrl>
+                            </wsdlUrls>
+                            <packageName>com.labpa.appweb.seats</packageName>
+                            <encoding>UTF-8</encoding>
+                            <verbose>true</verbose>
+                            <xnocompile>true</xnocompile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-flightroutepackage-service</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>http://localhost:8086/api/flightRoutePackageService?wsdl</wsdlUrl>
+                            </wsdlUrls>
+                            <packageName>com.labpa.appweb.flightroutepackage</packageName>
+                            <encoding>UTF-8</encoding>
+                            <verbose>true</verbose>
+                            <xnocompile>true</xnocompile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-buypackage-service</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>http://localhost:8086/api/buyPackageService?wsdl</wsdlUrl>
+                            </wsdlUrls>
+                            <packageName>com.labpa.appweb.buypackage</packageName>
+                            <encoding>UTF-8</encoding>
+                            <verbose>true</verbose>
+                            <xnocompile>true</xnocompile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-category-service</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>http://localhost:8086/api/categoryService?wsdl</wsdlUrl>
+                            </wsdlUrls>
+                            <packageName>com.labpa.appweb.category</packageName>
+                            <encoding>UTF-8</encoding>
+                            <verbose>true</verbose>
+                            <xnocompile>true</xnocompile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-city-service</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>http://localhost:8086/api/cityService?wsdl</wsdlUrl>
+                            </wsdlUrls>
+                            <packageName>com.labpa.appweb.city</packageName>
+                            <encoding>UTF-8</encoding>
+                            <verbose>true</verbose>
+                            <xnocompile>true</xnocompile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-ticket-service</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>http://localhost:8086/api/ticketService?wsdl</wsdlUrl>
+                            </wsdlUrls>
+                            <packageName>com.labpa.appweb.ticket</packageName>
+                            <encoding>UTF-8</encoding>
+                            <verbose>true</verbose>
+                            <xnocompile>true</xnocompile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-images-service</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>http://localhost:8086/api/imagesService?wsdl</wsdlUrl>
+                            </wsdlUrls>
+                            <packageName>com.labpa.appweb.images</packageName>
+                            <encoding>UTF-8</encoding>
+                            <verbose>true</verbose>
+                            <xnocompile>true</xnocompile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-airport-service</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>http://localhost:8086/api/airportService?wsdl</wsdlUrl>
+                            </wsdlUrls>
+                            <packageName>com.labpa.appweb.airport</packageName>
+                            <encoding>UTF-8</encoding>
+                            <verbose>true</verbose>
+                            <xnocompile>true</xnocompile>
+                        </configuration>
+                    </execution>
+
                 </executions>
             </plugin>
 

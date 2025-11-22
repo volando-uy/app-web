@@ -1,7 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
-<%@ page import="domain.dtos.flight.BaseFlightDTO" %>
+<%@ page import="com.labpa.appweb.flight.BaseFlightDTO" %>
+<%@ page import="java.time.temporal.TemporalAccessor" %>
 
 <%
     @SuppressWarnings("unchecked")
@@ -30,11 +31,11 @@
                 String img = (f.getImage() != null && !f.getImage().isEmpty())
                         ? f.getImage()
                         : "https://via.placeholder.com/640x360?text=Vuelo";
-                String dep = (f.getDepartureTime() != null) ? fmt.format(f.getDepartureTime()) : "--";
+                String dep = (f.getDepartureTime() != null) ? fmt.format((TemporalAccessor) f.getDepartureTime()) : "--";
                 String mins = (f.getDuration() != null) ? String.valueOf(f.getDuration()) : "--";
                 String eco  = (f.getMaxEconomySeats() != null) ? String.valueOf(f.getMaxEconomySeats()) : "--";
                 String bus  = (f.getMaxBusinessSeats() != null) ? String.valueOf(f.getMaxBusinessSeats()) : "--";
-                String created = (f.getCreatedAt() != null) ? fmt.format(f.getCreatedAt()) : "--";
+                String created = (f.getCreatedAt() != null) ? fmt.format((TemporalAccessor) f.getCreatedAt()) : "--";
             %>
             <!-- Card clickeable -->
             <article

@@ -1,5 +1,14 @@
 package servlets.index;
 
+import com.labpa.appweb.flight.BaseFlightDTO;
+import com.labpa.appweb.flight.FlightSoapAdapter;
+import com.labpa.appweb.flight.FlightSoapAdapterService;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
+import com.labpa.appweb.flightroutepackage.BaseFlightRoutePackageDTO;
+import com.labpa.appweb.flightroutepackage.FlightRoutePackage;
+import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapter;
+import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapterService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -8,22 +17,18 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import controllers.flight.IFlightController;
-import controllers.flightroutepackage.IFlightRoutePackageController;
-
-import domain.dtos.flight.BaseFlightDTO;
-import domain.dtos.flightroutepackage.BaseFlightRoutePackageDTO;
-
-import factory.ControllerFactory;
 
 @WebServlet("/index")
 public class IndexServlet extends HttpServlet {
 
-    private final IFlightRoutePackageController pkgCtrl =
-            ControllerFactory.getFlightRoutePackageController();
-    private final IFlightController flightCtrl =
-            ControllerFactory.getFlightController();
-
+//    private final IFlightRoutePackageController pkgCtrl =
+//            ControllerFactory.getFlightRoutePackageController();
+////    private final IFlightController flightCtrl =
+////            ControllerFactory.getFlightController();
+    private FlightSoapAdapterService flightSoapAdapterService = new FlightSoapAdapterService();
+    private FlightSoapAdapter flightPort = flightSoapAdapterService.getFlightSoapAdapterPort();
+    private FlightRoutePackageSoapAdapterService flightRouteSoapAdapterService = new FlightRoutePackageSoapAdapterService();
+    private FlightRoutePackageSoapAdapter flightRoutePackagePort = flightRouteSoapAdapterService.getFlightRoutePackageSoapAdapterPort();
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -55,14 +60,18 @@ public class IndexServlet extends HttpServlet {
 
     private List<BaseFlightRoutePackageDTO> getPackagesPreferWithRoutes() {
         try {
+//            List<BaseFlightRoutePackageDTO> list =
+//                    pkgCtrl.getAllFlightRoutesPackagesSimpleDetailsWithFlightRoutes();
             List<BaseFlightRoutePackageDTO> list =
-                    pkgCtrl.getAllFlightRoutesPackagesSimpleDetailsWithFlightRoutes();
+                    flightRoutePackagePort.getAllFlightRoutesPackagesSimpleDetailsWithFlightRoutes().getItem();
             return (list != null) ? list : Collections.emptyList();
         } catch (Exception e) {
             log("Fallo getAllFlightRoutesPackagesSimpleDetailsWithFlightRoutes()", e);
             try {
+//                List<BaseFlightRoutePackageDTO> list =
+//                        pkgCtrl.getAllFlightRoutesPackagesSimpleDetails();
                 List<BaseFlightRoutePackageDTO> list =
-                        pkgCtrl.getAllFlightRoutesPackagesSimpleDetails();
+                        flightRoutePackagePort.getAllFlightRoutesPackagesSimpleDetails().getItem();
                 return (list != null) ? list : Collections.emptyList();
             } catch (Exception e2) {
                 log("Fallo getAllFlightRoutesPackagesSimpleDetails()", e2);
@@ -73,7 +82,8 @@ public class IndexServlet extends HttpServlet {
 
     private List<BaseFlightDTO> getFlightsSafe() {
         try {
-            List<BaseFlightDTO> list = flightCtrl.getAllFlightsSimpleDetails();
+//            List<BaseFlightDTO> list = flightCtrl.getAllFlightsSimpleDetails();
+            List<BaseFlightDTO> list = flightPort.getAllFlightsSimpleDetails().getItem();
             return (list != null) ? list : Collections.emptyList();
         } catch (Exception e) {
             log("Fallo getAllFlightsSimpleDetails()", e);

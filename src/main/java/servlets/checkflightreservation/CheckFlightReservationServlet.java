@@ -1,20 +1,22 @@
 package servlets.checkflightreservation;
 
-import controllers.booking.IBookingController;
-import controllers.flight.IFlightController;
-import controllers.flightroute.IFlightRouteController;
-import controllers.ticket.ITicketController;
-import controllers.user.IUserController;
+import adapters.LocalDateTimeAdapter;
+import adapters.UniversalLocalDateTimeAdapter;
+import com.labpa.appweb.booking.BookFlightDTO;
+import com.labpa.appweb.booking.BookingSoapAdapter;
+import com.labpa.appweb.booking.BookingSoapAdapterService;
+import com.labpa.appweb.flight.FlightDTO;
+import com.labpa.appweb.flight.FlightSoapAdapter;
+import com.labpa.appweb.flight.FlightSoapAdapterService;
+import com.labpa.appweb.flightroute.EnumEstatusRuta;
+import com.labpa.appweb.flightroute.FlightRouteDTO;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
+import com.labpa.appweb.ticket.TicketDTO;
+import com.labpa.appweb.ticket.TicketSoapAdapter;
+import com.labpa.appweb.ticket.TicketSoapAdapterService;
+import com.labpa.appweb.user.*;
 
-import domain.dtos.bookflight.BookFlightDTO;
-import domain.dtos.flight.FlightDTO;
-import domain.dtos.flightroute.FlightRouteDTO;
-import domain.dtos.ticket.TicketDTO;
-import domain.dtos.user.*;
-
-import domain.models.enums.EnumEstatusRuta;
-
-import factory.ControllerFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -26,12 +28,29 @@ import java.util.*;
 
 @WebServlet("/booking/check")
 public class CheckFlightReservationServlet extends HttpServlet {
+//
+//    private final IUserController        users   = ControllerFactory.getUserController();
+//    private final IFlightRouteController routes  = ControllerFactory.getFlightRouteController();
+//    private final IFlightController      flights = ControllerFactory.getFlightController();
+//    private final IBookingController     books   = ControllerFactory.getBookingController();
+//    private final ITicketController      tickets = ControllerFactory.getTicketController();
 
-    private final IUserController        users   = ControllerFactory.getUserController();
-    private final IFlightRouteController routes  = ControllerFactory.getFlightRouteController();
-    private final IFlightController      flights = ControllerFactory.getFlightController();
-    private final IBookingController     books   = ControllerFactory.getBookingController();
-    private final ITicketController      tickets = ControllerFactory.getTicketController();
+    private UserSoapAdapterService userSoapAdapterService = new UserSoapAdapterService();
+    private UserSoapAdapter users = userSoapAdapterService.getUserSoapAdapterPort();
+
+    private FlightRouteSoapAdapterService flightRouteSoapAdapterService = new FlightRouteSoapAdapterService();
+    private FlightRouteSoapAdapter routes = flightRouteSoapAdapterService.getFlightRouteSoapAdapterPort();
+
+    private FlightSoapAdapterService flightSoapAdapterService = new FlightSoapAdapterService();
+    private FlightSoapAdapter flights = flightSoapAdapterService.getFlightSoapAdapterPort();
+
+    private BookingSoapAdapterService bookingSoapAdapterService = new BookingSoapAdapterService();
+    private BookingSoapAdapter books = bookingSoapAdapterService.getBookingSoapAdapterPort();
+
+    private TicketSoapAdapterService ticketSoapAdapterService = new TicketSoapAdapterService();
+    private TicketSoapAdapter tickets = ticketSoapAdapterService.getTicketSoapAdapterPort();
+
+
 
     private static Date toDate(LocalDateTime ldt) {
         if (ldt == null) return null;
@@ -92,7 +111,7 @@ public class CheckFlightReservationServlet extends HttpServlet {
             req.setAttribute("airlineName", airlineNick);
 
             if (route == null) {
-                List<FlightRouteDTO> rs = safe(routes.getAllFlightRoutesDetailsByAirlineNickname(airlineNick));
+                List<FlightRouteDTO> rs = safe(routes.getAllFlightRoutesDetailsByAirlineNickname(airlineNick).getItem());
                 req.setAttribute("routes", rs);
                 forward(req, resp);
                 return;
@@ -100,12 +119,16 @@ public class CheckFlightReservationServlet extends HttpServlet {
             req.setAttribute("routeName", route);
 
             if (flight == null) {
-                List<FlightDTO> fs = safe(flights.getAllFlightsDetailsByRouteName(route));
+                List<FlightDTO> fs = safe(flights.getAllFlightsDetailsByRouteName(route).getItem());
                 List<Map<String,Object>> flightsView = new ArrayList<>();
                 for (FlightDTO f : fs) {
                     Map<String,Object> m = new HashMap<>();
                     m.put("name", f.getName());
-                    m.put("departure", toDate(f.getDepartureTime())); // Date para fmt
+
+
+                    LocalDateTime javaTime = UniversalLocalDateTimeAdapter.toJavaTime(f.getDepartureTime());
+                    m.put("departure", toDate(javaTime));
+
                     flightsView.add(m);
                 }
                 req.setAttribute("flightsView", flightsView);
@@ -115,7 +138,7 @@ public class CheckFlightReservationServlet extends HttpServlet {
             req.setAttribute("flightName", flight);
 
             if (booking == null) {
-                List<BookFlightDTO> bs = safe(books.getBookFlightsDetailsByFlightName(flight));
+                List<BookFlightDTO> bs = safe(books.getBookFlightsDetailsByFlightName(flight).getItem());
 
                 List<Map<String,Object>> bookingsView = new ArrayList<>();
                 for (BookFlightDTO b : bs) {
@@ -124,7 +147,8 @@ public class CheckFlightReservationServlet extends HttpServlet {
                     bm.put("customerNickname", b.getCustomerNickname());
                     bm.put("seatType", b.getSeatType());
                     bm.put("totalPrice", b.getTotalPrice());
-                    bm.put("createdAt", toDate(b.getCreatedAt()));
+                    LocalDateTime javaTime = UniversalLocalDateTimeAdapter.toJavaTime(b.getCreatedAt());
+                    bm.put("createdAt", toDate(javaTime));
 
                     // Pasajeros
                     List<Map<String,Object>> passengers = new ArrayList<>();
@@ -160,7 +184,7 @@ public class CheckFlightReservationServlet extends HttpServlet {
             }
             BookFlightDTO bd = books.getBookFlightDetailsById(id);
             req.setAttribute("booking", bd);
-            req.setAttribute("bookingCreatedAtDate", toDate(bd != null ? bd.getCreatedAt() : null));
+            req.setAttribute("bookingCreatedAtDate", toDate(bd != null ? UniversalLocalDateTimeAdapter.toJavaTime(bd.getCreatedAt()) : null));
 
             List<TicketDTO> ts = new ArrayList<>();
             if (bd != null && bd.getTicketIds() != null) {
@@ -175,7 +199,7 @@ public class CheckFlightReservationServlet extends HttpServlet {
 
         // Elegir aerolínea
         if (airline == null) {
-            List<AirlineDTO> airlines = safe(users.getAllAirlinesDetails());
+            List<AirlineDTO> airlines = safe(users.getAllAirlinesDetails().getItem());
             req.setAttribute("airlines", airlines);
             forward(req, resp);
             return;
@@ -185,7 +209,7 @@ public class CheckFlightReservationServlet extends HttpServlet {
         // Rutas confirmadas de esa aerolínea
         if (route == null) {
             List<FlightRouteDTO> rs = safe(
-                    routes.getAllFlightRoutesDetailsByAirlineNickname(airline)
+                    routes.getAllFlightRoutesDetailsByAirlineNickname(airline).getItem()
             ).stream().filter(r -> r.getStatus() == EnumEstatusRuta.CONFIRMADA).toList();
             req.setAttribute("routes", rs);
             forward(req, resp);
@@ -195,12 +219,13 @@ public class CheckFlightReservationServlet extends HttpServlet {
 
         // Vuelos de la ruta
         if (flight == null) {
-            List<FlightDTO> fs = safe(flights.getAllFlightsDetailsByRouteName(route));
+            List<FlightDTO> fs = safe(flights.getAllFlightsDetailsByRouteName(route).getItem());
             List<Map<String,Object>> flightsView = new ArrayList<>();
             for (FlightDTO f : fs) {
                 Map<String,Object> m = new HashMap<>();
                 m.put("name", f.getName());
-                m.put("departure", toDate(f.getDepartureTime()));
+                LocalDateTime javaTime = UniversalLocalDateTimeAdapter.toJavaTime(f.getDepartureTime());
+                m.put("departure", toDate(javaTime));
                 flightsView.add(m);
             }
             req.setAttribute("flightsView", flightsView);
@@ -211,12 +236,16 @@ public class CheckFlightReservationServlet extends HttpServlet {
 
         // Listar TODAS mis reservas de ese vuelo
         String customerNick = ((CustomerDTO) req.getAttribute("usuario")).getNickname();
-        List<BookFlightDTO> allForFlight = safe(books.getBookFlightsDetailsByFlightName(flight));
+        List<BookFlightDTO> allForFlight = safe(books.getBookFlightsDetailsByFlightName(flight).getItem());
 
         List<BookFlightDTO> myBookings = allForFlight.stream()
                 .filter(b -> b != null && Objects.equals(customerNick, b.getCustomerNickname()))
-                .sorted(Comparator.comparing(BookFlightDTO::getCreatedAt,
-                        Comparator.nullsLast(Comparator.naturalOrder()))) // más viejas primero
+                .sorted(
+                        Comparator.comparing(
+                                b -> UniversalLocalDateTimeAdapter.toJavaTime(b.getCreatedAt()),
+                                Comparator.nullsLast(java.time.LocalDateTime::compareTo)
+                        )
+                )
                 .toList();
 
         // Si piden ver el detalle de una en particular (booking=id), lo mostramos
@@ -225,7 +254,7 @@ public class CheckFlightReservationServlet extends HttpServlet {
                 Long id = Long.valueOf(booking);
                 BookFlightDTO bd = books.getBookFlightDetailsById(id);
                 req.setAttribute("booking", bd);
-                req.setAttribute("bookingCreatedAtDate", toDate(bd != null ? bd.getCreatedAt() : null));
+                req.setAttribute("bookingCreatedAtDate", toDate(bd != null ? UniversalLocalDateTimeAdapter.toJavaTime(bd.getCreatedAt()) : null));
 
                 List<TicketDTO> ts = new ArrayList<>();
                 if (bd != null && bd.getTicketIds() != null) {
@@ -248,7 +277,8 @@ public class CheckFlightReservationServlet extends HttpServlet {
         for (BookFlightDTO b : myBookings) {
             Map<String,Object> bm = new HashMap<>();
             bm.put("id", b.getId());
-            bm.put("createdAt", toDate(b.getCreatedAt()));
+            LocalDateTime javaTime = UniversalLocalDateTimeAdapter.toJavaTime(b.getCreatedAt());
+            bm.put("createdAtDate", toDate(javaTime));
             bm.put("seatType", b.getSeatType());
             bm.put("totalPrice", b.getTotalPrice());
 

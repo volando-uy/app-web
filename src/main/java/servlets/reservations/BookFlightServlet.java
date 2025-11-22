@@ -1,46 +1,56 @@
 package servlets.reservations;
 
-import controllers.booking.IBookingController;
-import controllers.flight.IFlightController;
-import controllers.flightroute.IFlightRouteController;
-import controllers.seat.ISeatController;
+import com.labpa.appweb.booking.*;
+import com.labpa.appweb.flight.FlightDTO;
+import com.labpa.appweb.flight.FlightSoapAdapter;
+import com.labpa.appweb.flight.FlightSoapAdapterService;
+import com.labpa.appweb.flightroute.FlightRouteDTO;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
+import com.labpa.appweb.booking.LuggageDTO;
 
-import domain.dtos.bookflight.BaseBookFlightDTO;
-import domain.dtos.bookflight.BookFlightDTO;
-import domain.dtos.flight.FlightDTO;
-import domain.dtos.flightroute.FlightRouteDTO;
-import domain.dtos.luggage.BaseBasicLuggageDTO;
-import domain.dtos.luggage.BaseExtraLuggageDTO;
-import domain.dtos.luggage.LuggageDTO;
-import domain.dtos.ticket.BaseTicketDTO;
+import com.labpa.appweb.ticket.BaseBasicLuggageDTO;
+import com.labpa.appweb.ticket.BaseExtraLuggageDTO;
+import com.labpa.appweb.ticket.EnumEquipajeBasico;
+import com.labpa.appweb.ticket.EnumEquipajeExtra;
 
-import domain.models.enums.EnumTipoAsiento;
-import domain.models.enums.EnumTipoDocumento;
-import domain.models.luggage.EnumEquipajeBasico;
-import domain.models.luggage.EnumEquipajeExtra;
 
-import factory.ControllerFactory;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import mappers.LuggageMapper;
+import mappers.TicketLuggageMapper;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @WebServlet("/reservas")
 public class BookFlightServlet extends HttpServlet {
 
-    private final IBookingController booking    = ControllerFactory.getBookingController();
-    private final IFlightController  flights    = ControllerFactory.getFlightController();
-    private final IFlightRouteController routes = ControllerFactory.getFlightRouteController();
-    private final ISeatController    seats      = ControllerFactory.getSeatController();
+    private BookingSoapAdapterService bookingService = new BookingSoapAdapterService();
+    private BookingSoapAdapter booking = bookingService.getBookingSoapAdapterPort();
+
+    private FlightSoapAdapterService flightService = new FlightSoapAdapterService();
+    private FlightSoapAdapter flights = flightService.getFlightSoapAdapterPort();
+
+    private FlightRouteSoapAdapterService routeService = new FlightRouteSoapAdapterService();
+    private FlightRouteSoapAdapter routes = routeService.getFlightRouteSoapAdapterPort();
+
+//    private final IBookingController booking = ControllerFactory.getBookingController();
+//    private final IFlightController flights = ControllerFactory.getFlightController();
+//    private final IFlightRouteController routes = ControllerFactory.getFlightRouteController();
+////    private final ISeatController seats = ControllerFactory.getSeatController();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html; charset=UTF-8");
@@ -55,10 +65,16 @@ public class BookFlightServlet extends HttpServlet {
         }
 
         String flightName = req.getParameter("flight");
-        if (isBlank(flightName)) { resp.sendError(400); return; }
+        if (isBlank(flightName)) {
+            resp.sendError(400);
+            return;
+        }
 
         FlightDTO flight = flights.getFlightDetailsByName(flightName);
-        if (flight == null) { resp.sendError(404); return; }
+        if (flight == null) {
+            resp.sendError(404);
+            return;
+        }
         FlightRouteDTO route = routes.getFlightRouteDetailsByName(flight.getFlightRouteName());
 
         EnumTipoAsiento seatType = parseSeatType(req.getParameter("seatType"));
@@ -82,10 +98,16 @@ public class BookFlightServlet extends HttpServlet {
 
         HttpSession s = req.getSession(false);
         String nick = (s == null) ? null : (String) s.getAttribute("nickname");
-        if (isBlank(nick)) { resp.sendRedirect(req.getContextPath() + "/users/login"); return; }
+        if (isBlank(nick)) {
+            resp.sendRedirect(req.getContextPath() + "/users/login");
+            return;
+        }
 
         String flightName = req.getParameter("flight");
-        if (isBlank(flightName)) { resp.sendError(400); return; }
+        if (isBlank(flightName)) {
+            resp.sendError(400);
+            return;
+        }
 
         String action = req.getParameter("action");
         EnumTipoAsiento seatType = parseSeatType(req.getParameter("seatType"));
@@ -98,7 +120,10 @@ public class BookFlightServlet extends HttpServlet {
         }
 
         FlightDTO flight = flights.getFlightDetailsByName(flightName);
-        if (flight == null) { resp.sendError(404); return; }
+        if (flight == null) {
+            resp.sendError(404);
+            return;
+        }
         FlightRouteDTO route = routes.getFlightRouteDetailsByName(flight.getFlightRouteName());
 
         SeatAvailability avail = availability(flightName, flight);
@@ -147,17 +172,17 @@ public class BookFlightServlet extends HttpServlet {
         for (int k = 0; k < passengersCount; k++) {
             String p = "passengers[" + k + "]";
 
-            String name    = req.getParameter(p + ".name");
+            String name = req.getParameter(p + ".name");
             String surname = req.getParameter(p + ".surname");
-            String dtStr   = req.getParameter(p + ".docType");
-            String doc     = req.getParameter(p + ".numDoc");
+            String dtStr = req.getParameter(p + ".docType");
+            String doc = req.getParameter(p + ".numDoc");
 
             String basicTypeStr = req.getParameter(p + ".basicLuggageType");
-            double basicWeight  = d(req.getParameter(p + ".basicLuggageWeight"), 0.0);
+            double basicWeight = d(req.getParameter(p + ".basicLuggageWeight"), 0.0);
 
             String extraTypeStr = req.getParameter(p + ".extraLuggageType");
-            int    extraUnits   = i(req.getParameter(p + ".extraLuggageUnits"), 0);
-            double extraWeight  = d(req.getParameter(p + ".extraLuggageWeight"), 0.0);
+            int extraUnits = i(req.getParameter(p + ".extraLuggageUnits"), 0);
+            double extraWeight = d(req.getParameter(p + ".extraLuggageWeight"), 0.0);
 
             if (isBlank(name) || isBlank(surname) || isBlank(dtStr) || isBlank(doc) ||
                     isBlank(basicTypeStr) || isBlank(extraTypeStr)) {
@@ -175,29 +200,38 @@ public class BookFlightServlet extends HttpServlet {
             List<LuggageDTO> l = new ArrayList<>();
 
             BaseBasicLuggageDTO basic = new BaseBasicLuggageDTO();
-            basic.setCategory(EnumEquipajeBasico.valueOf(basicTypeStr));
             basic.setWeight(basicWeight);
-            l.add(basic);
+            basic.setCategory(EnumEquipajeBasico.valueOf(basicTypeStr));
+
+            l.add(LuggageMapper.toSoapLuggage(basic));
 
             EnumEquipajeExtra extraCat = EnumEquipajeExtra.valueOf(extraTypeStr);
-            for (int x = 0; x < extraUnits; x++) {
-                BaseExtraLuggageDTO ex = new BaseExtraLuggageDTO();
-                ex.setCategory(extraCat);
-                ex.setWeight(extraWeight);
-                l.add(ex);
+
+            for (int i = 0; i < extraUnits; i++) {
+                BaseExtraLuggageDTO extra = new BaseExtraLuggageDTO();
+                extra.setWeight(extraWeight);
+                extra.setCategory(extraCat);
+
+                l.add(LuggageMapper.toSoapLuggage(extra));
             }
+
             ticketMap.put(t, l);
         }
 
         CostBreakdown cbConfirm = computeCost(req, passengersCount, unitPrice, route);
 
-        BaseBookFlightDTO bookingDTO = new BaseBookFlightDTO();
+        SoapBaseBookFlightDTO bookingDTO = new SoapBaseBookFlightDTO();
         bookingDTO.setSeatType(seatType);
-        bookingDTO.setCreatedAt(LocalDateTime.now());
+//        bookingDTO.setCreatedAt(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        bookingDTO.setCreatedAt(now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         bookingDTO.setTotalPrice(cbConfirm.total());
 
+
         try {
-            booking.createBooking(bookingDTO, ticketMap, nick, flightName);
+//            booking.createBooking(bookingDTO, ticketMap, nick, flightName);
+            TicketLuggageArray array = TicketLuggageMapper.toSoapArray(ticketMap);
+            booking.createBooking(bookingDTO, array, nick, flightName);
             toast(req, "Reserva creada correctamente.", "success");
             resp.sendRedirect(req.getContextPath() + "/perfil");
         } catch (Exception e) {
@@ -210,7 +244,7 @@ public class BookFlightServlet extends HttpServlet {
     private boolean hasUserBookingForFlight(String nickname, String flightName) {
         if (isBlank(nickname) || isBlank(flightName)) return false;
         try {
-            List<BookFlightDTO> list = booking.getBookFlightsDetailsByFlightName(flightName);
+            List<BookFlightDTO> list = booking.getBookFlightsDetailsByFlightName(flightName).getItem();
             if (list == null) return false;
             for (BookFlightDTO bf : list) {
                 if (bf == null) continue;
@@ -226,17 +260,17 @@ public class BookFlightServlet extends HttpServlet {
     }
 
     private SeatAvailability availability(String flightName, FlightDTO f) {
-        int capT = (f.getMaxEconomySeats()  == null) ? 0 : f.getMaxEconomySeats();
+        int capT = (f.getMaxEconomySeats() == null) ? 0 : f.getMaxEconomySeats();
         int capE = (f.getMaxBusinessSeats() == null) ? 0 : f.getMaxBusinessSeats();
 
         int occT = 0, occE = 0;
         try {
-            List<BookFlightDTO> list = booking.getBookFlightsDetailsByFlightName(flightName);
+            List<BookFlightDTO> list = booking.getBookFlightsDetailsByFlightName(flightName).getItem();
             if (list != null) {
                 for (BookFlightDTO bf : list) {
                     if (bf == null || bf.getTicketIds() == null) continue;
                     int n = bf.getTicketIds().size();
-                    if (bf.getSeatType() == EnumTipoAsiento.TURISTA)   occT += n;
+                    if (bf.getSeatType() == EnumTipoAsiento.TURISTA) occT += n;
                     if (bf.getSeatType() == EnumTipoAsiento.EJECUTIVO) occE += n;
                 }
             }
@@ -251,7 +285,10 @@ public class BookFlightServlet extends HttpServlet {
 
     private static final class CostBreakdown {
         double seatSubtotal, extraSubtotal;
-        double total() { return seatSubtotal + extraSubtotal; }
+
+        double total() {
+            return seatSubtotal + extraSubtotal;
+        }
     }
 
     private CostBreakdown computeCost(HttpServletRequest req, int pax, double unitSeatPrice, FlightRouteDTO route) {
@@ -282,7 +319,7 @@ public class BookFlightServlet extends HttpServlet {
         req.setAttribute("passengersCount", pax);
         req.setAttribute("unitPrice", unitPrice);
 
-        int maxT = (avail.turista   == Integer.MAX_VALUE) ? 9 : avail.turista;
+        int maxT = (avail.turista == Integer.MAX_VALUE) ? 9 : avail.turista;
         int maxE = (avail.ejecutivo == Integer.MAX_VALUE) ? 9 : avail.ejecutivo;
         req.setAttribute("availTurista", maxT);
         req.setAttribute("availEjecutivo", maxE);
@@ -292,11 +329,42 @@ public class BookFlightServlet extends HttpServlet {
     }
 
     // util mínimos
-    private static final class SeatAvailability { final int turista, ejecutivo; SeatAvailability(int t, int e){this.turista=t; this.ejecutivo=e;} }
-    private static boolean isBlank(String s){ return s == null || s.trim().isEmpty(); }
-    private static int i(String s, int d){ try { return Integer.parseInt(s); } catch (Exception e) { return d; } }
-    private static double d(String s, double v){ try { return Double.parseDouble(s.replace(',', '.')); } catch (Exception e) { return v; } }
-    private static String enc(String s){ try { return URLEncoder.encode(s, StandardCharsets.UTF_8); } catch (Exception e) { return s; } }
+    private static final class SeatAvailability {
+        final int turista, ejecutivo;
+
+        SeatAvailability(int t, int e) {
+            this.turista = t;
+            this.ejecutivo = e;
+        }
+    }
+
+    private static boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+
+    private static int i(String s, int d) {
+        try {
+            return Integer.parseInt(s);
+        } catch (Exception e) {
+            return d;
+        }
+    }
+
+    private static double d(String s, double v) {
+        try {
+            return Double.parseDouble(s.replace(',', '.'));
+        } catch (Exception e) {
+            return v;
+        }
+    }
+
+    private static String enc(String s) {
+        try {
+            return URLEncoder.encode(s, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return s;
+        }
+    }
 
     private static String safeMsg(Exception e) {
         String m = e.getMessage();
@@ -304,9 +372,12 @@ public class BookFlightServlet extends HttpServlet {
         return m.length() > 180 ? m.substring(0, 180) + "…" : m;
     }
 
-    private static EnumTipoAsiento parseSeatType(String s){
-        try { return EnumTipoAsiento.valueOf(isBlank(s) ? "TURISTA" : s); }
-        catch (Exception e) { return EnumTipoAsiento.TURISTA; }
+    private static EnumTipoAsiento parseSeatType(String s) {
+        try {
+            return EnumTipoAsiento.valueOf(isBlank(s) ? "TURISTA" : s);
+        } catch (Exception e) {
+            return EnumTipoAsiento.TURISTA;
+        }
     }
 
     private static void toast(HttpServletRequest req, String msg, String type) {
@@ -315,7 +386,7 @@ public class BookFlightServlet extends HttpServlet {
         session.setAttribute("toastType", type);
     }
 
-    private static double unitPrice(FlightRouteDTO route, EnumTipoAsiento st){
+    private static double unitPrice(FlightRouteDTO route, EnumTipoAsiento st) {
         Double v = (st == EnumTipoAsiento.EJECUTIVO) ? route.getPriceBusinessClass() : route.getPriceTouristClass();
         return v == null ? 0.0 : v;
     }
