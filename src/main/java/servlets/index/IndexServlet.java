@@ -1,6 +1,8 @@
 package servlets.index;
 
+import adapters.FlightViewDTO;
 import com.labpa.appweb.flight.BaseFlightDTO;
+import com.labpa.appweb.flight.BaseFlightSoapViewDTO;
 import com.labpa.appweb.flight.FlightSoapAdapter;
 import com.labpa.appweb.flight.FlightSoapAdapterService;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
@@ -12,10 +14,12 @@ import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapterService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import mappers.FlightMapper;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 
 @WebServlet("/index")
@@ -51,9 +55,26 @@ public class IndexServlet extends HttpServlet {
         List<BaseFlightRoutePackageDTO> packages = getPackagesPreferWithRoutes();
         req.setAttribute("packages", packages);
 
-        List<BaseFlightDTO> flights = getFlightsSafe();
-        req.setAttribute("flights", flights);
-        req.setAttribute("flightsCount", flights.size());
+        List<BaseFlightSoapViewDTO> list = flightPort.getAllFlightsSimpleDetails().getItem();
+
+        List<FlightViewDTO> viewList = new ArrayList<>();
+        for (BaseFlightSoapViewDTO f : list) {
+            FlightViewDTO dto = new FlightViewDTO();
+
+            dto.setName(f.getName());
+            dto.setImage(f.getImage());
+            dto.setDepartureTime(f.getDepartureTime() != null ? f.getDepartureTime() : "--");
+            dto.setCreatedAt(f.getCreatedAt() != null ? f.getCreatedAt() : "--");
+            dto.setDuration(f.getDuration() != null ? String.valueOf(f.getDuration()) : "--");
+            dto.setMaxEconomySeats(f.getMaxEconomySeats() != null ? String.valueOf(f.getMaxEconomySeats()) : "--");
+            dto.setMaxBusinessSeats(f.getMaxBusinessSeats() != null ? String.valueOf(f.getMaxBusinessSeats()) : "--");
+
+            viewList.add(dto);
+        }
+
+        req.setAttribute("flights", viewList);
+        req.setAttribute("flightsCount", viewList.size());
+
 
         req.getRequestDispatcher("/index.jsp").forward(req, resp);
     }
@@ -80,14 +101,5 @@ public class IndexServlet extends HttpServlet {
         }
     }
 
-    private List<BaseFlightDTO> getFlightsSafe() {
-        try {
-//            List<BaseFlightDTO> list = flightCtrl.getAllFlightsSimpleDetails();
-            List<BaseFlightDTO> list = flightPort.getAllFlightsSimpleDetails().getItem();
-            return (list != null) ? list : Collections.emptyList();
-        } catch (Exception e) {
-            log("Fallo getAllFlightsSimpleDetails()", e);
-            return Collections.emptyList();
-        }
-    }
+
 }
