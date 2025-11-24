@@ -1,5 +1,7 @@
 package servlets.user;
 
+import com.labpa.appweb.constants.ConstantsSoapAdapter;
+import com.labpa.appweb.constants.ConstantsSoapAdapterService;
 import com.labpa.appweb.user.SoapUserDTO;
 import com.labpa.appweb.user.UserSoapAdapter;
 import com.labpa.appweb.user.UserSoapAdapterService;
@@ -22,25 +24,24 @@ public class ListUsersServlet extends HttpServlet {
     UserSoapAdapterService service = new UserSoapAdapterService();
     UserSoapAdapter port = service.getUserSoapAdapterPort();
 
+    ConstantsSoapAdapter constantsPort = new ConstantsSoapAdapterService().getConstantsSoapAdapterPort();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+        final String airline = constantsPort.getValueConstants().getUSERTYPEAIRLINE();
+        final String customer = constantsPort.getValueConstants().getUSERTYPECUSTOMER();
         List<SoapUserDTO> users = port.getAllUsersSimpleDetails().getItem();
 
         Map<String, String> tiposPorUsuario = new HashMap<>();
         for (SoapUserDTO user : users) {
-            String tipo;
-            String className = user.getClass().getSimpleName();
-            switch (className) {
-                case "BaseCustomerDTO":
-                    tipo = "Cliente";
-                    break;
-                case "BaseAirlineDTO":
-                    tipo = "Aerolínea";
-                    break;
-                default:
-                    tipo = "Visitante";
-                    break;
+            String tipo = user.getUserType();
+
+            if (tipo.equalsIgnoreCase(airline)) {
+                tipo = "Aerolínea";
+            } else if (tipo.equalsIgnoreCase(customer)) {
+                tipo = "Cliente";
+            } else {
+                tipo = "Visitante";
             }
             tiposPorUsuario.put(user.getNickname(), tipo);
         }
