@@ -20,6 +20,7 @@ import com.labpa.appweb.ticket.EnumEquipajeExtra;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import mappers.DateTimeMapper;
 import mappers.LuggageMapper;
 import mappers.TicketLuggageMapper;
 
@@ -223,9 +224,8 @@ public class BookFlightServlet extends HttpServlet {
 
         SoapBaseBookFlightDTO bookingDTO = new SoapBaseBookFlightDTO();
         bookingDTO.setSeatType(seatType);
-//        bookingDTO.setCreatedAt(LocalDateTime.now());
         LocalDateTime now = LocalDateTime.now();
-        bookingDTO.setCreatedAt(now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        bookingDTO.setCreatedAt(DateTimeMapper.toSoapLocalDateTime(now));
         bookingDTO.setTotalPrice(cbConfirm.total());
 
 

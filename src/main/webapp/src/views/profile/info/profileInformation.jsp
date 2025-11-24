@@ -11,8 +11,6 @@
 %>
 
 
-
-
 <body class="min-h-screen bg-gradient-to-r from-brand to-blue-300 py-12 px-4 flex items-center justify-center">
 <div class="relative w-full max-w-5xl bg-white rounded-2xl shadow-lg overflow-hidden">
 
@@ -47,6 +45,7 @@
                             Actualizar perfil
                         </button>
                     </form>
+
                 </c:if>
 
                 <a href="${homeUrl}"
@@ -73,31 +72,54 @@
                     <div>
                         <h2 class="text-lg font-semibold mb-2">Paquetes Comprados</h2>
                         <c:choose>
-                            <c:when test="${not empty usuario.boughtPackagesIds}">
-                                <div class="flex flex-wrap gap-2">
-                                    <c:forEach var="id" items="${usuario.boughtPackagesIds}">
-                                        <span class="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded-full">#${id}</span>
+                            <c:when test="${not empty boughtPackageLinks}">
+                                <ul class="space-y-2">
+                                    <c:forEach var="link" items="${boughtPackageLinks}">
+                                        <li class="p-3 rounded-lg border bg-gray-50 hover:bg-gray-100 transition">
+                                            <a class="text-blue-700 hover:underline font-medium"
+                                               href="${rootUrl}/booking/check?airline=${link.airline}&route=${link.routeName}&flight=${link.flightName}">
+                                                Paquete #${link.id}
+                                                <br/>
+                                                <span class="text-sm text-gray-700">
+                                                Ruta: <strong>${link.routeName}</strong><br/>
+                                                Vuelo: <strong>${link.flightName}</strong><br/>
+                                                Aerolínea: <strong>${link.airline}</strong>
+                                                </span>
+                                            </a>
+                                        </li>
                                     </c:forEach>
-                                </div>
+                                </ul>
+                            </c:when>
+
+                            <c:otherwise>
+                                <p class="text-gray-500 italic">No compraste ningún paquete aún.</p>
+                            </c:otherwise>
+                        </c:choose>
+                        <h2 class="text-lg font-semibold mt-4 mb-2">Reservas de Vuelo</h2>
+                        <c:choose>
+                            <c:when test="${not empty bookedFlightLinks}">
+                                <ul class="space-y-2">
+                                    <c:forEach var="link" items="${bookedFlightLinks}">
+                                        <li class="p-3 rounded-lg border bg-gray-50 hover:bg-gray-100 transition">
+                                            <a class="text-blue-700 hover:underline font-medium"
+                                               href="${rootUrl}/booking/check?airline=${link.airline}&route=${link.routeName}&flight=${link.flightName}&booking=${link.bookingId}">
+                                                Reserva #${link.bookingId}
+                                                <br/>
+                                                <span class="text-sm text-gray-700">
+                                                Ruta: <strong>${link.routeName}</strong><br/>
+                                                Vuelo: <strong>${link.flightName}</strong><br/>
+                                                Aerolínea: <strong>${link.airline}</strong>
+                                                </span>
+                                            </a>
+                                        </li>
+                                    </c:forEach>
+                                </ul>
                             </c:when>
                             <c:otherwise>
-                                <p class="text-gray-500 italic">No tiene paquetes comprados.</p>
+                                <p class="text-gray-500 italic">No tenés reservas de vuelo aún.</p>
                             </c:otherwise>
                         </c:choose>
 
-                        <h2 class="text-lg font-semibold mt-4 mb-2">Reservas de Vuelo</h2>
-                        <c:choose>
-                            <c:when test="${not empty usuario.bookFlightsIds}">
-                                <div class="flex flex-wrap gap-2">
-                                    <c:forEach var="id" items="${usuario.bookFlightsIds}">
-                                        <span class="bg-green-100 text-green-800 text-sm px-2 py-1 rounded-full">#${id}</span>
-                                    </c:forEach>
-                                </div>
-                            </c:when>
-                            <c:otherwise>
-                                <p class="text-gray-500 italic">No tiene vuelos reservados.</p>
-                            </c:otherwise>
-                        </c:choose>
                     </div>
                 </div>
             </c:when>
@@ -131,15 +153,26 @@
 
                         <h2 class="text-lg font-semibold mt-4 mb-2">Vuelos</h2>
                         <c:choose>
-                            <c:when test="${not empty usuario.flightsNames}">
-                                <ul class="list-disc list-inside">
-                                    <c:forEach var="vuelo" items="${usuario.flightsNames}">
-                                        <li>${vuelo}</li>
+                            <c:when test="${not empty bookedFlightLinks}">
+                                <ul class="space-y-2">
+                                    <c:forEach var="link" items="${bookedFlightLinks}">
+                                        <li class="p-3 rounded-lg border bg-white hover:bg-gray-50 transition">
+                                            <a class="text-blue-700 hover:underline font-medium"
+                                               href="${rootUrl}/booking/check?airline=${link.airline}&route=${link.routeName}&flight=${link.flightName}&booking=${link.bookingId}">
+                                                Reserva #${link.bookingId}
+                                                <br/>
+                                                <span class="text-sm text-gray-700">
+                                                Ruta: <strong>${link.routeName}</strong><br/>
+                                                Vuelo: <strong>${link.flightName}</strong><br/>
+                                                Aerolínea: <strong>${link.airline}</strong>
+                                                </span>
+                                            </a>
+                                        </li>
                                     </c:forEach>
                                 </ul>
                             </c:when>
                             <c:otherwise>
-                                <p class="text-gray-500 italic">Sin vuelos registrados.</p>
+                                <p class="text-gray-500 italic">No tenés reservas de vuelo aún.</p>
                             </c:otherwise>
                         </c:choose>
                     </div>
@@ -152,6 +185,10 @@
         </c:choose>
     </div>
 </div>
+
+<%
+    request.setAttribute("pageScript", "src/views/profile/info/profileInformation.js");
+%>
 
 <%@ include file="/src/components/layout/scripts.jspf" %>
 </body>
