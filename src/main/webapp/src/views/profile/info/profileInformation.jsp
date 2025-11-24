@@ -142,7 +142,12 @@
                             <c:when test="${not empty usuario.flightRoutesNames}">
                                 <ul class="list-disc list-inside">
                                     <c:forEach var="ruta" items="${usuario.flightRoutesNames}">
-                                        <li>${ruta}</li>
+                                        <li>
+                                            <a class="text-blue-700 hover:underline"
+                                               href="${rootUrl}/booking/check?airline=${usuario.nickname}&route=${fn:replace(ruta, ' ', '+')}">
+                                                    ${ruta}
+                                            </a>
+                                        </li>
                                     </c:forEach>
                                 </ul>
                             </c:when>
@@ -153,26 +158,21 @@
 
                         <h2 class="text-lg font-semibold mt-4 mb-2">Vuelos</h2>
                         <c:choose>
-                            <c:when test="${not empty bookedFlightLinks}">
-                                <ul class="space-y-2">
-                                    <c:forEach var="link" items="${bookedFlightLinks}">
-                                        <li class="p-3 rounded-lg border bg-white hover:bg-gray-50 transition">
-                                            <a class="text-blue-700 hover:underline font-medium"
-                                               href="${rootUrl}/booking/check?airline=${link.airline}&route=${link.routeName}&flight=${link.flightName}&booking=${link.bookingId}">
-                                                Reserva #${link.bookingId}
-                                                <br/>
-                                                <span class="text-sm text-gray-700">
-                                                Ruta: <strong>${link.routeName}</strong><br/>
-                                                Vuelo: <strong>${link.flightName}</strong><br/>
-                                                Aerolínea: <strong>${link.airline}</strong>
-                                                </span>
+                            <c:when test="${not empty usuario.flightsNames}">
+                                <ul class="list-disc list-inside">
+                                    <c:forEach var="vuelo" items="${usuario.flightsNames}" varStatus="status">
+                                        <c:set var="ruta" value="${usuario.flightRoutesNames[status.index]}" />
+                                        <li>
+                                            <a class="text-blue-700 hover:underline"
+                                               href="${rootUrl}/booking/check?airline=${usuario.nickname}&route=${fn:replace(ruta, ' ', '+')}&flight=${fn:replace(vuelo, ' ', '+')}">
+                                                    ${vuelo}
                                             </a>
                                         </li>
                                     </c:forEach>
                                 </ul>
                             </c:when>
                             <c:otherwise>
-                                <p class="text-gray-500 italic">No tenés reservas de vuelo aún.</p>
+                                <p class="text-gray-500 italic">Sin vuelos registrados.</p>
                             </c:otherwise>
                         </c:choose>
                     </div>
