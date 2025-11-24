@@ -26,19 +26,19 @@ public class ViewUserProfileServlet extends HttpServlet {
             return;
         }
 
-//        UserDTO baseUser = userController.getUserSimpleDetailsByNickname(nickname);
-        UserDTO baseUser = port.getUserSimpleDetailsByNickname(nickname);
-        if (baseUser instanceof BaseCustomerDTO) {
+//        SoapUserDTO baseUser = userController.getUserSimpleDetailsByNickname(nickname);
+        SoapUserDTO baseUser = port.getUserSimpleDetailsByNickname(nickname);
+        if (baseUser instanceof SoapBaseCustomerDTO) {
 //            CustomerDTO cliente = userController.getCustomerDetailsByNickname(nickname);
-            CustomerDTO cliente = port.getCustomerDetailsByNickname(nickname);
+            SoapCustomerDTO cliente = port.getCustomerDetailsByNickname(nickname);
 
             req.setAttribute("cliente", cliente);
             req.setAttribute("tipoUsuario", "cliente");
             req.setAttribute("usuario", cliente);
 
-        } else if (baseUser instanceof BaseAirlineDTO) {
+        } else if (baseUser instanceof SoapBaseAirlineDTO) {
 //            AirlineDTO aerolinea = userController.getAirlineDetailsByNickname(nickname);
-            AirlineDTO aerolinea = port.getAirlineDetailsByNickname(nickname);
+            SoapAirlineDTO aerolinea = port.getAirlineDetailsByNickname(nickname);
 
             req.setAttribute("aerolinea", aerolinea);
             req.setAttribute("tipoUsuario", "aerolinea");

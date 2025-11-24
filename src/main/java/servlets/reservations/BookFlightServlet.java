@@ -1,14 +1,15 @@
 package servlets.reservations;
 
 import com.labpa.appweb.booking.*;
-import com.labpa.appweb.flight.FlightDTO;
+
 import com.labpa.appweb.flight.FlightSoapAdapter;
 import com.labpa.appweb.flight.FlightSoapAdapterService;
-import com.labpa.appweb.flightroute.FlightRouteDTO;
+import com.labpa.appweb.flight.SoapFlightDTO;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
 import com.labpa.appweb.booking.LuggageDTO;
 
+import com.labpa.appweb.flightroute.SoapFlightRouteDTO;
 import com.labpa.appweb.ticket.BaseBasicLuggageDTO;
 import com.labpa.appweb.ticket.BaseExtraLuggageDTO;
 import com.labpa.appweb.ticket.EnumEquipajeBasico;
@@ -70,12 +71,12 @@ public class BookFlightServlet extends HttpServlet {
             return;
         }
 
-        FlightDTO flight = flights.getFlightDetailsByName(flightName);
+        SoapFlightDTO flight = flights.getFlightDetailsByName(flightName);
         if (flight == null) {
             resp.sendError(404);
             return;
         }
-        FlightRouteDTO route = routes.getFlightRouteDetailsByName(flight.getFlightRouteName());
+        SoapFlightRouteDTO route = routes.getFlightRouteDetailsByName(flight.getFlightRouteName());
 
         EnumTipoAsiento seatType = parseSeatType(req.getParameter("seatType"));
         int passengersCount = Math.max(1, i(req.getParameter("passengersCount"), 1));
@@ -119,12 +120,12 @@ public class BookFlightServlet extends HttpServlet {
             return;
         }
 
-        FlightDTO flight = flights.getFlightDetailsByName(flightName);
+        SoapFlightDTO flight = flights.getFlightDetailsByName(flightName);
         if (flight == null) {
             resp.sendError(404);
             return;
         }
-        FlightRouteDTO route = routes.getFlightRouteDetailsByName(flight.getFlightRouteName());
+        SoapFlightRouteDTO route = routes.getFlightRouteDetailsByName(flight.getFlightRouteName());
 
         SeatAvailability avail = availability(flightName, flight);
         int maxSel = (seatType == EnumTipoAsiento.EJECUTIVO) ? avail.ejecutivo : avail.turista;
@@ -244,9 +245,9 @@ public class BookFlightServlet extends HttpServlet {
     private boolean hasUserBookingForFlight(String nickname, String flightName) {
         if (isBlank(nickname) || isBlank(flightName)) return false;
         try {
-            List<BookFlightDTO> list = booking.getBookFlightsDetailsByFlightName(flightName).getItem();
+            List<SoapBookFlightDTO> list = booking.getBookFlightsDetailsByFlightName(flightName).getItem();
             if (list == null) return false;
-            for (BookFlightDTO bf : list) {
+            for (SoapBookFlightDTO bf : list) {
                 if (bf == null) continue;
                 String who = bf.getCustomerNickname();
                 if (who != null && who.trim().equalsIgnoreCase(nickname.trim())) {
@@ -259,15 +260,15 @@ public class BookFlightServlet extends HttpServlet {
         return false;
     }
 
-    private SeatAvailability availability(String flightName, FlightDTO f) {
+    private SeatAvailability availability(String flightName, SoapFlightDTO f) {
         int capT = (f.getMaxEconomySeats() == null) ? 0 : f.getMaxEconomySeats();
         int capE = (f.getMaxBusinessSeats() == null) ? 0 : f.getMaxBusinessSeats();
 
         int occT = 0, occE = 0;
         try {
-            List<BookFlightDTO> list = booking.getBookFlightsDetailsByFlightName(flightName).getItem();
+            List<SoapBookFlightDTO> list = booking.getBookFlightsDetailsByFlightName(flightName).getItem();
             if (list != null) {
-                for (BookFlightDTO bf : list) {
+                for (SoapBookFlightDTO bf : list) {
                     if (bf == null || bf.getTicketIds() == null) continue;
                     int n = bf.getTicketIds().size();
                     if (bf.getSeatType() == EnumTipoAsiento.TURISTA) occT += n;
@@ -291,7 +292,7 @@ public class BookFlightServlet extends HttpServlet {
         }
     }
 
-    private CostBreakdown computeCost(HttpServletRequest req, int pax, double unitSeatPrice, FlightRouteDTO route) {
+    private CostBreakdown computeCost(HttpServletRequest req, int pax, double unitSeatPrice, SoapFlightRouteDTO route) {
         CostBreakdown cb = new CostBreakdown();
         cb.seatSubtotal = unitSeatPrice * Math.max(pax, 0);
 
@@ -305,7 +306,7 @@ public class BookFlightServlet extends HttpServlet {
         return cb;
     }
 
-    private void setView(HttpServletRequest req, FlightDTO flight, FlightRouteDTO route,
+    private void setView(HttpServletRequest req, SoapFlightDTO flight, SoapFlightRouteDTO route,
                          String seatType, int pax, double unitPrice,
                          SeatAvailability avail, boolean existingBooking) {
 
@@ -386,7 +387,7 @@ public class BookFlightServlet extends HttpServlet {
         session.setAttribute("toastType", type);
     }
 
-    private static double unitPrice(FlightRouteDTO route, EnumTipoAsiento st) {
+    private static double unitPrice(SoapFlightRouteDTO route, EnumTipoAsiento st) {
         Double v = (st == EnumTipoAsiento.EJECUTIVO) ? route.getPriceBusinessClass() : route.getPriceTouristClass();
         return v == null ? 0.0 : v;
     }

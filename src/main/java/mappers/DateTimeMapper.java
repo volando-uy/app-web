@@ -1,24 +1,20 @@
 package mappers;
 
-import adapters.LocalDateTimeWithValue;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class DateTimeMapper {
 
-    private static final DateTimeFormatter ISO_FORMATTER =
-            DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-    public static LocalDateTimeWithValue toSoapLocalDateTime(LocalDateTime date) {
-        if (date == null) return null;
-        return new LocalDateTimeWithValue(ISO_FORMATTER.format(date));
+    public static String toSoapLocalDateTime(LocalDateTime dateTime) {
+        if (dateTime == null) return null;
+        return ISO_FORMATTER.format(dateTime);
     }
 
-    public static LocalDateTime fromSoapLocalDateTime(LocalDateTimeWithValue soapDate) {
-        if (soapDate == null || soapDate.getValue() == null) return null;
-        return LocalDateTime.parse(soapDate.getValue(), ISO_FORMATTER);
+    public static LocalDateTime fromSoapLocalDateTime(String soapDateTime) {
+        if (soapDateTime == null) return null;
+        return LocalDateTime.parse(soapDateTime, ISO_FORMATTER);
     }
-
-
 }

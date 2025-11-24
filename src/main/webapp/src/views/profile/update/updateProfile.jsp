@@ -1,7 +1,5 @@
 <%@ page import="com.labpa.appweb.user.*" %>
 <%@ page import="mappers.DateMapper" %>
-<%@ page import="adapters.LocalDateWithValue" %>
-<%@ page import="mappers.CustomerMapper" %>
 <%@ page import="utils.SoapDateParser" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
@@ -10,10 +8,10 @@
 
     request.setAttribute("pageTitle", "Editar Perfil - Volando.uy");
 
-    UserDTO user = (UserDTO) request.getAttribute("user");
+    SoapUserDTO user = (SoapUserDTO) request.getAttribute("user");
     SoapBaseCustomerDTO c = (SoapBaseCustomerDTO) request.getAttribute("customer");
-    boolean isCustomer = user instanceof BaseCustomerDTO;
-    boolean isAirline = user instanceof BaseAirlineDTO;
+    boolean isCustomer = user instanceof SoapBaseCustomerDTO;
+    boolean isAirline = user instanceof SoapBaseAirlineDTO;
 
     String userImage = user.getImage() != null ? user.getImage() : "/public/images/users/default-user.jpg";
     String profileUpdateUrl = request.getContextPath() + "/perfil/update";
@@ -99,7 +97,7 @@
         </div>
 
         <% } else if (isAirline) {
-            BaseAirlineDTO a = (BaseAirlineDTO) user;
+            SoapBaseAirlineDTO a = (SoapBaseAirlineDTO) user;
         %>
         <!-- PÁGINA WEB -->
         <div>

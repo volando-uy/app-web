@@ -1,18 +1,17 @@
 package servlets.createFlight;
 
-import adapters.LocalDateAdapter;
-import adapters.LocalDateTimeAdapter;
-import com.labpa.appweb.flight.BaseFlightDTO;
 import com.labpa.appweb.flight.FlightSoapAdapter;
 import com.labpa.appweb.flight.FlightSoapAdapterService;
-import com.labpa.appweb.flightroute.BaseFlightRouteDTO;
+import com.labpa.appweb.flight.SoapBaseFlightDTO;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
 
+import com.labpa.appweb.flightroute.SoapBaseFlightRouteDTO;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import mappers.LocalDateTimeMapper;
 import utils.FileBase64Util;
 
 import java.io.*;
@@ -42,7 +41,7 @@ public class createFlightServlet extends HttpServlet {
 
 //        List<BaseFlightRouteDTO> routes =
 //                flightRouteController.getAllFlightRoutesSimpleDetailsByAirlineNickname(airlineNickname);
-        List<BaseFlightRouteDTO> routes =
+        List<SoapBaseFlightRouteDTO> routes =
                 flightRouteController.getAllFlightRoutesSimpleDetailsByAirlineNickname(airlineNickname).getItem();
 
         req.setAttribute("airlineNickname", airlineNickname);
@@ -103,19 +102,17 @@ public class createFlightServlet extends HttpServlet {
 
             // Convertir fechas
             DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-            LocalDateTime createdAt = LocalDateTime.parse(createdAtStr, fmt);
-            LocalDateTime departureTime = LocalDateTime.parse(departureTimeStr, fmt);
 
             // DTO
-            BaseFlightDTO dto = new BaseFlightDTO();
+            SoapBaseFlightDTO dto = new SoapBaseFlightDTO();
             dto.setName(name);
             dto.setDuration(duration != null && !duration.isEmpty() ? Long.parseLong(duration) : null);
             dto.setMaxBusinessSeats(maxBusinessSeats);
             dto.setMaxEconomySeats(maxEconomySeats);
 
-            dto.setCreatedAt(LocalDateTimeAdapter.fromJavaTime(createdAt));
+            dto.setCreatedAt(createdAtStr);
 
-            dto.setDepartureTime(LocalDateTimeAdapter.fromJavaTime(departureTime));
+            dto.setDepartureTime(departureTimeStr);
 
             // Crear vuelo
 //            flightSoapAdapter.createFlight(dto, airlineNickname, flightRouteName, imageFile);

@@ -327,6 +327,21 @@
                             <xnocompile>true</xnocompile>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>generate-constants-service</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>http://localhost:8086/api/constantsService?wsdl</wsdlUrl>
+                            </wsdlUrls>
+                            <packageName>com.labpa.appweb.constants</packageName>
+                            <encoding>UTF-8</encoding>
+                            <verbose>true</verbose>
+                            <xnocompile>true</xnocompile>
+                        </configuration>
+                    </execution>
 
                 </executions>
             </plugin>

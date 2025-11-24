@@ -102,7 +102,7 @@ public class RegisterUserServlet extends HttpServlet {
             req.setAttribute("Customer", customer);
         } else if ("aerolinea".equals(userType)) {
             System.out.println("Registrando aerolínea...");
-            BaseAirlineDTO airline = new BaseAirlineDTO();
+            SoapBaseAirlineDTO airline = new SoapBaseAirlineDTO();
 
 
             String web = req.getParameter("reg-web-a");

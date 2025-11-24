@@ -4,9 +4,11 @@ import com.labpa.appweb.auth.AuthSoapAdapter;
 import com.labpa.appweb.auth.AuthSoapAdapterService;
 import com.labpa.appweb.auth.SoapLoginResponseDTO;
 import com.labpa.appweb.auth.SoapUserDTO;
-import com.labpa.appweb.user.BaseAirlineDTO;
-import com.labpa.appweb.user.BaseCustomerDTO;
 
+import com.labpa.appweb.constants.ConstantsSoapAdapter;
+import com.labpa.appweb.constants.ConstantsSoapAdapterService;
+import com.labpa.appweb.user.SoapBaseAirlineDTO;
+import com.labpa.appweb.user.SoapBaseCustomerDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,7 +22,7 @@ import java.io.IOException;
 public class LoginUserServlet extends HttpServlet {
 
     private final AuthSoapAdapter port = new AuthSoapAdapterService().getAuthSoapAdapterPort();
-
+    private final ConstantsSoapAdapter constantsPort = new ConstantsSoapAdapterService().getConstantsSoapAdapterPort();
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -56,21 +58,28 @@ public class LoginUserServlet extends HttpServlet {
 
             // Mapear SOAPUserDTO a BaseCustomerDTO o BaseAirlineDTO (del paquete SOAP)
             Object usuario;
-            if (isCustomer) {
-                BaseCustomerDTO customer = new BaseCustomerDTO();
+            String userType=soapUser.getUserType();
+            System.out.println("User type detected: " + userType);
+            System.out.println("User: " + soapUser);
+            if (constantsPort.getValueConstants().getUSERTYPECUSTOMER().equals(userType)) {
+                SoapBaseCustomerDTO customer = new SoapBaseCustomerDTO();
                 customer.setNickname(soapUser.getNickname());
                 customer.setName(soapUser.getName());
                 customer.setMail(soapUser.getMail());
                 customer.setImage(soapUser.getImage());
+                customer.setUserType(constantsPort.getValueConstants().getUSERTYPECUSTOMER());
                 usuario = customer;
-
-            } else {
-                BaseAirlineDTO airline = new BaseAirlineDTO();
+            } else if (constantsPort.getValueConstants().getUSERTYPEAIRLINE().equals(userType)) {
+                SoapBaseAirlineDTO airline = new SoapBaseAirlineDTO();
                 airline.setNickname(soapUser.getNickname());
                 airline.setName(soapUser.getName());
                 airline.setMail(soapUser.getMail());
                 airline.setImage(soapUser.getImage());
+                airline.setUserType(constantsPort.getValueConstants().getUSERTYPEAIRLINE());
                 usuario = airline;
+            }else{
+                handleLoginError(req, resp, nickname, "Tipo de usuario desconocido");
+                return;
             }
 
             // Iniciar sesión
@@ -84,6 +93,8 @@ public class LoginUserServlet extends HttpServlet {
             newSession.setAttribute("type", isCustomer ? "customer" : "airline");
             newSession.setAttribute("toastMessage", soapUser.getNickname() + " logueado con éxito");
             newSession.setAttribute("toastType", "success");
+            String resourceClassName = usuario.getClass().getSimpleName();
+            newSession.setAttribute("resourceClassName", resourceClassName);
 
             System.out.println("Usuario logueado: " + soapUser.getNickname());
 

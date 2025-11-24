@@ -1,14 +1,13 @@
 package servlets.createFlightRoute;
 
-import adapters.LocalDateAdapter;
 import com.labpa.appweb.airport.AirportSoapAdapter;
 import com.labpa.appweb.airport.AirportSoapAdapterService;
 import com.labpa.appweb.airport.BaseAirportDTO;
 import com.labpa.appweb.category.CategorySoapAdapter;
 import com.labpa.appweb.category.CategorySoapAdapterService;
-import com.labpa.appweb.flightroute.BaseFlightRouteDTO;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
+import com.labpa.appweb.flightroute.SoapBaseFlightRouteDTO;
 import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapterService;
 
 import jakarta.servlet.ServletException;
@@ -16,6 +15,7 @@ import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import mappers.DateMapper;
+import mappers.LocalDateMapper;
 import utils.FileBase64Util;
 
 import java.io.*;
@@ -118,22 +118,16 @@ public class createFlightRouteServlet extends HttpServlet {
                 }
             }
 
-            // === Parseos ===
-            LocalDate createdAt = null;
-            if (createdAtStr != null && !createdAtStr.isEmpty()) {
-                createdAt = LocalDate.parse(createdAtStr);
-            }
+
             Double priceExtra = parseDouble(priceExtraStr);
             Double priceTourist = parseDouble(priceTouristStr);
             Double priceBusiness = parseDouble(priceBusinessStr);
 
             // === Construir DTO ===
-            BaseFlightRouteDTO dto = new BaseFlightRouteDTO();
+            SoapBaseFlightRouteDTO dto = new SoapBaseFlightRouteDTO();
             dto.setName(name);
             dto.setDescription(description);
-
-            dto.setCreatedAt(LocalDateAdapter.toSoapLocalDate(LocalDate.parse(req.getParameter("createdAt"))));
-
+            dto.setCreatedAt(createdAtStr);
             dto.setPriceExtraUnitBaggage(priceExtra);
             dto.setPriceTouristClass(priceTourist);
             dto.setPriceBusinessClass(priceBusiness);

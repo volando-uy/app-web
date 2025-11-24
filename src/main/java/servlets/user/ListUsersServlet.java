@@ -1,6 +1,6 @@
 package servlets.user;
 
-import com.labpa.appweb.user.UserDTO;
+import com.labpa.appweb.user.SoapUserDTO;
 import com.labpa.appweb.user.UserSoapAdapter;
 import com.labpa.appweb.user.UserSoapAdapterService;
 
@@ -25,10 +25,10 @@ public class ListUsersServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        List<UserDTO> users = port.getAllUsersSimpleDetails().getItem();
+        List<SoapUserDTO> users = port.getAllUsersSimpleDetails().getItem();
 
         Map<String, String> tiposPorUsuario = new HashMap<>();
-        for (UserDTO user : users) {
+        for (SoapUserDTO user : users) {
             String tipo;
             String className = user.getClass().getSimpleName();
             switch (className) {

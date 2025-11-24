@@ -16,7 +16,7 @@ public class TicketLuggageMapper {
         for (Map.Entry<BaseTicketDTO, List<LuggageDTO>> entry : ticketMap.entrySet()) {
             TicketWithLuggage twl = new TicketWithLuggage();
             twl.setTicket(entry.getKey());
-            twl.getLuggages().addAll(entry.getValue());
+            twl.getBasicLuggageOrExtraLuggage().addAll(entry.getValue());
             array.getItems().add(twl);
         }
 

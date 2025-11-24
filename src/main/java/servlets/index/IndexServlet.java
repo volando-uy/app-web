@@ -1,10 +1,10 @@
 package servlets.index;
 
 import adapters.FlightViewDTO;
-import com.labpa.appweb.flight.BaseFlightDTO;
-import com.labpa.appweb.flight.BaseFlightSoapViewDTO;
+
 import com.labpa.appweb.flight.FlightSoapAdapter;
 import com.labpa.appweb.flight.FlightSoapAdapterService;
+import com.labpa.appweb.flight.SoapBaseFlightDTO;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
 import com.labpa.appweb.flightroutepackage.BaseFlightRoutePackageDTO;
@@ -14,7 +14,6 @@ import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapterService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import mappers.FlightMapper;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -55,10 +54,10 @@ public class IndexServlet extends HttpServlet {
         List<BaseFlightRoutePackageDTO> packages = getPackagesPreferWithRoutes();
         req.setAttribute("packages", packages);
 
-        List<BaseFlightSoapViewDTO> list = flightPort.getAllFlightsSimpleDetails().getItem();
+        List<SoapBaseFlightDTO> list = flightPort.getAllFlightsSimpleDetails().getItem();
 
         List<FlightViewDTO> viewList = new ArrayList<>();
-        for (BaseFlightSoapViewDTO f : list) {
+        for (SoapBaseFlightDTO f : list) {
             FlightViewDTO dto = new FlightViewDTO();
 
             dto.setName(f.getName());

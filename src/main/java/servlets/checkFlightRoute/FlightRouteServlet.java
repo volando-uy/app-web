@@ -1,13 +1,13 @@
 package servlets.checkFlightRoute;
 
-import com.labpa.appweb.flight.FlightDTO;
 import com.labpa.appweb.flight.FlightSoapAdapter;
 import com.labpa.appweb.flight.FlightSoapAdapterService;
+import com.labpa.appweb.flight.SoapFlightDTO;
 import com.labpa.appweb.flightroute.EnumEstatusRuta;
-import com.labpa.appweb.flightroute.FlightRouteDTO;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
-import com.labpa.appweb.user.AirlineDTO;
+import com.labpa.appweb.flightroute.SoapFlightRouteDTO;
+import com.labpa.appweb.user.SoapAirlineDTO;
 import com.labpa.appweb.user.UserSoapAdapter;
 import com.labpa.appweb.user.UserSoapAdapterService;
 
@@ -75,14 +75,14 @@ public class FlightRouteServlet extends HttpServlet {
         String flightParam = req.getParameter("flight");
 
         if (airlineParam == null) {
-            List<AirlineDTO> airlines = userController.getAllAirlinesDetails().getItem();
+            List<SoapAirlineDTO> airlines = userController.getAllAirlinesDetails().getItem();
             req.setAttribute("airlines", airlines);
             req.getRequestDispatcher("/src/views/checkflightroute/checkflightroute.jsp").forward(req, resp);
             return;
         }
 
         if (routeParam == null) {
-            List<FlightRouteDTO> routes = flightRouteController.getAllFlightRoutesDetailsByAirlineNickname(airlineParam).getItem();
+            List<SoapFlightRouteDTO> routes = flightRouteController.getAllFlightRoutesDetailsByAirlineNickname(airlineParam).getItem();
 
             routes = routes.stream()
                     .filter(r -> r.getStatus() != null && r.getStatus() == EnumEstatusRuta.CONFIRMADA)
@@ -94,11 +94,11 @@ public class FlightRouteServlet extends HttpServlet {
             return;
         }
 
-        FlightRouteDTO route = flightRouteController.getFlightRouteDetailsByName(routeParam);
+        SoapFlightRouteDTO route = flightRouteController.getFlightRouteDetailsByName(routeParam);
         req.setAttribute("route", route);
 
         if (flightParam != null) {
-            FlightDTO flight = flightController.getFlightDetailsByName(flightParam);
+            SoapFlightDTO flight = flightController.getFlightDetailsByName(flightParam);
             req.setAttribute("flight", flight);
         }
 

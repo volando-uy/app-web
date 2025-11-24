@@ -1,7 +1,9 @@
 package servlets.profile;
 
-import adapters.LocalDateWithValue;
-import com.labpa.appweb.images.ImageConstantsDTO;
+
+import com.labpa.appweb.constants.ConstantsSoapAdapter;
+import com.labpa.appweb.constants.ConstantsSoapAdapterService;
+import com.labpa.appweb.constants.ImageConstantsDTO;
 import com.labpa.appweb.images.ImagesSoapAdapter;
 import com.labpa.appweb.images.ImagesSoapAdapterService;
 import com.labpa.appweb.user.*;
@@ -10,6 +12,7 @@ import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import mappers.DateMapper;
+import mappers.LocalDateMapper;
 import utils.FileBase64Util;
 import utils.ImageStorageUtils;
 
@@ -27,7 +30,8 @@ import java.time.format.DateTimeFormatter;
 public class UpdateProfileServlet extends HttpServlet {
 
     private final UserSoapAdapter port = new UserSoapAdapterService().getUserSoapAdapterPort();
-    private final ImagesSoapAdapter imageport = new ImagesSoapAdapterService().getImagesSoapAdapterPort();
+
+    private final ConstantsSoapAdapter constantsSoapAdapter = new ConstantsSoapAdapterService().getConstantsSoapAdapterPort();
 
 
     @Override
@@ -42,12 +46,13 @@ public class UpdateProfileServlet extends HttpServlet {
         String nickname = (String) session.getAttribute("nickname");
 
         // Obtenemos los datos simples del usuario
-        UserDTO user = port.getUserSimpleDetailsByNickname(nickname);
+        SoapUserDTO user = port.getUserSimpleDetailsByNickname(nickname);
         if (tipo.equals("customer")) {
             SoapBaseCustomerDTO customer = port.getCustomerSimpleDetailsByNickname(user.getNickname());
             System.out.println("fecha nac: " + customer.getBirthDate().toString());
-            LocalDateWithValue birthDate = new LocalDateWithValue(customer.getBirthDate());
-            System.out.println("birthdate + value: " + birthDate.getValue());
+            LocalDate birthDate = LocalDateMapper.toLocalDate(customer.getBirthDate());
+            System.out.println("birthdate VALUE: " + birthDate);
+            System.out.println("birthdate CUSTOMER: " + customer.getBirthDate());
             req.setAttribute("customer", customer);
         }
         req.setAttribute("user", user);
@@ -66,13 +71,14 @@ public class UpdateProfileServlet extends HttpServlet {
             return;
         }
 
-        ImageConstantsDTO imageConstantsDTO = imageport.getImageConstants();
+        ImageConstantsDTO imageConstantsDTO = constantsSoapAdapter.getImageConstants();
         String nickname = (String) session.getAttribute("nickname");
-        String type = (String) session.getAttribute("type");
 
-        boolean isCustomer = type.equals("customer");
 
-        UserDTO userDetails = port.getUserSimpleDetailsByNickname(nickname);
+        SoapUserDTO userDetails = port.getUserSimpleDetailsByNickname(nickname);
+        String type = userDetails.getUserType();
+        boolean isCustomer = constantsSoapAdapter.getValueConstants().getUSERTYPECUSTOMER().equals(type);
+
         System.out.println("userDetails class: " + userDetails.getClass().getSimpleName());
         Part imagePart = req.getPart("profileImage");
 
@@ -92,18 +98,15 @@ public class UpdateProfileServlet extends HttpServlet {
                     imageBase64 = FileBase64Util.fileToBase64(finalImage);
                 }
 
-                String fechaNacimientoStr = req.getParameter("birthDate");
 
                 SoapBaseCustomerDTO dto = new SoapBaseCustomerDTO();
                 dto.setName(req.getParameter("name"));
+                dto.setNickname(userDetails.getNickname());
+                dto.setMail(userDetails.getMail());
+                dto.setPassword(userDetails.getPassword());
+
                 dto.setSurname(req.getParameter("surname"));
-//                dto.setBirthDate(
-//                        DateMapper.toSoapLocalDate(
-//                                LocalDate.parse(req.getParameter("birthDate"), DateTimeFormatter.ISO_LOCAL_DATE)
-//                        )
-//                );
-                LocalDate fechaNacimiento = LocalDate.parse(fechaNacimientoStr, DateTimeFormatter.ISO_LOCAL_DATE);
-                dto.setBirthDate(fechaNacimiento.toString()); // yyyy-MM-dd
+                dto.setBirthDate(req.getParameter("birthDate"));
                 dto.setCitizenship(req.getParameter("citizenship"));
                 dto.setDocType(EnumTipoDocumento.valueOf(req.getParameter("docType")));
                 dto.setNumDoc(req.getParameter("numDoc"));
@@ -111,13 +114,13 @@ public class UpdateProfileServlet extends HttpServlet {
                 // Update por SOAP
                 try {
                     System.out.println("imagebase64" + imageBase64);
-                    UserDTO updated = (UserDTO) port.updateUserC(nickname, dto, imageBase64 != null ? imageBase64 : "");
+                    SoapUserDTO updated = port.updateUser(nickname, dto, imageBase64 != null ? imageBase64 : "");
                     session.setAttribute("usuario", updated);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-            } else if (userDetails instanceof BaseAirlineDTO) {
+            } else if (type.equals(constantsSoapAdapter.getValueConstants().getUSERTYPEAIRLINE())) {
                 if (imagePart != null && imagePart.getSize() > 0) {
 
                     finalImage = ImageStorageUtils.saveImage(
@@ -128,12 +131,17 @@ public class UpdateProfileServlet extends HttpServlet {
                     );
                     imageBase64 = FileBase64Util.fileToBase64(finalImage);
                 }
-                BaseAirlineDTO dto = new BaseAirlineDTO();
-                dto.setName(req.getParameter("name"));
+                SoapBaseAirlineDTO dto = new SoapBaseAirlineDTO();
+                dto.setName(userDetails.getName());
+                dto.setNickname(userDetails.getNickname());
+                dto.setMail(userDetails.getMail());
+                dto.setPassword(userDetails.getPassword());
+
+
                 dto.setDescription(req.getParameter("description"));
                 dto.setWeb(req.getParameter("web"));
 
-                UserDTO updated = (UserDTO) port.updateUser(nickname, dto, imageBase64 != null ? imageBase64 : "");
+                SoapUserDTO updated = port.updateUser(nickname, dto, imageBase64 != null ? imageBase64 : "");
                 session.setAttribute("usuario", updated);
             }
 
