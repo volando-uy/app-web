@@ -357,7 +357,21 @@
                             <xnocompile>true</xnocompile>
                         </configuration>
                     </execution>
-
+                    <execution>
+                        <id>generate-pdf-service</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>http://localhost:8086/api/pdfService?wsdl</wsdlUrl>
+                            </wsdlUrls>
+                            <packageName>com.labpa.appweb.pdf</packageName>
+                            <encoding>UTF-8</encoding>
+                            <verbose>true</verbose>
+                            <xnocompile>true</xnocompile>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 

@@ -1,8 +1,8 @@
 <!-- Notyf y Tailwind -->
 <%@ include file="/src/components/layout/libs.jspf" %> <!-- Taglibs aquí una sola vez -->
 
-<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="${pageContext.request.contextPath}/resources/js/notyf.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/tailwind.min.js"></script>
 
 <script>
     // Context Path global para tus JS
