@@ -44,12 +44,6 @@
             <artifactId>gson</artifactId>
             <version>2.13.2</version>
         </dependency>
-        <!-- Tu librería VolandoUY -->
-<!--        <dependency>-->
-<!--            <groupId>com.gyabisito</groupId>-->
-<!--            <artifactId>VolandoUY</artifactId>-->
-<!--            <version>1.0-SNAPSHOT</version>-->
-<!--        </dependency>-->
 
         <!-- JAXB moderno -->
         <dependency>
