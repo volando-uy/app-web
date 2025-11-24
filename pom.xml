@@ -342,6 +342,21 @@
                             <xnocompile>true</xnocompile>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>generate-countries-service</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>http://localhost:8086/api/countriesService?wsdl</wsdlUrl>
+                            </wsdlUrls>
+                            <packageName>com.labpa.appweb.countries</packageName>
+                            <encoding>UTF-8</encoding>
+                            <verbose>true</verbose>
+                            <xnocompile>true</xnocompile>
+                        </configuration>
+                    </execution>
 
                 </executions>
             </plugin>

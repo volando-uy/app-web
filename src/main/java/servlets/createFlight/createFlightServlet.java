@@ -82,7 +82,7 @@ public class createFlightServlet extends HttpServlet {
 //                }
 //            }
             File imageFile = null;
-            String base64Image = null;
+            String base64Image = "";
 
             if (imagePart != null && imagePart.getSize() > 0) {
                 String uploadPath = getServletContext().getRealPath("/uploads");
