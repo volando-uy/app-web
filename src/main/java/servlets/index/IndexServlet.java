@@ -5,8 +5,10 @@ import adapters.FlightViewDTO;
 import com.labpa.appweb.flight.FlightSoapAdapter;
 import com.labpa.appweb.flight.FlightSoapAdapterService;
 import com.labpa.appweb.flight.SoapBaseFlightDTO;
+import com.labpa.appweb.flightroute.EnumEstatusRuta;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
+import com.labpa.appweb.flightroute.SoapFlightRouteDTO;
 import com.labpa.appweb.flightroutepackage.BaseFlightRoutePackageDTO;
 import com.labpa.appweb.flightroutepackage.FlightRoutePackage;
 import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapter;
@@ -30,8 +32,11 @@ public class IndexServlet extends HttpServlet {
 ////            ControllerFactory.getFlightController();
     private FlightSoapAdapterService flightSoapAdapterService = new FlightSoapAdapterService();
     private FlightSoapAdapter flightPort = flightSoapAdapterService.getFlightSoapAdapterPort();
-    private FlightRoutePackageSoapAdapterService flightRouteSoapAdapterService = new FlightRoutePackageSoapAdapterService();
-    private FlightRoutePackageSoapAdapter flightRoutePackagePort = flightRouteSoapAdapterService.getFlightRoutePackageSoapAdapterPort();
+    private FlightRoutePackageSoapAdapterService flightRoutePackageSoapAdapterService = new FlightRoutePackageSoapAdapterService();
+    private FlightRoutePackageSoapAdapter flightRoutePackagePort = flightRoutePackageSoapAdapterService.getFlightRoutePackageSoapAdapterPort();
+    private FlightRouteSoapAdapter flightRouteSoapAdapter = new FlightRouteSoapAdapterService().getFlightRouteSoapAdapterPort();
+
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -74,6 +79,39 @@ public class IndexServlet extends HttpServlet {
         req.setAttribute("flights", viewList);
         req.setAttribute("flightsCount", viewList.size());
 
+        List<BaseFlightRoutePackageDTO> pkgs;
+        Map<String, List<SoapFlightRouteDTO>> pkgRoutes = new HashMap<>();
+        try {
+            pkgs = flightRoutePackagePort.getAllFlightRoutesPackagesSimpleDetailsWithFlightRoutes().getItem();
+            if (pkgs == null) pkgs = Collections.emptyList();
+        } catch (Exception e) {
+            pkgs = Collections.emptyList();
+        }
+
+// rutas confirmadas por paquete
+        for (BaseFlightRoutePackageDTO p : pkgs) {
+            String name = Optional.ofNullable(p.getName()).orElse("");
+            if (name.isBlank()) continue;
+
+            List<SoapFlightRouteDTO> routes;
+            try {
+                routes = flightRouteSoapAdapter.getAllFlightRoutesDetailsByPackageName(name).getItem();
+                if (routes == null) routes = Collections.emptyList();
+            } catch (Exception e) {
+                routes = Collections.emptyList();
+            }
+
+            List<SoapFlightRouteDTO> confirmed = routes.stream()
+                    .filter(r -> r != null && r.getStatus() == EnumEstatusRuta.CONFIRMADA)
+                    .sorted(Comparator.comparing(SoapFlightRouteDTO::getName, String.CASE_INSENSITIVE_ORDER))
+                    .toList();
+
+            pkgRoutes.put(name, confirmed);
+        }
+
+// asignar al request
+        req.setAttribute("pkgs", pkgs);
+        req.setAttribute("pkgRoutes", pkgRoutes);
 
         req.getRequestDispatcher("/index.jsp").forward(req, resp);
     }

@@ -1,5 +1,48 @@
 // index.js
+document.addEventListener("DOMContentLoaded", () => {
+    const slidesContainer = document.getElementById("package-slides");
+    const slides = slidesContainer?.children || [];
+    const prevBtn = document.getElementById("carousel-prev");
+    const nextBtn = document.getElementById("carousel-next");
+    let index = 0;
 
+    function updateCarousel() {
+        const offset = -index * 100;
+        slidesContainer.style.transform = `translateX(${offset}%)`;
+    }
+
+    prevBtn?.addEventListener("click", () => {
+        if (index > 0) {
+            index--;
+            updateCarousel();
+        }
+    });
+
+    nextBtn?.addEventListener("click", () => {
+        if (index < slides.length - 1) {
+            index++;
+            updateCarousel();
+        }
+    });
+
+    // Optional: swipe support
+    let startX = 0;
+    slidesContainer.addEventListener("touchstart", (e) => {
+        startX = e.touches[0].clientX;
+    });
+
+    slidesContainer.addEventListener("touchend", (e) => {
+        const endX = e.changedTouches[0].clientX;
+        const diff = startX - endX;
+        if (diff > 50 && index < slides.length - 1) {
+            index++;
+            updateCarousel();
+        } else if (diff < -50 && index > 0) {
+            index--;
+            updateCarousel();
+        }
+    });
+});
 (function () {
     function getBase() {
         if (window.__BASE__) return window.__BASE__;
@@ -23,45 +66,10 @@
             });
         }, { threshold: 0.18 });
         obs.observe(el);
-    }
 
-    async function injectHeader() {
-        var container = $("#header-container");
-        if (!container) return;
-        try {
-            var res = await fetch(BASE + "/src/views/header/header.html", { cache: "no-cache" });
-            if (!res.ok) throw new Error("HTTP " + res.status);
-            container.innerHTML = await res.text();
-
-            // Cargar el JS del header (si existe)
-            var script = document.createElement("script");
-            script.src = BASE + "/src/views/header/header.js";
-            script.defer = true;
-            script.onload = function () {
-                try { if (typeof window.initHeader === "function") window.initHeader(); } catch (_) {}
-            };
-            document.body.appendChild(script);
-        } catch (err) {
-            console.warn("[header] No se pudo inyectar:", err);
-        }
-    }
-
-    async function injectFooter() {
-        var container = $("#footer-container");
-        if (!container) return;
-        try {
-            var res = await fetch(BASE + "/src/views/footer/footer.html", { cache: "no-cache" });
-            if (!res.ok) throw new Error("HTTP " + res.status);
-            container.innerHTML = await res.text();
-
-        } catch (err) {
-            console.warn("[footer] No se pudo inyectar:", err);
-        }
     }
 
     function init() {
-         injectHeader();
-        injectFooter();
 
         // Animaciones suaves
         animateOnScroll(document.getElementById("paquetes"));
