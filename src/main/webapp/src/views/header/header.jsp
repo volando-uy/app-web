@@ -1,13 +1,14 @@
-<%@ page import="domain.dtos.user.BaseAirlineDTO" %>
-<%@ page import="domain.dtos.user.BaseCustomerDTO" %>
-<%@ page import="domain.dtos.user.UserDTO" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ include file="/src/components/layout/libs.jspf" %>
-<!-- Taglibs aquí una sola vez -->
+<%@ page import="com.labpa.appweb.user.SoapUserDTO" %>
+<%@ page import="com.labpa.appweb.user.SoapBaseCustomerDTO" %>
+<%@ page import="com.labpa.appweb.user.SoapBaseAirlineDTO" %>
+
 <%
-    UserDTO user = (UserDTO) session.getAttribute("usuario");
-    boolean isCustomer = user instanceof BaseCustomerDTO;
-    boolean isAirline = user instanceof BaseAirlineDTO;
+    SoapUserDTO user = (SoapUserDTO) session.getAttribute("usuario");
+
+    boolean isCustomer = user instanceof SoapBaseCustomerDTO;
+    boolean isAirline = user instanceof SoapBaseAirlineDTO;
 %>
 
 <header class="sticky top-0 z-50 bg-brand text-white shadow-md">

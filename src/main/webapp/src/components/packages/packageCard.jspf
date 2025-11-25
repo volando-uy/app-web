@@ -11,7 +11,7 @@
 <c:set var="sumRef" value="0"/>
 <c:forEach var="r" items="${routes}">
     <c:if test="${not empty r.priceTouristClass}">
-        <c:set var="sumRef" value="${sumRef + r.priceTouristClass}"/>
+        <c:set var="sumRef" value="${sumRef + (pkg.seatType.toString() == \"Tourist\" ? r.priceTouristClass : r.priceBusinessClass)}"/>
     </c:if>
 </c:forEach>
 

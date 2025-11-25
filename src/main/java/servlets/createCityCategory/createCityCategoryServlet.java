@@ -1,34 +1,53 @@
 package servlets.createCityCategory;
 
-import controllers.category.CategoryController;
-import controllers.city.CityController;
-import domain.dtos.category.CategoryDTO;
-import domain.dtos.city.BaseCityDTO;
-import domain.services.category.CategoryService;
-import domain.services.city.CityService;
+import com.labpa.appweb.category.CategoryDTO;
+import com.labpa.appweb.category.CategorySoapAdapter;
+import com.labpa.appweb.category.CategorySoapAdapterService;
+import com.labpa.appweb.city.BaseCityDTO;
+import com.labpa.appweb.city.CitySoapAdapter;
+import com.labpa.appweb.city.CitySoapAdapterService;
 
+
+import com.labpa.appweb.countries.SoapCountriesAdapter;
+import com.labpa.appweb.countries.SoapCountriesAdapterService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 @WebServlet("/createCityAndCategory")
 public class createCityCategoryServlet extends HttpServlet {
 
-    private CategoryController categoryController;
-    private CityController cityController;
+//    private CategoryController categoryController;
+//    private CityController cityController;
 
-    @Override
-    public void init() throws ServletException {
-        categoryController = new CategoryController(new CategoryService());
-        cityController = new CityController(new CityService());
-    }
+    private CategorySoapAdapterService categorySoapAdapterService = new CategorySoapAdapterService();
+    private CategorySoapAdapter categoryController = categorySoapAdapterService.getCategorySoapAdapterPort();
+
+    private CitySoapAdapterService citySoapAdapterService = new CitySoapAdapterService();
+    private CitySoapAdapter cityController = citySoapAdapterService.getCitySoapAdapterPort();
+
+
+    private SoapCountriesAdapter soapCountriesAdapter=new SoapCountriesAdapterService().getSoapCountriesAdapterPort();
+//    @Override
+//    public void init() throws ServletException {
+////        categoryController = new CategoryController(new CategoryService());
+////        cityController = new CityController(new CityService());
+//
+//    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        // Obtener lista de países
+        List<String> countries = soapCountriesAdapter.getAllCountries().getItem();
+
+        // Pasarla como atributo al JSP
+        req.setAttribute("countries", countries);
+
         req.getRequestDispatcher("/src/views/createCityAndCategory/createCityAndCategory.jsp").forward(req, resp);
     }
 
@@ -53,13 +72,15 @@ public class createCityCategoryServlet extends HttpServlet {
                         handleError(request, response, "El nombre de la categoría es obligatorio");
                         return;
                     }
-
-                    CategoryDTO created = categoryController.createCategory(new CategoryDTO(name));
+                    CategoryDTO dto = new CategoryDTO();
+                    dto.setName(name);
+                    CategoryDTO created = categoryController.createCategory(dto);
                     HttpSession session = request.getSession();
                     session.setAttribute("toastMessage", "Categoría creada correctamente: " + created.getName());
                     session.setAttribute("toastType", "success");
                     response.sendRedirect(request.getContextPath() + "/createFlight");
                 }
+
 
                 case "createCity" -> {
                     String name = request.getParameter("name");
@@ -75,8 +96,23 @@ public class createCityCategoryServlet extends HttpServlet {
                     BaseCityDTO dto = new BaseCityDTO();
                     dto.setName(name);
                     dto.setCountry(country);
-                    dto.setLatitude(latitude != null && !latitude.isEmpty() ? Double.parseDouble(latitude) : null);
-                    dto.setLongitude(longitude != null && !longitude.isEmpty() ? Double.parseDouble(longitude) : null);
+                    Double lat = null;
+                    Double lon = null;
+
+                    try {
+                        if (latitude != null && !latitude.trim().isEmpty()) {
+                            lat = Double.parseDouble(latitude);
+                        }
+                        if (longitude != null && !longitude.trim().isEmpty()) {
+                            lon = Double.parseDouble(longitude);
+                        }
+                    } catch (NumberFormatException e) {
+                        handleError(request, response, "Latitud o longitud no tienen un formato válido.");
+                        return;
+                    }
+
+                    dto.setLatitude(lat);
+                    dto.setLongitude(lon);
 
                     BaseCityDTO created = cityController.createCity(dto);
                     HttpSession session = request.getSession();

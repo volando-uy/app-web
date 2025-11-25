@@ -2,16 +2,19 @@
 
 package servlets.packageservlet;
 
-import controllers.buypackage.IBuyPackageController;
-import controllers.flightroutepackage.IFlightRoutePackageController;
 
-import domain.dtos.buypackage.BaseBuyPackageDTO;
-import domain.dtos.flightroutepackage.BaseFlightRoutePackageDTO;
-
-import factory.ControllerFactory;
+import com.labpa.appweb.buypackage.BaseBuyPackageDTO;
+import com.labpa.appweb.buypackage.BuyPackageSoapAdapter;
+import com.labpa.appweb.buypackage.BuyPackageSoapAdapterService;
+import com.labpa.appweb.flightroutepackage.BaseFlightRoutePackageDTO;
+import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapter;
+import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapterService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -23,10 +26,15 @@ import java.util.Date;
 @WebServlet("/package/buypackage")
 public class BuyPackageServlet extends HttpServlet {
 
-    private final IBuyPackageController buyCtrl =
-            ControllerFactory.getBuyPackageController();
-    private final IFlightRoutePackageController pkgCtrl =
-            ControllerFactory.getFlightRoutePackageController();
+    //    private final IBuyPackageController buyCtrl =
+//            ControllerFactory.getBuyPackageController();
+//    private final IFlightRoutePackageController pkgCtrl =
+//            ControllerFactory.getFlightRoutePackageController();
+    private FlightRoutePackageSoapAdapterService flightRoutePackageService = new FlightRoutePackageSoapAdapterService();
+    private FlightRoutePackageSoapAdapter flightRoutePackageSoapAdapter = flightRoutePackageService.getFlightRoutePackageSoapAdapterPort();
+
+    private BuyPackageSoapAdapterService buyPackageService = new BuyPackageSoapAdapterService();
+    private BuyPackageSoapAdapter buyPackageSoapAdapter = buyPackageService.getBuyPackageSoapAdapterPort();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -51,8 +59,11 @@ public class BuyPackageServlet extends HttpServlet {
         }
 
         BaseFlightRoutePackageDTO pkg = null;
-        try { pkg = pkgCtrl.getFlightRoutePackageSimpleDetailsByName(pkgName); }
-        catch (Exception ignored) {}
+        try {
+//            pkg = pkgCtrl.getFlightRoutePackageSimpleDetailsByName(pkgName);
+            pkg = flightRoutePackageSoapAdapter.getFlightRoutePackageSimpleDetailsByName(pkgName);
+        } catch (Exception ignored) {
+        }
 
         if (pkg == null) {
             toast(req, "Paquete no encontrado", "error");
@@ -61,10 +72,10 @@ public class BuyPackageServlet extends HttpServlet {
         }
 
         LocalDate purchaseDate = LocalDate.now(ZoneId.systemDefault());
-        LocalDate expiry       = purchaseDate.plusDays(Math.max(0, pkg.getValidityPeriodDays()));
+        LocalDate expiry = purchaseDate.plusDays(Math.max(0, pkg.getValidityPeriodDays()));
         ZoneId zone = ZoneId.systemDefault();
         Date purchaseLegacy = Date.from(purchaseDate.atStartOfDay(zone).toInstant());
-        Date expiryLegacy   = Date.from(expiry.atStartOfDay(zone).toInstant());
+        Date expiryLegacy = Date.from(expiry.atStartOfDay(zone).toInstant());
 
         req.setAttribute("pkg", pkg);
         req.setAttribute("purchaseDateLegacy", purchaseLegacy);
@@ -99,7 +110,8 @@ public class BuyPackageServlet extends HttpServlet {
         }
 
         try {
-            BaseBuyPackageDTO purchase = buyCtrl.createBuyPackage(nick, pkgName);
+//            BaseBuyPackageDTO purchase = buyCtrl.createBuyPackage(nick, pkgName);
+            BaseBuyPackageDTO purchase = buyPackageSoapAdapter.createBuyPackage(nick, pkgName);
             toast(req, "Compra realizada (ID " + (purchase != null ? purchase.getId() : "-") + ")", "success");
             resp.sendRedirect(req.getContextPath() + "/perfil");
 
@@ -115,16 +127,27 @@ public class BuyPackageServlet extends HttpServlet {
         }
     }
 
-    private static void setupEncoding(HttpServletResponse resp , HttpServletRequest req) {
-        try { req.setCharacterEncoding("UTF-8"); } catch (Exception ignored) {}
+    private static void setupEncoding(HttpServletResponse resp, HttpServletRequest req) {
+        try {
+            req.setCharacterEncoding("UTF-8");
+        } catch (Exception ignored) {
+        }
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html; charset=UTF-8");
     }
-    private static String trim(String s) { return (s == null) ? null : s.trim(); }
-    private static String url(String s){
-        try { return URLEncoder.encode(s, StandardCharsets.UTF_8); }
-        catch (Exception e) { return s; }
+
+    private static String trim(String s) {
+        return (s == null) ? null : s.trim();
     }
+
+    private static String url(String s) {
+        try {
+            return URLEncoder.encode(s, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return s;
+        }
+    }
+
     private static void toast(HttpServletRequest req, String msg, String type) {
         HttpSession session = req.getSession();
         session.setAttribute("toastMessage", msg);

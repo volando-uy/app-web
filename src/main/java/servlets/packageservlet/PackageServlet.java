@@ -1,13 +1,13 @@
 package servlets.packageservlet;
 
-import controllers.flightroute.IFlightRouteController;
-import controllers.flightroutepackage.IFlightRoutePackageController;
+import com.labpa.appweb.flightroute.EnumEstatusRuta;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
+import com.labpa.appweb.flightroute.SoapFlightRouteDTO;
+import com.labpa.appweb.flightroutepackage.BaseFlightRoutePackageDTO;
+import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapter;
+import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapterService;
 
-import domain.dtos.flightroute.FlightRouteDTO;
-import domain.dtos.flightroutepackage.BaseFlightRoutePackageDTO;
-import domain.models.enums.EnumEstatusRuta;
-
-import factory.ControllerFactory;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -22,11 +22,14 @@ import java.util.stream.Collectors;
 @WebServlet("/packages/list")
 public class PackageServlet extends HttpServlet {
 
-    private final IFlightRoutePackageController packageController =
-            ControllerFactory.getFlightRoutePackageController();
-    private final IFlightRouteController routeCtrl =
-            ControllerFactory.getFlightRouteController();
-
+//    private final IFlightRoutePackageController packageController =
+//            ControllerFactory.getFlightRoutePackageController();
+//    private final IFlightRouteController routeCtrl =
+//            ControllerFactory.getFlightRouteController();
+    private FlightRoutePackageSoapAdapterService flightRoutePackageService = new FlightRoutePackageSoapAdapterService();
+    private FlightRoutePackageSoapAdapter soapAdapter = flightRoutePackageService.getFlightRoutePackageSoapAdapterPort();
+    private FlightRouteSoapAdapterService flightRouteService = new FlightRouteSoapAdapterService();
+    private FlightRouteSoapAdapter flightRouteSoapAdapter = flightRouteService.getFlightRouteSoapAdapterPort();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -43,7 +46,8 @@ public class PackageServlet extends HttpServlet {
         // 1) Paquetes "simples con rutas" (tu método que ya venías usando)
         List<BaseFlightRoutePackageDTO> pkgs;
         try {
-            pkgs = packageController.getAllFlightRoutesPackagesSimpleDetailsWithFlightRoutes();
+//            pkgs = packageController.getAllFlightRoutesPackagesSimpleDetailsWithFlightRoutes();
+            pkgs = soapAdapter.getAllFlightRoutesPackagesSimpleDetailsWithFlightRoutes().getItem();
             if (pkgs == null) pkgs = Collections.emptyList();
         } catch (Exception e) {
             hadError = true;
@@ -52,15 +56,16 @@ public class PackageServlet extends HttpServlet {
         }
 
         // Rutas por paquete
-        Map<String, List<FlightRouteDTO>> pkgRoutes = new HashMap<>();
+        Map<String, List<SoapFlightRouteDTO>> pkgRoutes = new HashMap<>();
         for (BaseFlightRoutePackageDTO p : pkgs) {
             if (p == null) continue;
             String pkgName = p.getName();
             if (isBlank(pkgName)) continue;
 
-            List<FlightRouteDTO> routes;
+            List<SoapFlightRouteDTO> routes;
             try {
-                routes = routeCtrl.getAllFlightRoutesDetailsByPackageName(pkgName);
+//                routes = routeCtrl.getAllFlightRoutesDetailsByPackageName(pkgName);
+                routes = flightRouteSoapAdapter.getAllFlightRoutesDetailsByPackageName(pkgName).getItem();
                 if (routes == null) routes = Collections.emptyList();
             } catch (Exception ex) {
                 hadError = true;
@@ -68,9 +73,9 @@ public class PackageServlet extends HttpServlet {
                 routes = Collections.emptyList();
             }
 
-            List<FlightRouteDTO> confirmed = routes.stream()
+            List<SoapFlightRouteDTO> confirmed = routes.stream()
                     .filter(r -> r != null && r.getStatus() == EnumEstatusRuta.CONFIRMADA)
-                    .sorted(Comparator.comparing(FlightRouteDTO::getName, String.CASE_INSENSITIVE_ORDER))
+                    .sorted(Comparator.comparing(SoapFlightRouteDTO::getName, String.CASE_INSENSITIVE_ORDER))
                     .collect(Collectors.toList());
 
             pkgRoutes.put(pkgName, confirmed);
@@ -88,8 +93,8 @@ public class PackageServlet extends HttpServlet {
                 String haystack = (opt(p.getName()) + " " + opt(p.getDescription())).toLowerCase();
                 if (haystack.contains(qParam)) return true;
 
-                List<FlightRouteDTO> rs = pkgRoutes.getOrDefault(opt(p.getName()), Collections.emptyList());
-                for (FlightRouteDTO r : rs) {
+                List<SoapFlightRouteDTO> rs = pkgRoutes.getOrDefault(opt(p.getName()), Collections.emptyList());
+                for (SoapFlightRouteDTO r : rs) {
                     String rStr = (opt(r.getName()) + " " + opt(r.getAirlineNickname()) + " "
                             + opt(r.getOriginAeroCode()) + " " + opt(r.getDestinationAeroCode())).toLowerCase();
                     if (rStr.contains(qParam)) return true;
@@ -105,8 +110,8 @@ public class PackageServlet extends HttpServlet {
         if (!modalParam.isEmpty() && filtered.stream().anyMatch(p -> opt(p.getName()).equals(modalParam))) {
             modalPkgName = modalParam;
             if (!routeParam.isEmpty()) {
-                List<FlightRouteDTO> routes = pkgRoutes.getOrDefault(modalPkgName, Collections.emptyList());
-                for (FlightRouteDTO r : routes) {
+                List<SoapFlightRouteDTO> routes = pkgRoutes.getOrDefault(modalPkgName, Collections.emptyList());
+                for (SoapFlightRouteDTO r : routes) {
                     if (r != null && routeParam.equalsIgnoreCase(opt(r.getName()))) {
                         safeRouteParam = routeParam;
                         break;

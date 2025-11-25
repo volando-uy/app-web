@@ -1,9 +1,12 @@
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ include file="/src/components/layout/libs.jspf" %>
 <!DOCTYPE html>
 <html lang="es">
 <%
     request.setAttribute("pageTitle", "Crear Ciudad y Categoria - Volando.uy");
+    List<String> countries = (List<String>) request.getAttribute("countries");
+
 %>
 
 <%@ include file="/src/components/layout/head.jspf" %>
@@ -25,16 +28,23 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-600">País *</label>
-                    <input name="country" type="text" class="mt-1 w-full border rounded-lg px-3 py-2" placeholder="Ej: Uruguay" required>
+                    <select name="country" required class="mt-1 w-full border rounded-lg px-3 py-2">
+                        <option value="" disabled selected>Selecciona un país</option>
+                        <% if (countries != null) {
+                            for (String country : countries) { %>
+                        <option value="<%= country %>"><%= country %></option>
+                        <%   }
+                        } %>
+                    </select>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-600">Latitud</label>
-                        <input name="latitude" type="text" class="mt-1 w-full border rounded-lg px-3 py-2" placeholder="-34.9011">
+                        <input name="latitude" type="number" step="any" class="mt-1 w-full border rounded-lg px-3 py-2" placeholder="-34.9011">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-600">Longitud</label>
-                        <input name="longitude" type="text" class="mt-1 w-full border rounded-lg px-3 py-2" placeholder="-56.1645">
+                        <input name="longitude" type="number" step="any" class="mt-1 w-full border rounded-lg px-3 py-2" placeholder="-56.1645">
                     </div>
                 </div>
                 <button type="submit" class="w-full bg-brand text-white py-2 rounded-lg hover:bg-blue-700 transition">Registrar ciudad</button>

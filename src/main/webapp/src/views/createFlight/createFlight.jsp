@@ -1,6 +1,6 @@
-<%@ page import="domain.dtos.user.BaseAirlineDTO" %>
+<%@ page import="com.labpa.appweb.user.SoapBaseAirlineDTO" %>
 <%@ page import="java.util.List" %>
-<%@ page import="domain.dtos.flightroute.BaseFlightRouteDTO" %>
+<%@ page import="com.labpa.appweb.flightroute.SoapBaseFlightRouteDTO" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ include file="/src/components/layout/libs.jspf" %>
 <!DOCTYPE html>

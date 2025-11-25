@@ -1,18 +1,20 @@
 package utils;
 
-import controllers.auth.IAuthController;
-import factory.ControllerFactory;
+import com.labpa.appweb.auth.AuthSoapAdapter;
+import com.labpa.appweb.auth.AuthSoapAdapterService;
+
 import jakarta.servlet.http.HttpSession;
 
 public class SessionUtils {
 
-    private static final IAuthController authController = ControllerFactory.getAuthController();
+//    private static final IAuthController authController = ControllerFactory.getAuthController();
+    private static final AuthSoapAdapter authSoapAdapter = new AuthSoapAdapterService().getAuthSoapAdapterPort();
 
     public static boolean isUserAuthenticated(HttpSession session) {
         if (session == null) return false;
 
         String token = (String) session.getAttribute("jwt");
-        return token != null && authController.isAuthenticated(token);
+        return token != null && authSoapAdapter.isAuthenticated(token);
     }
 
     public static String getNickname(HttpSession session) {
@@ -22,8 +24,8 @@ public class SessionUtils {
         if (nickname != null && !nickname.isBlank()) return nickname;
 
         String token = (String) session.getAttribute("jwt");
-        if (token != null && authController.isAuthenticated(token)) {
-            nickname = authController.getNicknameFromToken(token);
+        if (token != null && authSoapAdapter.isAuthenticated(token)) {
+            nickname = authSoapAdapter.getNicknameFromToken(token);
             session.setAttribute("nickname", nickname);
             return nickname;
         }
@@ -36,13 +38,13 @@ public class SessionUtils {
         if (session == null) return false;
 
         String token = (String) session.getAttribute("jwt");
-        return token != null && authController.isAirline(token);
+        return token != null && authSoapAdapter.isAirline(token);
     }
 
     public static boolean isCustomer(HttpSession session) {
         if (session == null) return false;
 
         String token = (String) session.getAttribute("jwt");
-        return token != null && authController.isCustomer(token);
+        return token != null && authSoapAdapter.isCustomer(token);
     }
 }

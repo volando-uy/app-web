@@ -1,7 +1,7 @@
 package servlets.user;
 
-import com.labpa.appweb.client.UserSoapAdapter;
-import com.labpa.appweb.client.UserSoapAdapterService;
+import com.labpa.appweb.user.UserSoapAdapter;
+import com.labpa.appweb.user.UserSoapAdapterService;
 import jakarta.servlet.Servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -14,12 +14,13 @@ import java.util.List;
 
 @WebServlet("/existsUser")
 public class ExistsUserServlet extends HttpServlet {
+    UserSoapAdapterService service = new UserSoapAdapterService();
+    UserSoapAdapter port = service.getUserSoapAdapterPort();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        UserSoapAdapterService service = new UserSoapAdapterService();
-        UserSoapAdapter port = service.getUserSoapAdapterPort();
+
 
         String nickname = request.getParameter("nickname");
         String mail = request.getParameter("mail");
