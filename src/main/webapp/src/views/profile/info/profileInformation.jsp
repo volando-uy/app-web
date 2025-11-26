@@ -28,7 +28,26 @@
                 <h1 class="text-3xl font-bold text-gray-800">${usuario.name}</h1>
                 <p class="text-gray-600"><strong>Nickname:</strong> ${usuario.nickname}</p>
                 <p class="text-gray-600"><strong>Email:</strong> ${usuario.mail}</p>
+                <c:if test="${not empty loggedUser && loggedUser != usuario.nickname}">
+                    <form action="${rootUrl}/followers/follow" method="post">
+                        <input type="hidden" name="target" value="${usuario.nickname}"/>
 
+                        <c:choose>
+                            <c:when test="${isFollowing}">
+                                <button type="submit"
+                                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                                    Dejar de seguir
+                                </button>
+                            </c:when>
+                            <c:otherwise>
+                                <button type="submit"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                                    Seguir
+                                </button>
+                            </c:otherwise>
+                        </c:choose>
+                    </form>
+                </c:if>
                 <c:if test="${sessionScope.jwt_nick != null && sessionScope.jwt_nick == usuario.nickname}">
                     <form action="${logoutUrl}" method="post"
                           class="mt-4 inline-block" title="Cerrar sesión de ${usuario.nickname}">

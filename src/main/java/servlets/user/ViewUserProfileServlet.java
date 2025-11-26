@@ -9,6 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
@@ -16,7 +17,6 @@ import java.io.IOException;
 public class ViewUserProfileServlet extends HttpServlet {
 
     private final UserSoapAdapter port = new UserSoapAdapterService().getUserSoapAdapterPort();
-    private final ConstantsSoapAdapter constantsPort = new ConstantsSoapAdapterService().getConstantsSoapAdapterPort();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -28,18 +28,20 @@ public class ViewUserProfileServlet extends HttpServlet {
             return;
         }
 
-        // Obtener usuario base
         SoapUserDTO baseUser = port.getUserSimpleDetailsByNickname(nickname);
 
-        // Inicializamos tipoUsuario por defecto
-        String tipoUsuario = "visitante";  // fallback si no es ni cliente ni aerolínea
+        if (baseUser == null) {
+            resp.sendRedirect(req.getContextPath() + "/users/list");
+            return;
+        }
+
+        String tipoUsuario = "visitante";
 
         if (baseUser instanceof SoapBaseCustomerDTO) {
             SoapCustomerDTO cliente = port.getCustomerDetailsByNickname(nickname);
             req.setAttribute("cliente", cliente);
             req.setAttribute("usuario", cliente);
             tipoUsuario = "cliente";
-
         } else if (baseUser instanceof SoapBaseAirlineDTO) {
             SoapAirlineDTO aerolinea = port.getAirlineDetailsByNickname(nickname);
             req.setAttribute("aerolinea", aerolinea);
@@ -47,14 +49,26 @@ public class ViewUserProfileServlet extends HttpServlet {
             tipoUsuario = "aerolinea";
         }
 
-        // Constantes del sistema
-        String tipoCustomer = constantsPort.getValueConstants().getUSERTYPECUSTOMER();
-        String tipoAirline = constantsPort.getValueConstants().getUSERTYPEAIRLINE();
+        HttpSession session = req.getSession(false);
+        boolean isFollowing = false;
+        String loggedUser = null;
 
-        // Atributos que el JSP espera
+        if (session != null && session.getAttribute("usuario") != null) {
+            loggedUser = ((SoapUserDTO) session.getAttribute("usuario")).getNickname();
+
+            // No puede seguirse a sí mismo
+            if (!loggedUser.equals(nickname)) {
+                isFollowing = port.isFollowing(loggedUser, nickname);  // Asegura que el estado de seguimiento se actualice
+            }
+
+            req.setAttribute("loggedUser", loggedUser);
+        }
+
+        req.setAttribute("isFollowing", isFollowing);
+
         req.setAttribute("tipoUsuario", tipoUsuario);
-        req.setAttribute("isCustomer", "cliente".equalsIgnoreCase(tipoUsuario));
-        req.setAttribute("isAirline", "aerolinea".equalsIgnoreCase(tipoUsuario));
+        req.setAttribute("isCustomer", "cliente".equals(tipoUsuario));
+        req.setAttribute("isAirline", "aerolinea".equals(tipoUsuario));
         req.setAttribute("pageTitle", "Perfil de Usuario - " + baseUser.getNickname());
 
         req.getRequestDispatcher("/src/views/profile/info/profileInformation.jsp").forward(req, resp);
