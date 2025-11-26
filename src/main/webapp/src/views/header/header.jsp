@@ -14,12 +14,14 @@
 %>
 
 <header class="sticky top-0 z-50 bg-brand text-white shadow-md">
-    <div class="container mx-auto px-4 py-3 flex items-center justify-between relative">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
 
+        <!-- LOGO -->
         <a href="${homeUrl}" class="flex items-center gap-2">
             <span class="text-xl font-bold">Volando<span class="text-yellow-300">.uy</span></span>
         </a>
 
+        <!-- NAV DESKTOP -->
         <nav id="nav-desktop" class="hidden md:flex items-center gap-6">
             <a href="${flightsUrl}" class="hover:text-yellow-300">Vuelos</a>
             <a href="${packagesUrl}" class="hover:text-yellow-300">Paquetes</a>
@@ -61,39 +63,38 @@
         </c:choose>
 
         <button id="togglePanelBtn"
-                class="md:hidden absolute top-3 right-3 bg-white/10 backdrop-blur-sm border border-white/20
-                       text-white rounded-full w-11 h-11 shadow-lg flex items-center justify-center text-2xl z-[60]">
+                class="md:hidden bg-brand text-white flex items-center justify-center text-3xl p-2">
             ☰
         </button>
+    </div>
+    <div id="mobilePanel"
+         class="md:hidden bg-brand text-white rounded-2xl shadow-lg p-4 flex flex-col gap-2
+            w-[200px] hidden absolute right-4 top-[70px] z-[60]">
+        <% if (!isLogged) { %>
+        <a href="${loginUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Iniciar sesión</a>
+        <% } else { %>
+        <% if (isCustomer) { %>
+        <a href="${profileUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Mi perfil / Check-In</a>
+        <a href="${flightsUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Buscar vuelos</a>
+        <a href="${checkBookingUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Mis reservas</a>
 
-        <div id="mobilePanel"
-             class="md:hidden absolute top-16 right-3 bg-brand text-white rounded-2xl shadow-lg p-4 flex flex-col gap-2
-                    w-[200px] hidden z-[60]">
-            <% if (!isLogged) { %>
-            <a href="${loginUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Iniciar sesión</a>
-            <% } else { %>
-            <% if (isCustomer) { %>
-            <a href="${profileUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Mi perfil</a>
-            <a href="${flightsUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Buscar vuelos</a>
-            <a href="${checkBookingUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Mis reservas</a>
-            <a href="${listPackageUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Paquetes</a>
+        <% } else if (isAirline) { %>
+        <a href="${createFlightUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Crear vuelo</a>
+        <a href="${createFlightRouteUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Crear ruta</a>
+        <a href="${createCityAndCategoryUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Crear ciudad/categoría</a>
+        <a href="${checkBookingUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Reservas</a>
+        <% } %>
 
-            <% } else if (isAirline) { %>
-            <a href="${createFlightUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Crear vuelo</a>
-            <a href="${createFlightRouteUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Crear ruta</a>
-            <a href="${createCityAndCategoryUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Crear ciudad/categoría</a>
-            <a href="${checkBookingUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Reservas</a>
-            <% } %>
-            <form action="${logoutUrl}" method="post">
-                <button type="submit"
-                        class="block w-full text-left text-sm px-3 py-2 rounded-lg hover:bg-white/10">
-                     Cerrar sesión
-                </button>
-            </form>
-            <% } %>
-        </div>
+        <form action="${logoutUrl}" method="post">
+            <button type="submit"
+                    class="block w-full text-left text-sm px-3 py-2 rounded-lg hover:bg-white/10">
+                Cerrar sesión
+            </button>
+        </form>
+        <% } %>
     </div>
 </header>
+
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const btn = document.getElementById("togglePanelBtn");
