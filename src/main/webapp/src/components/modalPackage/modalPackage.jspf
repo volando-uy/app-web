@@ -51,9 +51,7 @@
                     <div class="text-right text-lg font-semibold text-gray-700">
                         <c:set var="sumRef" value="0"/>
                         <c:forEach var="r" items="${routes}">
-                            <c:if test="${not empty r.priceTouristClass}">
-                                <c:set var="sumRef" value="${sumRef + r.priceTouristClass}"/>
-                            </c:if>
+                            <c:set var="sumRef" value="${sumRef + (selectedPkg.seatType.toString() == \"Tourist\" ? r.priceTouristClass : r.priceBusinessClass)}"/>
                         </c:forEach>
                         <fmt:formatNumber value="${sumRef}" type="currency" currencySymbol="US$ " minFractionDigits="2"/>
                     </div>
@@ -65,7 +63,7 @@
                         <tr>
                             <th class="text-left px-3 py-2">Ruta</th>
                             <th class="text-left px-3 py-2">Aerol&iacute;nea</th>
-                            <th class="text-right px-3 py-2">Precio (turista)</th>
+                            <th class="text-right px-3 py-2">Precio (${selectedPkg.seatType})</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -85,7 +83,7 @@
                                         </td>
                                         <td class="px-3 py-2"><c:out value="${r.airlineNickname}"/></td>
                                         <td class="px-3 py-2 text-right">
-                                            <fmt:formatNumber value="${empty r.priceTouristClass ? 0 : r.priceTouristClass}"
+                                            <fmt:formatNumber value="${selectedPkg.seatType.toString() == \"Turista\" ? r.priceTouristClass : r.priceBusinessClass}"
                                                               type="currency" currencySymbol="US$ " minFractionDigits="2"/>
                                         </td>
                                     </tr>

@@ -24,6 +24,7 @@
 <!-- Header -->
 <jsp:include page="/src/views/header/header.jsp"/>
 
+<jsp:include page="/src/components/leftPanel/leftPanel.jsp"/>
 <!-- Contenido principal -->
 <main class="flex-1 container mx-auto px-4 py-8 flex flex-col gap-12">
     <section id="paquetes" class="w-full">

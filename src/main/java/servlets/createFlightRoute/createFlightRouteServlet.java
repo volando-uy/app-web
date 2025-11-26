@@ -1,45 +1,48 @@
 package servlets.createFlightRoute;
 
-import controllers.airport.IAirportController;
-import controllers.category.ICategoryController;
-import controllers.flightroute.IFlightRouteController;
-import domain.dtos.airport.BaseAirportDTO;
-import domain.dtos.flightroute.BaseFlightRouteDTO;
-import factory.ControllerFactory;
+import com.labpa.appweb.airport.AirportSoapAdapter;
+import com.labpa.appweb.airport.AirportSoapAdapterService;
+import com.labpa.appweb.airport.BaseAirportDTO;
+import com.labpa.appweb.category.CategorySoapAdapter;
+import com.labpa.appweb.category.CategorySoapAdapterService;
+import com.labpa.appweb.flightroute.EnumEstatusRuta;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
+import com.labpa.appweb.flightroute.SoapBaseFlightRouteDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import utils.FileBase64Util;
 
 import java.io.*;
-import java.time.LocalDate;
 import java.util.*;
 
 @WebServlet("/createFlightRoute")
 @MultipartConfig
 public class createFlightRouteServlet extends HttpServlet {
 
-    private final IFlightRouteController controller = ControllerFactory.getFlightRouteController();
+    private final FlightRouteSoapAdapter flightRouteSoapAdapter =
+            new FlightRouteSoapAdapterService().getFlightRouteSoapAdapterPort();
+
+    private final AirportSoapAdapter airportSoapAdapter =
+            new AirportSoapAdapterService().getAirportSoapAdapterPort();
+
+    private final CategorySoapAdapter categorySoapAdapter =
+            new CategorySoapAdapterService().getCategorySoapAdapterPort();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // Controladores
-        IAirportController airportController = ControllerFactory.getAirportController();
-        ICategoryController categoryController = ControllerFactory.getCategoryController();
-
-        // Datos para los selects
-        List<BaseAirportDTO> airports = new ArrayList<>(airportController.getAllAirportsSimpleDetails());
-        List<String> categories = categoryController.getAllCategoriesNames();
+        List<BaseAirportDTO> airports = new ArrayList<>(airportSoapAdapter.getAllAirportsSimpleDetails().getItem());
+        List<String> categories = categorySoapAdapter.getAllCategoriesNames().getItem();
 
         airports.sort(Comparator.comparing(BaseAirportDTO::getCode));
 
-        // Pasar al JSP
         req.setAttribute("airports", airports);
         req.setAttribute("categories", categories);
 
-        // Redirigir al JSP
         req.getRequestDispatcher("/src/views/createflightRoute/createflightRoute.jsp").forward(req, resp);
     }
 
@@ -51,7 +54,7 @@ public class createFlightRouteServlet extends HttpServlet {
         resp.setContentType("application/json;charset=UTF-8");
 
         try {
-            // Parámetros básicos
+            // === Parámetros ===
             String name = trimToNull(req.getParameter("name"));
             String description = trimToNull(req.getParameter("description"));
             String createdAtStr = trimToNull(req.getParameter("createdAt"));
@@ -61,74 +64,65 @@ public class createFlightRouteServlet extends HttpServlet {
             String originAeroCode = trimToNull(req.getParameter("originAeroCode"));
             String destinationAeroCode = trimToNull(req.getParameter("destinationAeroCode"));
 
-            // === Aerolínea desde sesión ===
+
+            if (originAeroCode == null || destinationAeroCode == null) {
+                handleError(req, resp, "Los códigos de aeropuerto de origen y destino son obligatorios.");
+            }
+
             HttpSession session = req.getSession(false);
             String airlineNickname = null;
-
             if (session != null) {
                 airlineNickname = (String) session.getAttribute("airlineNickname");
-
-                // Si no existe con ese nombre, usar el nickname general
                 if (airlineNickname == null) {
                     airlineNickname = (String) session.getAttribute("nickname");
                 }
             }
-
-            // Validar que no esté nulo
             if (airlineNickname == null) {
                 throw new IllegalArgumentException("El usuario de aerolínea no está identificado en la sesión.");
             }
 
-            // === Categorías seleccionadas ===
+            // === Categorías ===
             String[] cats = req.getParameterValues("categories");
-            List<String> categories = new ArrayList<>();
-            if (cats != null) {
-                categories = Arrays.asList(cats);
-            }
+            List<String> categories = cats != null ? Arrays.asList(cats) : new ArrayList<>();
 
-            // === Procesar imagen (opcional) ===
+            // === Imagen ===
             Part imagePart = req.getPart("image");
             File imageFile = null;
-            if (imagePart != null && imagePart.getSize() > 0) {
+            String imageBase64 = "";
+            String fileName = "";
+
+            if (imagePart != null  && imagePart.getSize() > 0) {
                 String uploadPath = getServletContext().getRealPath("/uploads");
                 File uploadDir = new File(uploadPath);
                 if (!uploadDir.exists()) uploadDir.mkdirs();
 
                 String submitted = imagePart.getSubmittedFileName();
-                String fileName = (submitted != null)
-                        ? new File(submitted).getName()
-                        : "upload_" + System.currentTimeMillis();
+                fileName = (submitted != null) ? new File(submitted).getName() : "upload_" + System.currentTimeMillis();
                 imageFile = new File(uploadDir, fileName);
 
-                try (InputStream in = imagePart.getInputStream();
-                     FileOutputStream out = new FileOutputStream(imageFile)) {
+                try (InputStream in = imagePart.getInputStream(); FileOutputStream out = new FileOutputStream(imageFile)) {
                     in.transferTo(out);
                 }
-            }
 
-            // === Parseos ===
-            LocalDate createdAt = null;
-            if (createdAtStr != null && !createdAtStr.isEmpty()) {
-                createdAt = LocalDate.parse(createdAtStr);
+                imageBase64 = FileBase64Util.fileToBase64(imageFile);
             }
-            Double priceExtra = parseDouble(priceExtraStr);
-            Double priceTourist = parseDouble(priceTouristStr);
-            Double priceBusiness = parseDouble(priceBusinessStr);
 
             // === Construir DTO ===
-            BaseFlightRouteDTO dto = new BaseFlightRouteDTO();
+            SoapBaseFlightRouteDTO dto = new SoapBaseFlightRouteDTO();
             dto.setName(name);
             dto.setDescription(description);
-            dto.setCreatedAt(createdAt);
-            dto.setPriceExtraUnitBaggage(priceExtra);
-            dto.setPriceTouristClass(priceTourist);
-            dto.setPriceBusinessClass(priceBusiness);
-            dto.setImage((imageFile != null) ? imageFile.getName() : null);
-            dto.setStatus(null);
+            dto.setCreatedAt(createdAtStr);
+            dto.setPriceExtraUnitBaggage(parseDouble(priceExtraStr));
+            dto.setPriceTouristClass(parseDouble(priceTouristStr));
+            dto.setPriceBusinessClass(parseDouble(priceBusinessStr));
+            dto.setStatus(EnumEstatusRuta.SIN_ESTADO);
+            dto.setImage(fileName); // se setea el nombre, aunque no haya base64
+
+            com.labpa.appweb.flightroute.StringArray categoriesArray = new com.labpa.appweb.flightroute.StringArray();
+            categoriesArray.getItem().addAll(categories);
 
             // === Crear ruta de vuelo ===
-            controller.createFlightRoute(dto, originAeroCode, destinationAeroCode, airlineNickname, categories, imageFile);
-
+            flightRouteSoapAdapter.createFlightRoute(dto, originAeroCode, destinationAeroCode, airlineNickname, categoriesArray, imageBase64);
 
             session.setAttribute("toastMessage", "Ruta de vuelo creada correctamente.");
             session.setAttribute("toastType", "success");
@@ -160,10 +154,5 @@ public class createFlightRouteServlet extends HttpServlet {
         if (s == null) return null;
         s = s.trim();
         return s.isEmpty() ? null : s;
-    }
-
-    private static String escapeJson(String s) {
-        if (s == null) return "";
-        return s.replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
     }
 }

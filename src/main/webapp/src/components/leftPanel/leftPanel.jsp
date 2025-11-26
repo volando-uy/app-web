@@ -1,11 +1,13 @@
+<%@ page import="com.labpa.appweb.user.SoapUserDTO" %>
+<%@ page import="com.labpa.appweb.constants.ValuesConstantsDTO" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/src/components/layout/libs.jspf" %>
 
 <%
-    domain.dtos.user.UserDTO usuario = (domain.dtos.user.UserDTO) session.getAttribute("usuario");
-
+    SoapUserDTO usuario = (SoapUserDTO) session.getAttribute("usuario");
+    ValuesConstantsDTO valuesConstantsDTO = new ValuesConstantsDTO();
     if (usuario != null) {
-        String tipoUsuario = usuario.getClass().getSimpleName().toLowerCase();
+        String tipoUsuario = usuario.getUserType();
 %>
 
 <button id="togglePanelBtn"
@@ -16,14 +18,14 @@
 <!-- Panel móvil desplegable -->
 <div id="mobilePanel"
      class="fixed bottom-20 right-6 bg-brand text-white rounded-2xl shadow-lg p-4 flex flex-col gap-2 w-[180px] hidden z-50">
-    <% if (tipoUsuario.contains("airline")) { %>
+    <% if (valuesConstantsDTO.getUSERTYPEAIRLINE() == usuario.getUserType()) { %>
     <a href="${createFlightUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">✈️ Crear vuelo</a>
     <a href="${createFlightRouteUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">🧭 Crear ruta</a>
     <a href="${createPackageUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">🎒 Crear paquete</a>
     <a href="${listPackageUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">📦 Mis paquetes</a>
     <a href="${checkBookingUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">🧾 Reservas</a>
 
-    <% } else if (tipoUsuario.contains("customer")) { %>
+    <% } else if (valuesConstantsDTO.getUSERTYPECUSTOMER() == usuario.getUserType()) { %>
     <a href="${profileUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">ℹ️ Mi perfil</a>
     <a href="${flightsUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">✈️ Buscar vuelos</a>
     <a href="${checkBookingUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">🧾 Mis reservas</a>

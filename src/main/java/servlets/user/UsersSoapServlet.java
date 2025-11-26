@@ -1,10 +1,8 @@
 package servlets.user;
 
-import com.labpa.appweb.client.UserSoapAdapter;
-import com.labpa.appweb.client.UserSoapAdapterService;
-import controllers.user.IUserController;
-import domain.dtos.user.UserDTO;
-import factory.ControllerFactory;
+import com.labpa.appweb.user.UserSoapAdapter;
+import com.labpa.appweb.user.UserSoapAdapterService;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,11 +14,11 @@ import java.util.List;
 
 @WebServlet("/userssoap")
 public class UsersSoapServlet extends HttpServlet {
+    UserSoapAdapterService service = new UserSoapAdapterService();
+    UserSoapAdapter port = service.getUserSoapAdapterPort();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        UserSoapAdapterService service = new UserSoapAdapterService();
-        UserSoapAdapter port = service.getUserSoapAdapterPort();
 
         List<String> user = port.getAllUsersNicknames().getItem();
         response.setContentType("text/plain");

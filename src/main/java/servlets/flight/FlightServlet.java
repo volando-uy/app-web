@@ -3,29 +3,46 @@ package servlets.flight;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.*;
 
-import controllers.category.ICategoryController;
-import controllers.flight.IFlightController;
-import controllers.flightroute.IFlightRouteController;
-import controllers.user.IUserController;
 
-import domain.dtos.flight.FlightDTO;
-import domain.dtos.flightroute.FlightRouteDTO;
-import domain.models.enums.EnumEstatusRuta;
+import com.labpa.appweb.category.CategorySoapAdapter;
+import com.labpa.appweb.category.CategorySoapAdapterService;
+import com.labpa.appweb.flight.FlightSoapAdapter;
+import com.labpa.appweb.flight.FlightSoapAdapterService;
+import com.labpa.appweb.flight.SoapFlightDTO;
+import com.labpa.appweb.flightroute.EnumEstatusRuta;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
+import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
+import com.labpa.appweb.flightroute.SoapFlightRouteDTO;
+import com.labpa.appweb.user.UserSoapAdapter;
+import com.labpa.appweb.user.UserSoapAdapterService;
 
-import factory.ControllerFactory;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import mappers.DateTimeMapper;
 
 @WebServlet("/flight/list")
 public class FlightServlet extends HttpServlet {
 
-    private final ICategoryController categoryController = ControllerFactory.getCategoryController();
-    private final IUserController     userController     = ControllerFactory.getUserController();
-    private final IFlightController   flightCtrl         = ControllerFactory.getFlightController();
-    private final IFlightRouteController flightRouteCtrl = ControllerFactory.getFlightRouteController();
+//    private final ICategoryController categoryController = ControllerFactory.getCategoryController();
+//    private final IUserController     userController     = ControllerFactory.getUserController();
+//    private final IFlightController   flightCtrl         = ControllerFactory.getFlightController();
+//    private final IFlightRouteController flightRouteCtrl = ControllerFactory.getFlightRouteController();
+    private CategorySoapAdapterService categorySoapAdapterService = new CategorySoapAdapterService();
+    private CategorySoapAdapter categoryController = categorySoapAdapterService.getCategorySoapAdapterPort();
+
+    private UserSoapAdapterService userSoapAdapterService = new UserSoapAdapterService();
+    private UserSoapAdapter userController = userSoapAdapterService.getUserSoapAdapterPort();
+
+    private FlightSoapAdapterService flightSoapAdapterService = new FlightSoapAdapterService();
+    private FlightSoapAdapter flightCtrl = flightSoapAdapterService.getFlightSoapAdapterPort();
+
+    private FlightRouteSoapAdapterService flightRouteSoapAdapterService = new FlightRouteSoapAdapterService();
+    private FlightRouteSoapAdapter flightRouteCtrl = flightRouteSoapAdapterService.getFlightRouteSoapAdapterPort();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -71,7 +88,7 @@ public class FlightServlet extends HttpServlet {
         // Categorías
         List<String> categories;
         try {
-            List<String> raw = categoryController.getAllCategoriesNames();
+            List<String> raw = categoryController.getAllCategoriesNames().getItem();
             categories = new ArrayList<>(raw != null ? raw : Collections.emptyList());
         } catch (Exception e) {
             log("Error cargando categorías", e);
@@ -83,7 +100,7 @@ public class FlightServlet extends HttpServlet {
 
         List<String> airlines;
         try {
-            List<String> raw = userController.getAllAirlinesNicknames();
+            List<String> raw = userController.getAllAirlinesNicknames().getItem();
             airlines = new ArrayList<>(raw != null ? raw : Collections.emptyList());
         } catch (Exception e) {
             log("Error cargando aerolíneas", e);
@@ -100,9 +117,9 @@ public class FlightServlet extends HttpServlet {
                                       String selectedRouteName,
                                       String selectedFlightName) {
 
-        List<FlightDTO> allFlights;
+        List<SoapFlightDTO> allFlights;
         try {
-            allFlights = flightCtrl.getAllFlightsDetails();
+            allFlights = flightCtrl.getAllFlightsDetails().getItem();
             if (allFlights == null) allFlights = Collections.emptyList();
         } catch (Exception e) {
             log("Error obteniendo todos los vuelos", e);
@@ -111,7 +128,7 @@ public class FlightServlet extends HttpServlet {
 
         // Rutas  en los vuelos
         Set<String> routeNames = new HashSet<>();
-        for (FlightDTO f : allFlights) {
+        for (SoapFlightDTO f : allFlights) {
             if (f == null) continue;
             if (selectedAirline != null && !selectedAirline.isBlank()) {
                 String a = f.getAirlineNickname();
@@ -121,10 +138,10 @@ public class FlightServlet extends HttpServlet {
             if (rn != null && !rn.isBlank()) routeNames.add(rn);
         }
 
-        List<FlightRouteDTO> allRoutesRaw = new ArrayList<>();
+        List<SoapFlightRouteDTO> allRoutesRaw = new ArrayList<>();
         for (String rn : routeNames) {
             try {
-                FlightRouteDTO r = flightRouteCtrl.getFlightRouteDetailsByName(rn);
+                SoapFlightRouteDTO r = flightRouteCtrl.getFlightRouteDetailsByName(rn);
                 if (r != null) allRoutesRaw.add(r);
             } catch (Exception ex) {
                 log("Error obteniendo ruta por nombre: " + rn, ex);
@@ -132,8 +149,8 @@ public class FlightServlet extends HttpServlet {
         }
 
         // Filtrar rutas
-        List<FlightRouteDTO> routesFiltered = new ArrayList<>();
-        for (FlightRouteDTO r : allRoutesRaw) {
+        List<SoapFlightRouteDTO> routesFiltered = new ArrayList<>();
+        for (SoapFlightRouteDTO r : allRoutesRaw) {
             if (r == null || r.getStatus() != EnumEstatusRuta.CONFIRMADA) continue;
 
             boolean okCategory = (selectedCategory == null || selectedCategory.isBlank());
@@ -151,13 +168,13 @@ public class FlightServlet extends HttpServlet {
 
             routesFiltered.add(r);
         }
-        routesFiltered.sort(Comparator.comparing(FlightRouteDTO::getName, String.CASE_INSENSITIVE_ORDER));
+        routesFiltered.sort(Comparator.comparing(SoapFlightRouteDTO::getName, String.CASE_INSENSITIVE_ORDER));
         req.setAttribute("routes", routesFiltered);
 
 
         boolean routeMatchesFilter = false;
         if (selectedRouteName != null && !selectedRouteName.isBlank()) {
-            for (FlightRouteDTO r : routesFiltered) {
+            for (SoapFlightRouteDTO r : routesFiltered) {
                 if (r.getName() != null && r.getName().equalsIgnoreCase(selectedRouteName)) {
                     routeMatchesFilter = true; break;
                 }
@@ -171,9 +188,9 @@ public class FlightServlet extends HttpServlet {
         req.setAttribute("selectedFlightName", selectedFlightName);
 
         // Ruta seleccionada
-        FlightRouteDTO selectedRoute = null;
+        SoapFlightRouteDTO selectedRoute = null;
         if (selectedRouteName != null && !selectedRouteName.isBlank()) {
-            for (FlightRouteDTO r : routesFiltered) {
+            for (SoapFlightRouteDTO r : routesFiltered) {
                 if (r.getName() != null && r.getName().equalsIgnoreCase(selectedRouteName)) {
                     selectedRoute = r; break;
                 }
@@ -186,9 +203,9 @@ public class FlightServlet extends HttpServlet {
         req.setAttribute("selectedRoute", selectedRoute);
 
         // Vuelos a mostrar
-        List<FlightDTO> flightsToShow = new ArrayList<>();
+        List<SoapFlightDTO> flightsToShow = new ArrayList<>();
         if (selectedRouteName != null && !selectedRouteName.isBlank()) {
-            for (FlightDTO f : allFlights) {
+            for (SoapFlightDTO f : allFlights) {
                 if (f == null) continue;
                 String rn = f.getFlightRouteName();
                 if (rn != null && rn.equalsIgnoreCase(selectedRouteName)) {
@@ -200,14 +217,22 @@ public class FlightServlet extends HttpServlet {
                 }
             }
         }
-        flightsToShow.sort(Comparator.comparing(FlightDTO::getDepartureTime,
-                Comparator.nullsLast(Comparator.naturalOrder())));
+        flightsToShow.sort(
+                Comparator.comparing(
+                        flight -> {
+                            return DateTimeMapper.fromSoapLocalDateTime(flight.getDepartureTime());
+                        },
+                        Comparator.nullsLast(LocalDateTime::compareTo)
+                )
+        );
+
+
         req.setAttribute("flights", flightsToShow);
 
         // Vuelo seleccionado
-        FlightDTO selectedFlight = null;
+        SoapFlightDTO selectedFlight = null;
         if (selectedFlightName != null && !selectedFlightName.isBlank()) {
-            for (FlightDTO f : flightsToShow) {
+            for (SoapFlightDTO f : flightsToShow) {
                 if (f != null && f.getName() != null &&
                         f.getName().equalsIgnoreCase(selectedFlightName)) {
                     selectedFlight = f; break;

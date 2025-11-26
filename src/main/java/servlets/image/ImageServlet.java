@@ -1,12 +1,14 @@
 package servlets.image;
 
+import com.labpa.appweb.images.ImagesSoapAdapter;
+import com.labpa.appweb.images.ImagesSoapAdapterService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import shared.utils.ImageProcessor;
+
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +17,8 @@ import java.util.*;
 
 @WebServlet("/image")
 public class ImageServlet extends HttpServlet {
+
+    ImagesSoapAdapter imagesSoapAdapter = new ImagesSoapAdapterService().getImagesSoapAdapterPort();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -29,7 +33,7 @@ public class ImageServlet extends HttpServlet {
         }
 
         // 2. Use your custom method to get the absolute path
-        String imagePath = ImageProcessor.getImageAbsolutePath(resourceClass, key);
+        String imagePath = imagesSoapAdapter.getImageAbsolutePath(resourceClass, key);
 
         File imageFile = new File(imagePath);
         if (!imageFile.exists()) {

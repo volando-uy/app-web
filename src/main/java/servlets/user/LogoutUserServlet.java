@@ -24,7 +24,7 @@ public class LogoutUserServlet extends HttpServlet {
             // Crear una nueva sesión para mensajes flash
             HttpSession newSession = req.getSession(true);
             newSession.setAttribute("toastMessage", nickname + " ha cerrado sesión.");
-            newSession.setAttribute("toastType", "info");
+            newSession.setAttribute("toastType", "success");
         }
 
         resp.sendRedirect(req.getContextPath() + "/");

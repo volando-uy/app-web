@@ -9,13 +9,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Reservar vuelo</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/tailwind.min.js"></script>
     <script>
         tailwind.config = { theme: { extend: { colors: { brand: "#0B4C73" } } } };
     </script>
 
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/fontawesome.min.css"></link>
 </head>
 
 <body class="bg-[#f5f6fa] min-h-screen flex flex-col">

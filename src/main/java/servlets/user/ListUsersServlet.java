@@ -1,10 +1,12 @@
 package servlets.user;
 
-import controllers.user.IUserController;
-import domain.dtos.user.BaseAirlineDTO;
-import domain.dtos.user.BaseCustomerDTO;
-import domain.dtos.user.UserDTO;
-import factory.ControllerFactory;
+import com.labpa.appweb.constants.ConstantsSoapAdapter;
+import com.labpa.appweb.constants.ConstantsSoapAdapterService;
+import com.labpa.appweb.user.SoapUserDTO;
+import com.labpa.appweb.user.UserSoapAdapter;
+import com.labpa.appweb.user.UserSoapAdapterService;
+
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,19 +20,26 @@ import java.util.Map;
 
 @WebServlet("/users/list")
 public class ListUsersServlet extends HttpServlet {
-    private final IUserController userController = ControllerFactory.getUserController();
+    //    private final IUserController userController = ControllerFactory.getUserController();
+    UserSoapAdapterService service = new UserSoapAdapterService();
+    UserSoapAdapter port = service.getUserSoapAdapterPort();
+
+    ConstantsSoapAdapter constantsPort = new ConstantsSoapAdapterService().getConstantsSoapAdapterPort();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<UserDTO> users = userController.getAllUsersSimpleDetails();
+        final String airline = constantsPort.getValueConstants().getUSERTYPEAIRLINE();
+        final String customer = constantsPort.getValueConstants().getUSERTYPECUSTOMER();
+        List<SoapUserDTO> users = port.getAllUsersSimpleDetails().getItem();
 
         Map<String, String> tiposPorUsuario = new HashMap<>();
-        for (UserDTO user : users) {
-            String tipo;
-            if (user instanceof BaseCustomerDTO) {
-                tipo = "Cliente";
-            } else if (user instanceof BaseAirlineDTO) {
+        for (SoapUserDTO user : users) {
+            String tipo = user.getUserType();
+
+            if (tipo.equalsIgnoreCase(airline)) {
                 tipo = "Aerolínea";
+            } else if (tipo.equalsIgnoreCase(customer)) {
+                tipo = "Cliente";
             } else {
                 tipo = "Visitante";
             }

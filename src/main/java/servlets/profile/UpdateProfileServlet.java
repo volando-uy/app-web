@@ -1,20 +1,25 @@
 package servlets.profile;
 
-import controllers.user.IUserController;
-import domain.dtos.user.*;
-import domain.models.enums.EnumTipoDocumento;
-import factory.ControllerFactory;
+
+import com.labpa.appweb.constants.ConstantsSoapAdapter;
+import com.labpa.appweb.constants.ConstantsSoapAdapterService;
+import com.labpa.appweb.constants.ImageConstantsDTO;
+import com.labpa.appweb.images.ImagesSoapAdapter;
+import com.labpa.appweb.images.ImagesSoapAdapterService;
+import com.labpa.appweb.user.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import shared.constants.Images;
+import mappers.DateMapper;
+import mappers.LocalDateMapper;
+import utils.FileBase64Util;
 import utils.ImageStorageUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
-
+import java.time.format.DateTimeFormatter;
 
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024,  // 1MB
@@ -24,7 +29,10 @@ import java.time.LocalDate;
 @WebServlet("/perfil/update")
 public class UpdateProfileServlet extends HttpServlet {
 
-    private final IUserController userController = ControllerFactory.getUserController();
+    private final UserSoapAdapter port = new UserSoapAdapterService().getUserSoapAdapterPort();
+
+    private final ConstantsSoapAdapter constantsSoapAdapter = new ConstantsSoapAdapterService().getConstantsSoapAdapterPort();
+
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -34,11 +42,21 @@ public class UpdateProfileServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/users/login");
             return;
         }
-
+        String tipo = (String) req.getSession().getAttribute("type");
         String nickname = (String) session.getAttribute("nickname");
-//        UserDTO user = userController.getCustomerDetailsByNickname(nickname);
-        UserDTO user = userController.getUserSimpleDetailsByNickname(nickname);
+
+        // Obtenemos los datos simples del usuario
+        SoapUserDTO user = port.getUserSimpleDetailsByNickname(nickname);
+        if (tipo.equals("customer")) {
+            SoapBaseCustomerDTO customer = port.getCustomerSimpleDetailsByNickname(user.getNickname());
+            System.out.println("fecha nac: " + customer.getBirthDate().toString());
+            LocalDate birthDate = LocalDateMapper.toLocalDate(customer.getBirthDate());
+            System.out.println("birthdate VALUE: " + birthDate);
+            System.out.println("birthdate CUSTOMER: " + customer.getBirthDate());
+            req.setAttribute("customer", customer);
+        }
         req.setAttribute("user", user);
+
 
         req.getRequestDispatcher("/src/views/profile/update/updateProfile.jsp").forward(req, resp);
     }
@@ -47,63 +65,95 @@ public class UpdateProfileServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        HttpSession session = req.getSession();
+        HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("nickname") == null) {
             resp.sendRedirect(req.getContextPath() + "/users/login");
             return;
         }
 
+        ImageConstantsDTO imageConstantsDTO = constantsSoapAdapter.getImageConstants();
         String nickname = (String) session.getAttribute("nickname");
-        UserDTO userDetails = userController.getUserSimpleDetailsByNickname(nickname);
 
+
+        SoapUserDTO userDetails = port.getUserSimpleDetailsByNickname(nickname);
+        String type = userDetails.getUserType();
+        boolean isCustomer = constantsSoapAdapter.getValueConstants().getUSERTYPECUSTOMER().equals(type);
+
+        System.out.println("userDetails class: " + userDetails.getClass().getSimpleName());
         Part imagePart = req.getPart("profileImage");
 
-
         File finalImage = null;
+
         try {
+            String imageBase64 = null;
+            if (isCustomer) {
 
-            if (userDetails instanceof BaseCustomerDTO customer) {
-                finalImage = ImageStorageUtils.saveImage(
-                        getServletContext(),
-                        imagePart,
-                        Images.IMAGES_PATH + Images.CUSTOMERS_PATH,
-                        nickname
-                );
+                if (imagePart != null && imagePart.getSize() > 0) {
+                    finalImage = ImageStorageUtils.saveImage(
+                            getServletContext(),
+                            imagePart,
+                            imageConstantsDTO.getImagesPath() + imageConstantsDTO.getCustomersPath(),
+                            nickname
+                    );
+                    imageBase64 = FileBase64Util.fileToBase64(finalImage);
+                }
 
 
-                BaseCustomerDTO dto = new BaseCustomerDTO();
+                SoapBaseCustomerDTO dto = new SoapBaseCustomerDTO();
                 dto.setName(req.getParameter("name"));
+                dto.setNickname(userDetails.getNickname());
+                dto.setMail(userDetails.getMail());
+                dto.setPassword(userDetails.getPassword());
+
                 dto.setSurname(req.getParameter("surname"));
-                dto.setBirthDate(LocalDate.parse(req.getParameter("birthDate")));
+                dto.setBirthDate(req.getParameter("birthDate"));
                 dto.setCitizenship(req.getParameter("citizenship"));
                 dto.setDocType(EnumTipoDocumento.valueOf(req.getParameter("docType")));
                 dto.setNumDoc(req.getParameter("numDoc"));
 
-                UserDTO newUser = userController.updateUser(customer.getNickname(), dto, finalImage);
-                System.out.println(newUser);
+                // Update por SOAP
+                try {
+                    System.out.println("imagebase64" + imageBase64);
+                    SoapUserDTO updated = port.updateUser(nickname, dto, imageBase64 != null ? imageBase64 : "");
+                    session.setAttribute("usuario", updated);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-            } else if (userDetails instanceof BaseAirlineDTO airline) {
-                finalImage = ImageStorageUtils.saveImage(
-                        getServletContext(),
-                        imagePart,
-                        Images.IMAGES_PATH + Images.AIRLINES_PATH,
-                        nickname
-                );
+            } else if (type.equals(constantsSoapAdapter.getValueConstants().getUSERTYPEAIRLINE())) {
+                if (imagePart != null && imagePart.getSize() > 0) {
+
+                    finalImage = ImageStorageUtils.saveImage(
+                            getServletContext(),
+                            imagePart,
+                            imageConstantsDTO.getImagesPath() + imageConstantsDTO.getAirlinesPath(),
+                            nickname
+                    );
+                    imageBase64 = FileBase64Util.fileToBase64(finalImage);
+                }
+                SoapBaseAirlineDTO dto = new SoapBaseAirlineDTO();
+                dto.setName(userDetails.getName());
+                dto.setNickname(userDetails.getNickname());
+                dto.setMail(userDetails.getMail());
+                dto.setPassword(userDetails.getPassword());
 
 
-                BaseAirlineDTO dto = new BaseAirlineDTO();
-                dto.setName(req.getParameter("name"));
                 dto.setDescription(req.getParameter("description"));
                 dto.setWeb(req.getParameter("web"));
 
-
-                UserDTO newUser = userController.updateUser(airline.getNickname(), dto, finalImage);
-                System.out.println(newUser);
+                SoapUserDTO updated = port.updateUser(nickname, dto, imageBase64 != null ? imageBase64 : "");
+                session.setAttribute("usuario", updated);
             }
-        } catch (Exception e) {
 
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.setAttribute("toastMessage", "Error al actualizar el perfil: " + e.getMessage());
+            session.setAttribute("toastType", "error");
+            resp.sendRedirect(req.getContextPath() + "/perfil");
+            return;
         }
 
+        // Borrar imagen subida del disco (ya está en base64)
         ImageStorageUtils.deleteImage(finalImage);
 
         // ✅ Confirmación y redirección
@@ -112,5 +162,3 @@ public class UpdateProfileServlet extends HttpServlet {
         resp.sendRedirect(req.getContextPath() + "/perfil");
     }
 }
-
-
