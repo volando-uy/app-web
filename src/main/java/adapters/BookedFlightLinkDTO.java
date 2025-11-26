@@ -5,15 +5,17 @@ public class BookedFlightLinkDTO {
     private String routeName;
     private String flightName;
     private String airline;
+    private boolean isBooked;
 
     public BookedFlightLinkDTO() {
     }
 
-    public BookedFlightLinkDTO(Long bookingId, String routeName, String flightName, String airline) {
+    public BookedFlightLinkDTO(Long bookingId, String routeName, String flightName, String airline, boolean isBooked) {
         this.bookingId = bookingId;
         this.routeName = routeName;
         this.flightName = flightName;
         this.airline = airline;
+        this.isBooked = isBooked;
     }
 
     public Long getBookingId() {
@@ -47,4 +49,9 @@ public class BookedFlightLinkDTO {
     public void setAirline(String airline) {
         this.airline = airline;
     }
+
+    public boolean isBooked() {
+        return isBooked;
+    }
+
 }

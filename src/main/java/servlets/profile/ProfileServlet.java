@@ -122,7 +122,8 @@ public class ProfileServlet extends HttpServlet {
                                                 bookingId,
                                                 flight.getFlightRouteName(),
                                                 flight.getName(),
-                                                flight.getAirlineNickname()
+                                                flight.getAirlineNickname(),
+                                                b.isIsBooked()
                                         ));
                                         agregado = true;
                                         break;
