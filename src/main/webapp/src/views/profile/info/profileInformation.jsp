@@ -10,7 +10,6 @@
     SoapUserDTO usuario = (SoapUserDTO) request.getAttribute("usuario");
 %>
 
-
 <body class="min-h-screen bg-gradient-to-r from-brand to-blue-300 py-12 px-4 flex items-center justify-center">
 <div class="relative w-full max-w-5xl bg-white rounded-2xl shadow-lg overflow-hidden">
 
@@ -29,6 +28,27 @@
                 <p class="text-gray-600"><strong>Nickname:</strong> ${usuario.nickname}</p>
                 <p class="text-gray-600"><strong>Email:</strong> ${usuario.mail}</p>
 
+                <c:if test="${not empty loggedUser && loggedUser != usuario.nickname}">
+                    <form action="${rootUrl}/followers/follow" method="post">
+                        <input type="hidden" name="target" value="${usuario.nickname}"/>
+
+                        <c:choose>
+                            <c:when test="${isFollowing}">
+                                <button type="submit"
+                                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                                    Dejar de seguir
+                                </button>
+                            </c:when>
+                            <c:otherwise>
+                                <button type="submit"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                                    Seguir
+                                </button>
+                            </c:otherwise>
+                        </c:choose>
+                    </form>
+                </c:if>
+
                 <c:if test="${sessionScope.jwt_nick != null && sessionScope.jwt_nick == usuario.nickname}">
                     <form action="${logoutUrl}" method="post"
                           class="mt-4 inline-block" title="Cerrar sesión de ${usuario.nickname}">
@@ -45,7 +65,6 @@
                             Actualizar perfil
                         </button>
                     </form>
-
                 </c:if>
 
                 <a href="${homeUrl}"
@@ -86,16 +105,6 @@
                                                 Aerolínea: <strong>${link.airline}</strong>
                                                 </span>
                                             </a>
-                                            <!-- Botón de descarga PDF -->
-                                            <a href="${rootUrl}/pdf/package?id=${link.id}"
-                                               title="Descargar PDF"
-                                               target="_blank"
-                                               class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-red-100 text-red-700 text-sm font-medium hover:bg-red-200 transition">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M6 2a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5L18.5 9H13V3.5zM8 14v-1h2.25c.97 0 1.75-.78 1.75-1.75S11.22 9.5 10.25 9.5H8v5h1zm1-4h1.25c.41 0 .75.34.75.75s-.34.75-.75.75H9v-1.5zM14 14.25c0 .41.34.75.75.75h1v.75a.75.75 0 0 0 1.5 0v-.75h.75a.75.75 0 0 0 0-1.5H17v-.75a.75.75 0 0 0-1.5 0v.75h-.75a.75.75 0 0 0-.75.75z"/>
-                                                </svg>
-                                                Descargar PDF
-                                            </a>
                                         </li>
                                     </c:forEach>
                                 </ul>
@@ -120,15 +129,6 @@
                                                 Vuelo: <strong>${link.flightName}</strong><br/>
                                                 Aerolínea: <strong>${link.airline}</strong>
                                                 </span>
-                                            </a>
-                                            <a href="${rootUrl}/pdf/booking?id=${link.bookingId}"
-                                               title="Descargar PDF"
-                                               target="_blank"
-                                               class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-red-100 text-red-700 text-sm font-medium hover:bg-red-200 transition">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M6 2a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5L18.5 9H13V3.5zM8 14v-1h2.25c.97 0 1.75-.78 1.75-1.75S11.22 9.5 10.25 9.5H8v5h1zm1-4h1.25c.41 0 .75.34.75.75s-.34.75-.75.75H9v-1.5zM14 14.25c0 .41.34.75.75.75h1v.75a.75.75 0 0 0 1.5 0v-.75h.75a.75.75 0 0 0 0-1.5H17v-.75a.75.75 0 0 0-1.5 0v.75h-.75a.75.75 0 0 0-.75.75z"/>
-                                                </svg>
-                                                Descargar PDF
                                             </a>
                                         </li>
                                     </c:forEach>

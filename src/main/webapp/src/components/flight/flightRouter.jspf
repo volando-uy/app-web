@@ -26,4 +26,3 @@
 
 </c:choose>
 
-<jsp:include page="/src/components/leftPanel/leftPanel.jsp"/>
