@@ -160,10 +160,10 @@ public class BookFlightServlet extends HttpServlet {
 
             CostBreakdown cb = computeCost(req, passengersCount, unitPrice, route);
             setView(req, flight, route, seatType.name(), passengersCount, unitPrice, avail, existing);
-            req.setAttribute("calcSeatSubtotal", cb.seatSubtotal);
-            req.setAttribute("calcExtraSubtotal", cb.extraSubtotal);
-            req.setAttribute("priceExtraUnit", route.getPriceExtraUnitBaggage() == null ? 0.0 : route.getPriceExtraUnitBaggage());
-            req.setAttribute("calcTotal", cb.total());
+            req.setAttribute("calcSeatSubtotal", String.format("%.2f", cb.seatSubtotal));
+            req.setAttribute("calcExtraSubtotal", String.format("%.2f", cb.extraSubtotal));
+            req.setAttribute("priceExtraUnit", String.format("%.2f", route.getPriceBusinessClass()));
+            req.setAttribute("calcTotal", String.format("%.2f", cb.total()));
             req.setAttribute("calcDone", true);
             req.getRequestDispatcher("/src/views/bookFlight/bookflight.jsp").forward(req, resp);
             return;
