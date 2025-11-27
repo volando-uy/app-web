@@ -48,8 +48,8 @@
             <c:otherwise>
                 <div id="header-actions" class="hidden md:flex items-center gap-3">
                     <a href="${profileUrl}"
-                       class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-center">
-                        Ver Perfil
+                       class="inline-flex items-center justify-center px-3 py-2 rounded-lg hover:bg-white/20 text-center">
+                        ${nickname}
                     </a>
 
                     <form action="${logoutUrl}" method="post" title="Cerrar sesión de ${nickname}">
