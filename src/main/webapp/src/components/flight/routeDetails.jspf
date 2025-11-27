@@ -34,5 +34,17 @@
                 <strong><fmt:formatNumber value="${selectedRoute.priceBusinessClass}" type="currency" currencySymbol="US$"/></strong>
             </p>
         </div>
+        <c:choose>
+            <c:when test="${not empty selectedRoute.videoURL}">
+                <div class="md:w-1/5 flex items-center justify-center">
+                    <div class="aspect-video bg-gray-50 border rounded-lg overflow-hidden flex items-center justify-center w-full">
+                        <video controls playsinline class="w-full h-full object-cover bg-black">
+                            <source src="${fn:escapeXml(selectedRoute.videoURL)}" type="video/mp4"/>
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </div>
+            </c:when>
+        </c:choose>
     </div>
 </div>

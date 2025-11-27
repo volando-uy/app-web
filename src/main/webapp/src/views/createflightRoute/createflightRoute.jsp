@@ -123,6 +123,11 @@
                 <input name="image" type="file" accept="image/*" class="w-full text-sm"/>
             </div>
 
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">URL de video:</label>
+                <input name="videoURL" type="text" required class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-brand"/>
+            </div>
+
             <div class="text-center">
                 <button type="submit" class="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-md hover:bg-brand/90">
                     + Crear Ruta de Vuelo
