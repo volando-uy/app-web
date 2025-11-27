@@ -10,11 +10,10 @@ import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
 import com.labpa.appweb.booking.LuggageDTO;
 
 import com.labpa.appweb.flightroute.SoapFlightRouteDTO;
-import com.labpa.appweb.ticket.BaseBasicLuggageDTO;
-import com.labpa.appweb.ticket.BaseExtraLuggageDTO;
-import com.labpa.appweb.ticket.EnumEquipajeBasico;
-import com.labpa.appweb.ticket.EnumEquipajeExtra;
-
+import com.labpa.appweb.booking.BaseBasicLuggageDTO;
+import com.labpa.appweb.booking.BaseExtraLuggageDTO;
+import com.labpa.appweb.booking.EnumEquipajeBasico;
+import com.labpa.appweb.booking.EnumEquipajeExtra;
 
 
 import jakarta.servlet.ServletException;
@@ -204,6 +203,7 @@ public class BookFlightServlet extends HttpServlet {
             BaseBasicLuggageDTO basic = new BaseBasicLuggageDTO();
             basic.setWeight(basicWeight);
             basic.setCategory(EnumEquipajeBasico.valueOf(basicTypeStr));
+            System.out.println("Equipaje básico para pasajero " + k + ": " + basic.toString());
 
             l.add(LuggageMapper.toSoapLuggage(basic));
 
@@ -212,7 +212,7 @@ public class BookFlightServlet extends HttpServlet {
             for (int i = 0; i < extraUnits; i++) {
                 BaseExtraLuggageDTO extra = new BaseExtraLuggageDTO();
                 extra.setWeight(extraWeight);
-                extra.setCategory(extraCat);
+                extra.setCategory(EnumEquipajeExtra.valueOf(extraTypeStr));
 
                 l.add(LuggageMapper.toSoapLuggage(extra));
             }
