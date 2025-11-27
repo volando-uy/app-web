@@ -14,12 +14,30 @@
 %>
 
 <header class="sticky top-0 z-50 bg-brand text-white shadow-md">
+
     <div class="container mx-auto px-4 py-3 flex items-center justify-between">
 
         <!-- LOGO -->
         <a href="${homeUrl}" class="flex items-center gap-2">
             <span class="text-xl font-bold">Volando<span class="text-yellow-300">.uy</span></span>
         </a>
+
+        <button id="open-search"
+                class="hidden md:flex items-center justify-center p-2 rounded-lg bg-white/10 hover:bg-white/20 transition">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round"
+                 class="w-5 h-5 text-white">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+
+        </button>
 
         <!-- NAV DESKTOP -->
         <nav id="nav-desktop" class="hidden md:flex items-center gap-6">
@@ -113,4 +131,4 @@
         to { opacity: 1; transform: translateY(0); }
     }
     .animate-fade-in { animation: fadeIn 0.17s ease-out; }
-</style>
+</style><%@ include file="/src/components/search/search-overlay.jspf" %>
