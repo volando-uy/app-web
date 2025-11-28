@@ -35,7 +35,7 @@
             </p>
         </div>
         <c:choose>
-            <c:when test="${not empty selectedRoute.videoURL}">
+            <c:when test="${not empty selectedRoute.videoURL && selectedRoute.videoURL != null}">
                 <div class="md:w-1/5 flex items-center justify-center">
                     <div class="aspect-video bg-gray-50 border rounded-lg overflow-hidden flex items-center justify-center w-full">
                         <video controls playsinline class="w-full h-full object-cover bg-black">
