@@ -2,8 +2,7 @@ package servlets.user;
 
 import com.labpa.appweb.user.UserSoapAdapter;
 import com.labpa.appweb.user.UserSoapAdapterService;
-import config.SoapServiceFactory;
-import jakarta.servlet.Servlet;
+import servlets.SoapServiceFactory;import jakarta.servlet.Servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

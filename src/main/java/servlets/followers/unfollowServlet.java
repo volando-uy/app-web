@@ -5,8 +5,7 @@ import com.labpa.appweb.user.UserSoapAdapterService;
 import com.labpa.appweb.user.SoapCustomerDTO;
 import com.labpa.appweb.user.SoapUserDTO;
 
-import config.SoapServiceFactory;
-import jakarta.servlet.ServletException;
+import servlets.SoapServiceFactory;import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;

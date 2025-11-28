@@ -3,12 +3,12 @@ package utils;
 import com.labpa.appweb.auth.AuthSoapAdapter;
 import com.labpa.appweb.auth.AuthSoapAdapterService;
 
-import jakarta.servlet.http.HttpSession;
+import servlets.SoapServiceFactory;import jakarta.servlet.http.HttpSession;
 
 public class SessionUtils {
 
 //    private static final IAuthController authController = ControllerFactory.getAuthController();
-    private static final AuthSoapAdapter authSoapAdapter = new AuthSoapAdapterService().getAuthSoapAdapterPort();
+    private static final AuthSoapAdapter authSoapAdapter = SoapServiceFactory.getAuthService();
 
     public static boolean isUserAuthenticated(HttpSession session) {
         if (session == null) return false;

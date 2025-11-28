@@ -1,4 +1,4 @@
-package config;
+package servlets;
 
 import javax.xml.namespace.QName;
 import java.net.URL;
@@ -19,6 +19,7 @@ import com.labpa.appweb.airport.*;
 import com.labpa.appweb.constants.*;
 import com.labpa.appweb.countries.*;
 import com.labpa.appweb.pdf.*;
+import config.ConfigProperties;
 
 public class SoapServiceFactory {
 

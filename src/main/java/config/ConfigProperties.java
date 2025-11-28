@@ -20,6 +20,8 @@ public class ConfigProperties {
                 try (FileInputStream fis = new FileInputStream(externalConfig)) {
                     properties.load(fis);
                     System.out.println("Configuración cargada desde: " + externalConfig.getAbsolutePath());
+                    //imprimir todas las propiedades cargadas
+
                 }
             } else {
                 try (InputStream input = ConfigProperties.class.getClassLoader().getResourceAsStream("application.properties")) {

@@ -7,7 +7,7 @@ import com.labpa.appweb.constants.ImageConstantsDTO;
 import com.labpa.appweb.images.ImagesSoapAdapter;
 import com.labpa.appweb.images.ImagesSoapAdapterService;
 import com.labpa.appweb.user.*;
-import config.SoapServiceFactory;
+import servlets.SoapServiceFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;

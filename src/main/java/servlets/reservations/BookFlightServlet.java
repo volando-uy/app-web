@@ -16,8 +16,7 @@ import com.labpa.appweb.booking.EnumEquipajeBasico;
 import com.labpa.appweb.booking.EnumEquipajeExtra;
 
 
-import config.SoapServiceFactory;
-import jakarta.servlet.ServletException;
+import servlets.SoapServiceFactory;import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import mappers.DateTimeMapper;

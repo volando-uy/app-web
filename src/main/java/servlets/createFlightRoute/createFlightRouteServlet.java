@@ -9,7 +9,7 @@ import com.labpa.appweb.flightroute.EnumEstatusRuta;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
 import com.labpa.appweb.flightroute.SoapBaseFlightRouteDTO;
-import config.SoapServiceFactory;
+import servlets.SoapServiceFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -89,7 +89,7 @@ public class createFlightRouteServlet extends HttpServlet {
             String imageBase64 = "";
             String fileName = "";
 
-            if (imagePart != null  && imagePart.getSize() > 0) {
+            if (imagePart != null && imagePart.getSize() > 0) {
                 String uploadPath = getServletContext().getRealPath("/uploads");
                 File uploadDir = new File(uploadPath);
                 if (!uploadDir.exists()) uploadDir.mkdirs();

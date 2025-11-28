@@ -7,8 +7,7 @@ import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
 
 import com.labpa.appweb.flightroute.SoapBaseFlightRouteDTO;
-import config.SoapServiceFactory;
-import jakarta.servlet.*;
+import servlets.SoapServiceFactory;import jakarta.servlet.*;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;

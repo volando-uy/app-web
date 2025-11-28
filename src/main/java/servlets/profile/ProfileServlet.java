@@ -18,8 +18,7 @@ import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapter;
 import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapterService;
 import com.labpa.appweb.user.*;
 
-import config.SoapServiceFactory;
-import jakarta.servlet.ServletException;
+import servlets.SoapServiceFactory;import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;

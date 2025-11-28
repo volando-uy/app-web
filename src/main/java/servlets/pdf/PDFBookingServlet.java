@@ -2,8 +2,7 @@ package servlets.pdf;
 
 import com.labpa.appweb.pdf.SoapPDFAdapter;
 import com.labpa.appweb.pdf.SoapPDFAdapterService;
-import config.SoapServiceFactory;
-import jakarta.jws.WebService;
+import servlets.SoapServiceFactory;import jakarta.jws.WebService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

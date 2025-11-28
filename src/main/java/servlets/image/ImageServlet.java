@@ -2,8 +2,7 @@ package servlets.image;
 
 import com.labpa.appweb.images.ImagesSoapAdapter;
 import com.labpa.appweb.images.ImagesSoapAdapterService;
-import config.SoapServiceFactory;
-import jakarta.servlet.ServletException;
+import servlets.SoapServiceFactory;import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

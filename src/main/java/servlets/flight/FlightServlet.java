@@ -20,11 +20,12 @@ import com.labpa.appweb.user.UserSoapAdapter;
 import com.labpa.appweb.user.UserSoapAdapterService;
 
 
-import config.SoapServiceFactory;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import mappers.DateTimeMapper;
+import servlets.SoapServiceFactory;
 
 @WebServlet("/flight/list")
 public class FlightServlet extends HttpServlet {

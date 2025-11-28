@@ -16,8 +16,7 @@ import com.labpa.appweb.ticket.TicketSoapAdapter;
 import com.labpa.appweb.ticket.TicketSoapAdapterService;
 import com.labpa.appweb.user.*;
 
-import config.SoapServiceFactory;
-import jakarta.servlet.ServletException;
+import servlets.SoapServiceFactory;import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import mappers.LocalDateTimeMapper;

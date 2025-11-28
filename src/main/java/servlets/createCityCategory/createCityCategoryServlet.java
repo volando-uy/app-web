@@ -10,8 +10,7 @@ import com.labpa.appweb.city.CitySoapAdapterService;
 
 import com.labpa.appweb.countries.SoapCountriesAdapter;
 import com.labpa.appweb.countries.SoapCountriesAdapterService;
-import config.SoapServiceFactory;
-import jakarta.servlet.ServletException;
+import servlets.SoapServiceFactory;import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
