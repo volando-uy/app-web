@@ -63,6 +63,7 @@ public class createFlightRouteServlet extends HttpServlet {
             String priceBusinessStr = trimToNull(req.getParameter("priceBusinessClass"));
             String originAeroCode = trimToNull(req.getParameter("originAeroCode"));
             String destinationAeroCode = trimToNull(req.getParameter("destinationAeroCode"));
+            String videoURL = trimToNull(req.getParameter("videoURL"));
 
 
             if (originAeroCode == null || destinationAeroCode == null) {
@@ -117,6 +118,7 @@ public class createFlightRouteServlet extends HttpServlet {
             dto.setPriceBusinessClass(parseDouble(priceBusinessStr));
             dto.setStatus(EnumEstatusRuta.SIN_ESTADO);
             dto.setImage(fileName); // se setea el nombre, aunque no haya base64
+            dto.setVideoURL(videoURL);
 
             com.labpa.appweb.flightroute.StringArray categoriesArray = new com.labpa.appweb.flightroute.StringArray();
             categoriesArray.getItem().addAll(categories);
