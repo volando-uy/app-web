@@ -1,0 +1,28 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
+<c:url var="filtersAction" value="/flight/list"/>
+<c:url var="reservationBase" value="/reservas"/>
+
+<%@ include file="/src/components/filters/filters.jspf" %>
+
+<c:choose>
+
+    <c:when test="${empty selectedRouteName}">
+        <%@ include file="/src/components/flight/routeList.jspf" %>
+    </c:when>
+
+    <c:when test="${not empty selectedRouteName and empty selectedFlight}">
+        <div class="space-y-6">
+            <%@ include file="/src/components/flight/routeDetails.jspf" %>
+            <%@ include file="/src/components/flight/flightList.jspf" %>
+        </div>
+    </c:when>
+    <c:when test="${not empty selectedFlight}">
+        <%@ include file="/src/components/flight/flightDetailsFull.jspf" %>
+    </c:when>
+
+</c:choose>
+

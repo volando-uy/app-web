@@ -1,0 +1,59 @@
+<!-- Notyf y Tailwind -->
+<%@ include file="/src/components/layout/libs.jspf" %> <!-- Taglibs aquí una sola vez -->
+
+<script src="${pageContext.request.contextPath}/resources/js/notyf.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/tailwind.min.js"></script>
+
+<script>
+    // Context Path global para tus JS
+        window.__BASE__ = "${pageContext.request.contextPath}";
+    console.log("Context Path:", window.__BASE__);
+
+    // Notyf Configuración
+    const notyf = new Notyf({
+        duration: 3000,
+        position: {
+            x: 'right',
+            y: 'bottom'
+        }
+    });
+
+    // Tailwind Custom Theme
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    brand: "#0B4C73"
+                }
+            }
+        }
+    };
+</script>
+
+<%
+    String toastMessage = (String) session.getAttribute("toastMessage");
+    String toastType = (String) session.getAttribute("toastType");
+    System.out.println("Toast message: " + session.getAttribute("toastMessage"));
+    System.out.println("Toast toastType: " + session.getAttribute("toastType"));
+
+    if (toastMessage != null) {
+%>
+<script>
+    window.addEventListener("DOMContentLoaded", function() {
+        const notyf = new Notyf({
+            duration: 3000,
+            position: { x: 'right', y: 'bottom' }
+        });
+        notyf["<%= toastType != null ? toastType : "success" %>"]("<%= toastMessage.replace("\"", "\\\"") %>");
+    });
+</script>
+<%
+        session.removeAttribute("toastMessage");
+        session.removeAttribute("toastType");
+    }
+%>
+
+
+<c:if test="${not empty pageScript}">
+    <script src="${pageContext.request.contextPath}/${pageScript}"></script>
+</c:if>

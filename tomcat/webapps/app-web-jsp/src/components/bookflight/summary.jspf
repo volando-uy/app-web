@@ -1,0 +1,37 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<div class="bg-white p-5 rounded-2xl shadow-sm border">
+    <h3 class="text-sm font-semibold mb-2">Resumen</h3>
+
+    <div class="text-sm space-y-1 mb-3">
+        <div>Clase seleccionada: <strong>${seatTypePreview}</strong></div>
+        <div>Pasajeros: <strong>${passengersCount}</strong></div>
+    </div>
+
+    <c:if test="${calcDone}">
+        <div class="text-sm space-y-1 mb-4">
+            <div>Asientos: ${calcSeatSubtotal}</div>
+            <div>Extras: ${calcExtraSubtotal}</div>
+            <div class="font-semibold">Total: ${calcTotal}</div>
+        </div>
+    </c:if>
+
+    <c:if test="${existingBooking}">
+        <div class="text-xs text-yellow-800 bg-yellow-50 border border-yellow-200 rounded px-3 py-2 mb-3">
+            Ya tenés una reserva para este vuelo. Si continuás, vas a crear otra.
+        </div>
+    </c:if>
+
+    <button type="submit"
+            form="postForm"
+            name="action"
+            value="confirm"
+            class="w-full px-4 py-2 rounded bg-brand text-white disabled:opacity-50"
+    ${passengersCount <= 0 || passengersMax == 0 ? 'disabled' : ''}>
+        <c:choose>
+            <c:when test="${existingBooking}">Confirmar de todos modos</c:when>
+            <c:otherwise>Confirmar reserva</c:otherwise>
+        </c:choose>
+    </button>
+</div>

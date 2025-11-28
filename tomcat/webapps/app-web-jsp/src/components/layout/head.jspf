@@ -1,0 +1,16 @@
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <c:choose>
+        <c:when test="${not empty pageTitle}">
+            <title><c:out value="${pageTitle}"/></title>
+        </c:when>
+        <c:otherwise>
+            <title>Volando</title>
+        </c:otherwise>
+    </c:choose>
+
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/notyf.min.css"></link>
+
+</head>
