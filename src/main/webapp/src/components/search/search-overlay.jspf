@@ -1,0 +1,49 @@
+<div id="search-overlay"
+     class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-[999] flex items-center justify-center p-4">
+
+    <div class="bg-white rounded-2xl w-full max-w-xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+
+
+        <button id="close-search"
+                class="absolute top-3 right-3 text-gray-600 hover:text-black text-2xl">
+            &times;
+        </button>
+
+        <!-- Título -->
+        <h2 class="text-2xl font-bold text-brand mb-4">Buscar</h2>
+
+        <!-- Formulario -->
+        <form id="search-form" class="flex gap-3">
+            <input type="text" id="search-query"
+                   placeholder="Buscar rutas o paquetes..."
+                   class="flex-1 px-4 py-3 rounded-lg border focus:ring-2 focus:ring-brand focus:outline-none"
+                   required>
+            <button type="submit"
+                    class="px-5 py-3 bg-brand text-white rounded-lg hover:bg-brand-dark transition">
+                Buscar
+            </button>
+        </form>
+
+        <!-- Filtros -->
+        <div class="mt-4">
+            <label class="block font-semibold mb-1">Ordenar resultados:</label>
+            <select id="search-sort"
+                    class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand">
+                <option value="name-asc">Nombre A - Z</option>
+                <option value="name-desc">Nombre Z - A</option>
+            </select>
+        </div>
+
+        <!-- Resultados -->
+        <div id="search-results" class="mt-6"></div>
+
+    </div>
+</div>
+
+<!-- EXPOSE APP CONTEXT TO JS -->
+<script>
+    const APP_CTX = "${pageContext.request.contextPath}";
+</script>
+
+
+<script src="${pageContext.request.contextPath}/src/components/search/search-overlay.js"></script>
