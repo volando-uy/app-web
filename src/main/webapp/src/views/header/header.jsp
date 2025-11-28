@@ -50,6 +50,7 @@
             <a href="${checkBookingUrl}" class="hover:text-yellow-300">Mis reservas</a>
 
             <% } else if (isAirline) { %>
+            <a href="${profileUrl}"class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">${nickname}</a>
             <a href="${createFlightUrl}" class="hover:text-yellow-300">Crear vuelo</a>
             <a href="${createFlightRouteUrl}" class="hover:text-yellow-300">Crear ruta</a>
             <a href="${createCityAndCategoryUrl}" class="hover:text-yellow-300">Crear ciudad / categoría</a>
