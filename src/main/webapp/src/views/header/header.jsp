@@ -23,7 +23,7 @@
         </a>
 
         <button id="open-search"
-                class="hidden md:flex items-center justify-center p-2 rounded-lg bg-white/10 hover:bg-white/20 transition">
+                class="block md:flex items-center justify-center p-2 rounded-lg bg-white/10 hover:bg-white/20 transition">
 
             <svg xmlns="http://www.w3.org/2000/svg"
                  viewBox="0 0 24 24"
