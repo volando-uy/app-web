@@ -9,7 +9,7 @@ import com.labpa.appweb.constants.ConstantsSoapAdapter;
 import com.labpa.appweb.constants.ConstantsSoapAdapterService;
 import com.labpa.appweb.user.SoapBaseAirlineDTO;
 import com.labpa.appweb.user.SoapBaseCustomerDTO;
-import jakarta.servlet.ServletException;
+import servlets.SoapServiceFactory;import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,8 +21,9 @@ import java.io.IOException;
 @WebServlet("/users/login")
 public class LoginUserServlet extends HttpServlet {
 
-    private final AuthSoapAdapter port = new AuthSoapAdapterService().getAuthSoapAdapterPort();
-    private final ConstantsSoapAdapter constantsPort = new ConstantsSoapAdapterService().getConstantsSoapAdapterPort();
+    private final AuthSoapAdapter port = SoapServiceFactory.getAuthService();
+    private final ConstantsSoapAdapter constantsPort = SoapServiceFactory.getConstantsService();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -58,7 +59,7 @@ public class LoginUserServlet extends HttpServlet {
 
             // Mapear SOAPUserDTO a BaseCustomerDTO o BaseAirlineDTO (del paquete SOAP)
             Object usuario;
-            String userType=soapUser.getUserType();
+            String userType = soapUser.getUserType();
             System.out.println("User type detected: " + userType);
             System.out.println("User: " + soapUser);
             if (constantsPort.getValueConstants().getUSERTYPECUSTOMER().equals(userType)) {
@@ -77,7 +78,7 @@ public class LoginUserServlet extends HttpServlet {
                 airline.setImage(soapUser.getImage());
                 airline.setUserType(constantsPort.getValueConstants().getUSERTYPEAIRLINE());
                 usuario = airline;
-            }else{
+            } else {
                 handleLoginError(req, resp, nickname, "Tipo de usuario desconocido");
                 return;
             }

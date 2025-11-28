@@ -13,7 +13,8 @@ import com.labpa.appweb.flightroutepackage.BaseFlightRoutePackageDTO;
 import com.labpa.appweb.flightroutepackage.FlightRoutePackage;
 import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapter;
 import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapterService;
-import jakarta.servlet.ServletException;
+import com.labpa.appweb.user.SoapUserDTO;
+import servlets.SoapServiceFactory;import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
@@ -30,11 +31,9 @@ public class IndexServlet extends HttpServlet {
 //            ControllerFactory.getFlightRoutePackageController();
 ////    private final IFlightController flightCtrl =
 ////            ControllerFactory.getFlightController();
-    private FlightSoapAdapterService flightSoapAdapterService = new FlightSoapAdapterService();
-    private FlightSoapAdapter flightPort = flightSoapAdapterService.getFlightSoapAdapterPort();
-    private FlightRoutePackageSoapAdapterService flightRoutePackageSoapAdapterService = new FlightRoutePackageSoapAdapterService();
-    private FlightRoutePackageSoapAdapter flightRoutePackagePort = flightRoutePackageSoapAdapterService.getFlightRoutePackageSoapAdapterPort();
-    private FlightRouteSoapAdapter flightRouteSoapAdapter = new FlightRouteSoapAdapterService().getFlightRouteSoapAdapterPort();
+    private FlightSoapAdapter flightPort = SoapServiceFactory.getFlightService();
+    private FlightRoutePackageSoapAdapter flightRoutePackagePort = SoapServiceFactory.getFlightRoutePackageService();
+    private FlightRouteSoapAdapter flightRouteSoapAdapter = SoapServiceFactory.getFlightRouteService();
 
 
     @Override

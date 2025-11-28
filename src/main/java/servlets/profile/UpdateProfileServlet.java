@@ -7,6 +7,7 @@ import com.labpa.appweb.constants.ImageConstantsDTO;
 import com.labpa.appweb.images.ImagesSoapAdapter;
 import com.labpa.appweb.images.ImagesSoapAdapterService;
 import com.labpa.appweb.user.*;
+import servlets.SoapServiceFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -29,9 +30,8 @@ import java.time.format.DateTimeFormatter;
 @WebServlet("/perfil/update")
 public class UpdateProfileServlet extends HttpServlet {
 
-    private final UserSoapAdapter port = new UserSoapAdapterService().getUserSoapAdapterPort();
-
-    private final ConstantsSoapAdapter constantsSoapAdapter = new ConstantsSoapAdapterService().getConstantsSoapAdapterPort();
+    private final UserSoapAdapter port = SoapServiceFactory.getUserService();
+    private final ConstantsSoapAdapter constantsSoapAdapter = SoapServiceFactory.getConstantsService();
 
 
     @Override

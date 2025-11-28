@@ -5,7 +5,7 @@ import com.labpa.appweb.user.SoapUserDTO;
 import com.labpa.appweb.user.UserSoapAdapter;
 import com.labpa.appweb.user.UserSoapAdapterService;
 
-import jakarta.servlet.ServletException;
+import servlets.SoapServiceFactory;import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +17,7 @@ import java.io.IOException;
 @WebServlet("/followers/follow")
 public class followServlet extends HttpServlet {
 
-    private final UserSoapAdapter port = new UserSoapAdapterService().getUserSoapAdapterPort();
+    private final UserSoapAdapter port = SoapServiceFactory.getUserService();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

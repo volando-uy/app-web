@@ -9,6 +9,7 @@ import com.labpa.appweb.flightroute.EnumEstatusRuta;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
 import com.labpa.appweb.flightroute.SoapBaseFlightRouteDTO;
+import servlets.SoapServiceFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -22,14 +23,11 @@ import java.util.*;
 @MultipartConfig
 public class createFlightRouteServlet extends HttpServlet {
 
-    private final FlightRouteSoapAdapter flightRouteSoapAdapter =
-            new FlightRouteSoapAdapterService().getFlightRouteSoapAdapterPort();
+    private final FlightRouteSoapAdapter flightRouteSoapAdapter = SoapServiceFactory.getFlightRouteService();
 
-    private final AirportSoapAdapter airportSoapAdapter =
-            new AirportSoapAdapterService().getAirportSoapAdapterPort();
+    private final AirportSoapAdapter airportSoapAdapter = SoapServiceFactory.getAirportService();
 
-    private final CategorySoapAdapter categorySoapAdapter =
-            new CategorySoapAdapterService().getCategorySoapAdapterPort();
+    private final CategorySoapAdapter categorySoapAdapter = SoapServiceFactory.getCategoryService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -92,7 +90,7 @@ public class createFlightRouteServlet extends HttpServlet {
             String imageBase64 = "";
             String fileName = "";
 
-            if (imagePart != null  && imagePart.getSize() > 0) {
+            if (imagePart != null && imagePart.getSize() > 0) {
                 String uploadPath = getServletContext().getRealPath("/uploads");
                 File uploadDir = new File(uploadPath);
                 if (!uploadDir.exists()) uploadDir.mkdirs();

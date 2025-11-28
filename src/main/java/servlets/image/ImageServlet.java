@@ -2,7 +2,7 @@ package servlets.image;
 
 import com.labpa.appweb.images.ImagesSoapAdapter;
 import com.labpa.appweb.images.ImagesSoapAdapterService;
-import jakarta.servlet.ServletException;
+import servlets.SoapServiceFactory;import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,7 +18,7 @@ import java.util.*;
 @WebServlet("/image")
 public class ImageServlet extends HttpServlet {
 
-    ImagesSoapAdapter imagesSoapAdapter = new ImagesSoapAdapterService().getImagesSoapAdapterPort();
+    ImagesSoapAdapter imagesSoapAdapter = SoapServiceFactory.getImagesService();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

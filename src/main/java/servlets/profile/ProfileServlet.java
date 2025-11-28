@@ -18,7 +18,7 @@ import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapter;
 import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapterService;
 import com.labpa.appweb.user.*;
 
-import jakarta.servlet.ServletException;
+import servlets.SoapServiceFactory;import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,12 +32,12 @@ import java.util.List;
 @WebServlet("/perfil")
 public class ProfileServlet extends HttpServlet {
 
-    private final UserSoapAdapter userPort = new UserSoapAdapterService().getUserSoapAdapterPort();
-    private final ConstantsSoapAdapter constantsPort = new ConstantsSoapAdapterService().getConstantsSoapAdapterPort();
-    private final BuyPackageSoapAdapter buyPackageService = new BuyPackageSoapAdapterService().getBuyPackageSoapAdapterPort();
-    private final FlightSoapAdapter flightService = new FlightSoapAdapterService().getFlightSoapAdapterPort();
-    private final FlightRoutePackageSoapAdapter flightRoutePackageSoapAdapter = new FlightRoutePackageSoapAdapterService().getFlightRoutePackageSoapAdapterPort();
-    private final BookingSoapAdapter bookingSoapAdapter = new BookingSoapAdapterService().getBookingSoapAdapterPort();
+    private final UserSoapAdapter userPort = SoapServiceFactory.getUserService();
+    private final ConstantsSoapAdapter constantsPort = SoapServiceFactory.getConstantsService();
+    private final BuyPackageSoapAdapter buyPackageService = SoapServiceFactory.getBuyPackageService();
+    private final FlightSoapAdapter flightService = SoapServiceFactory.getFlightService();
+    private final FlightRoutePackageSoapAdapter flightRoutePackageSoapAdapter = SoapServiceFactory.getFlightRoutePackageService();
+    private final BookingSoapAdapter bookingSoapAdapter = SoapServiceFactory.getBookingService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)

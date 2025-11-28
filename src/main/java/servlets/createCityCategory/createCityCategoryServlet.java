@@ -10,7 +10,7 @@ import com.labpa.appweb.city.CitySoapAdapterService;
 
 import com.labpa.appweb.countries.SoapCountriesAdapter;
 import com.labpa.appweb.countries.SoapCountriesAdapterService;
-import jakarta.servlet.ServletException;
+import servlets.SoapServiceFactory;import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
@@ -21,24 +21,14 @@ import java.util.List;
 @WebServlet("/createCityAndCategory")
 public class createCityCategoryServlet extends HttpServlet {
 
-//    private CategoryController categoryController;
-//    private CityController cityController;
 
-    private CategorySoapAdapterService categorySoapAdapterService = new CategorySoapAdapterService();
-    private CategorySoapAdapter categoryController = categorySoapAdapterService.getCategorySoapAdapterPort();
+    private CategorySoapAdapter categoryController = SoapServiceFactory.getCategoryService();
 
-    private CitySoapAdapterService citySoapAdapterService = new CitySoapAdapterService();
-    private CitySoapAdapter cityController = citySoapAdapterService.getCitySoapAdapterPort();
+    private CitySoapAdapter cityController = SoapServiceFactory.getCityService();
 
+    private SoapCountriesAdapter soapCountriesAdapter = SoapServiceFactory.getCountriesService();
 
-    private SoapCountriesAdapter soapCountriesAdapter=new SoapCountriesAdapterService().getSoapCountriesAdapterPort();
-//    @Override
-//    public void init() throws ServletException {
-////        categoryController = new CategoryController(new CategoryService());
-////        cityController = new CityController(new CityService());
-//
-//    }
-
+    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -132,6 +122,7 @@ public class createCityCategoryServlet extends HttpServlet {
         }
 
     }
+
     private void handleError(HttpServletRequest req, HttpServletResponse resp, String message) throws IOException {
         HttpSession session = req.getSession();
         session.setAttribute("toastMessage", message);

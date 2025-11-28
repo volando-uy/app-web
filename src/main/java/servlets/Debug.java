@@ -1,5 +1,6 @@
 package servlets;
 
+import config.ConfigProperties;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @WebServlet("/debug")
 @MultipartConfig
 public class Debug extends HttpServlet {
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -24,7 +26,7 @@ public class Debug extends HttpServlet {
 
         resp.setContentType("text/plain; charset=UTF-8");
         PrintWriter out = resp.getWriter();
-
+        out.println("📥 authService.endpoint = " + ConfigProperties.get("authService.endpoint"));
         out.println("📡 Método: " + req.getMethod());
         out.println("🛣️ URI: " + req.getRequestURI());
         out.println("🧭 Context Path: " + req.getContextPath());

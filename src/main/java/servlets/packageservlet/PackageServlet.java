@@ -9,7 +9,7 @@ import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapter;
 import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapterService;
 
 
-import jakarta.servlet.ServletException;
+import servlets.SoapServiceFactory;import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
@@ -22,14 +22,10 @@ import java.util.stream.Collectors;
 @WebServlet("/packages/list")
 public class PackageServlet extends HttpServlet {
 
-//    private final IFlightRoutePackageController packageController =
-//            ControllerFactory.getFlightRoutePackageController();
-//    private final IFlightRouteController routeCtrl =
-//            ControllerFactory.getFlightRouteController();
-    private FlightRoutePackageSoapAdapterService flightRoutePackageService = new FlightRoutePackageSoapAdapterService();
-    private FlightRoutePackageSoapAdapter soapAdapter = flightRoutePackageService.getFlightRoutePackageSoapAdapterPort();
-    private FlightRouteSoapAdapterService flightRouteService = new FlightRouteSoapAdapterService();
-    private FlightRouteSoapAdapter flightRouteSoapAdapter = flightRouteService.getFlightRouteSoapAdapterPort();
+
+
+    private FlightRoutePackageSoapAdapter soapAdapter = SoapServiceFactory.getFlightRoutePackageService();
+    private FlightRouteSoapAdapter flightRouteSoapAdapter = SoapServiceFactory.getFlightRouteService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
