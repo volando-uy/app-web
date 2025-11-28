@@ -4,6 +4,7 @@ import com.labpa.appweb.constants.ConstantsSoapAdapter;
 import com.labpa.appweb.constants.ConstantsSoapAdapterService;
 import com.labpa.appweb.user.*;
 
+import config.SoapServiceFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,7 +17,8 @@ import java.io.IOException;
 @WebServlet("/users/view")
 public class ViewUserProfileServlet extends HttpServlet {
 
-    private final UserSoapAdapter port = new UserSoapAdapterService().getUserSoapAdapterPort();
+    UserSoapAdapter port = SoapServiceFactory.getUserService();
+
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

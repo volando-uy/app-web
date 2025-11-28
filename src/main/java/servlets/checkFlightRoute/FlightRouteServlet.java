@@ -11,6 +11,7 @@ import com.labpa.appweb.user.SoapAirlineDTO;
 import com.labpa.appweb.user.UserSoapAdapter;
 import com.labpa.appweb.user.UserSoapAdapterService;
 
+import config.SoapServiceFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -24,18 +25,10 @@ import java.util.List;
 @WebServlet("/flightRoute")
 public class FlightRouteServlet extends HttpServlet {
 
-//    private final IFlightRouteController flightRouteController = ControllerFactory.getFlightRouteController();
-//    private final IFlightController flightController = ControllerFactory.getFlightController();
-//    private final IUserController userController = ControllerFactory.getUserController();
 
-    private FlightRouteSoapAdapterService flightRouteSoapAdapterService = new FlightRouteSoapAdapterService();
-    private FlightRouteSoapAdapter flightRouteController = flightRouteSoapAdapterService.getFlightRouteSoapAdapterPort();
-
-    private FlightSoapAdapterService flightSoapAdapterService = new FlightSoapAdapterService();
-    private FlightSoapAdapter flightController = flightSoapAdapterService.getFlightSoapAdapterPort();
-
-    private UserSoapAdapterService userSoapAdapterService = new UserSoapAdapterService();
-    private UserSoapAdapter userController = userSoapAdapterService.getUserSoapAdapterPort();
+    private FlightRouteSoapAdapter flightRouteController = SoapServiceFactory.getFlightRouteService();
+    private FlightSoapAdapter flightController = SoapServiceFactory.getFlightService();
+    private UserSoapAdapter userController = SoapServiceFactory.getUserService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)

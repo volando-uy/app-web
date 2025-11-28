@@ -7,6 +7,7 @@ import com.labpa.appweb.flightroute.FlightRouteSoapAdapter;
 import com.labpa.appweb.flightroute.FlightRouteSoapAdapterService;
 
 import com.labpa.appweb.flightroute.SoapBaseFlightRouteDTO;
+import config.SoapServiceFactory;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -25,14 +26,8 @@ import java.util.List;
 @MultipartConfig
 public class createFlightServlet extends HttpServlet {
 
-//    private final IFlightController ctrl = ControllerFactory.getFlightController();
-//    private final IFlightRouteController flightRouteController = ControllerFactory.getFlightRouteController();
-    private FlightRouteSoapAdapterService flightRouteSoapAdapterService = new FlightRouteSoapAdapterService();
-    private FlightRouteSoapAdapter flightRouteController =flightRouteSoapAdapterService.getFlightRouteSoapAdapterPort();
-
-    private FlightSoapAdapterService flightSoapAdapterService = new FlightSoapAdapterService();
-    private FlightSoapAdapter flightSoapAdapter = flightSoapAdapterService.getFlightSoapAdapterPort();
-
+    private FlightRouteSoapAdapter flightRouteController = SoapServiceFactory.getFlightRouteService();
+    private FlightSoapAdapter flightSoapAdapter = SoapServiceFactory.getFlightService();
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {

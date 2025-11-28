@@ -2,6 +2,7 @@ package servlets.pdf;
 
 import com.labpa.appweb.pdf.SoapPDFAdapter;
 import com.labpa.appweb.pdf.SoapPDFAdapterService;
+import config.SoapServiceFactory;
 import jakarta.jws.WebService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,7 +19,7 @@ import java.util.Base64;
 @WebServlet("/pdf/booking")
 public class PDFBookingServlet extends HttpServlet {
 
-    private final SoapPDFAdapter pdfAdapter = new SoapPDFAdapterService().getSoapPDFAdapterPort();
+    private final SoapPDFAdapter pdfAdapter = SoapServiceFactory.getPdfService();
 
 
     @Override

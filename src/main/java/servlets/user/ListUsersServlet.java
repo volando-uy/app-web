@@ -7,6 +7,7 @@ import com.labpa.appweb.user.UserSoapAdapter;
 import com.labpa.appweb.user.UserSoapAdapterService;
 
 
+import config.SoapServiceFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,9 +21,8 @@ import java.util.Map;
 
 @WebServlet("/users/list")
 public class ListUsersServlet extends HttpServlet {
-    //    private final IUserController userController = ControllerFactory.getUserController();
-    UserSoapAdapterService service = new UserSoapAdapterService();
-    UserSoapAdapter port = service.getUserSoapAdapterPort();
+    UserSoapAdapter port = SoapServiceFactory.getUserService();
+
 
     ConstantsSoapAdapter constantsPort = new ConstantsSoapAdapterService().getConstantsSoapAdapterPort();
 

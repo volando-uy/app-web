@@ -9,6 +9,7 @@ import com.labpa.appweb.buypackage.BuyPackageSoapAdapterService;
 import com.labpa.appweb.flightroutepackage.BaseFlightRoutePackageDTO;
 import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapter;
 import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapterService;
+import config.SoapServiceFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -26,15 +27,10 @@ import java.util.Date;
 @WebServlet("/package/buypackage")
 public class BuyPackageServlet extends HttpServlet {
 
-    //    private final IBuyPackageController buyCtrl =
-//            ControllerFactory.getBuyPackageController();
-//    private final IFlightRoutePackageController pkgCtrl =
-//            ControllerFactory.getFlightRoutePackageController();
-    private FlightRoutePackageSoapAdapterService flightRoutePackageService = new FlightRoutePackageSoapAdapterService();
-    private FlightRoutePackageSoapAdapter flightRoutePackageSoapAdapter = flightRoutePackageService.getFlightRoutePackageSoapAdapterPort();
 
-    private BuyPackageSoapAdapterService buyPackageService = new BuyPackageSoapAdapterService();
-    private BuyPackageSoapAdapter buyPackageSoapAdapter = buyPackageService.getBuyPackageSoapAdapterPort();
+    private FlightRoutePackageSoapAdapter flightRoutePackageSoapAdapter = SoapServiceFactory.getFlightRoutePackageService();
+
+    private BuyPackageSoapAdapter buyPackageSoapAdapter = SoapServiceFactory.getBuyPackageService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)

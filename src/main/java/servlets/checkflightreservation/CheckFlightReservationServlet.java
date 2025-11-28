@@ -16,6 +16,7 @@ import com.labpa.appweb.ticket.TicketSoapAdapter;
 import com.labpa.appweb.ticket.TicketSoapAdapterService;
 import com.labpa.appweb.user.*;
 
+import config.SoapServiceFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -35,20 +36,16 @@ public class CheckFlightReservationServlet extends HttpServlet {
 //    private final IBookingController     books   = ControllerFactory.getBookingController();
 //    private final ITicketController      tickets = ControllerFactory.getTicketController();
 
-    private UserSoapAdapterService userSoapAdapterService = new UserSoapAdapterService();
-    private UserSoapAdapter users = userSoapAdapterService.getUserSoapAdapterPort();
 
-    private FlightRouteSoapAdapterService flightRouteSoapAdapterService = new FlightRouteSoapAdapterService();
-    private FlightRouteSoapAdapter routes = flightRouteSoapAdapterService.getFlightRouteSoapAdapterPort();
+    private UserSoapAdapter users = SoapServiceFactory.getUserService();
 
-    private FlightSoapAdapterService flightSoapAdapterService = new FlightSoapAdapterService();
-    private FlightSoapAdapter flights = flightSoapAdapterService.getFlightSoapAdapterPort();
+    private FlightRouteSoapAdapter routes = SoapServiceFactory.getFlightRouteService();
 
-    private BookingSoapAdapterService bookingSoapAdapterService = new BookingSoapAdapterService();
-    private BookingSoapAdapter books = bookingSoapAdapterService.getBookingSoapAdapterPort();
+    private FlightSoapAdapter flights = SoapServiceFactory.getFlightService();
 
-    private TicketSoapAdapterService ticketSoapAdapterService = new TicketSoapAdapterService();
-    private TicketSoapAdapter tickets = ticketSoapAdapterService.getTicketSoapAdapterPort();
+    private BookingSoapAdapter books = SoapServiceFactory.getBookingService();
+
+    private TicketSoapAdapter tickets = SoapServiceFactory.getTicketService();
 
 
 

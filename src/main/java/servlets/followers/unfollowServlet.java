@@ -5,6 +5,7 @@ import com.labpa.appweb.user.UserSoapAdapterService;
 import com.labpa.appweb.user.SoapCustomerDTO;
 import com.labpa.appweb.user.SoapUserDTO;
 
+import config.SoapServiceFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -13,7 +14,7 @@ import java.io.IOException;
 @WebServlet("/followers/unfollow")
 public class unfollowServlet extends HttpServlet {
 
-    private final UserSoapAdapter port = new UserSoapAdapterService().getUserSoapAdapterPort();
+    private final UserSoapAdapter port = SoapServiceFactory.getUserService();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)

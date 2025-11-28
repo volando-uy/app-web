@@ -16,6 +16,7 @@ import com.labpa.appweb.booking.EnumEquipajeBasico;
 import com.labpa.appweb.booking.EnumEquipajeExtra;
 
 
+import config.SoapServiceFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -34,19 +35,9 @@ import java.util.*;
 @WebServlet("/reservas")
 public class BookFlightServlet extends HttpServlet {
 
-    private BookingSoapAdapterService bookingService = new BookingSoapAdapterService();
-    private BookingSoapAdapter booking = bookingService.getBookingSoapAdapterPort();
-
-    private FlightSoapAdapterService flightService = new FlightSoapAdapterService();
-    private FlightSoapAdapter flights = flightService.getFlightSoapAdapterPort();
-
-    private FlightRouteSoapAdapterService routeService = new FlightRouteSoapAdapterService();
-    private FlightRouteSoapAdapter routes = routeService.getFlightRouteSoapAdapterPort();
-
-//    private final IBookingController booking = ControllerFactory.getBookingController();
-//    private final IFlightController flights = ControllerFactory.getFlightController();
-//    private final IFlightRouteController routes = ControllerFactory.getFlightRouteController();
-////    private final ISeatController seats = ControllerFactory.getSeatController();
+    private BookingSoapAdapter booking = SoapServiceFactory.getBookingService();
+    private FlightSoapAdapter flights = SoapServiceFactory.getFlightService();
+    private FlightRouteSoapAdapter routes = SoapServiceFactory.getFlightRouteService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

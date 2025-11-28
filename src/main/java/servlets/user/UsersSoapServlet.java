@@ -3,6 +3,7 @@ package servlets.user;
 import com.labpa.appweb.user.UserSoapAdapter;
 import com.labpa.appweb.user.UserSoapAdapterService;
 
+import config.SoapServiceFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -14,8 +15,8 @@ import java.util.List;
 
 @WebServlet("/userssoap")
 public class UsersSoapServlet extends HttpServlet {
-    UserSoapAdapterService service = new UserSoapAdapterService();
-    UserSoapAdapter port = service.getUserSoapAdapterPort();
+    UserSoapAdapter port = SoapServiceFactory.getUserService();
+
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

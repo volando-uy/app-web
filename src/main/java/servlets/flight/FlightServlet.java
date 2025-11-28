@@ -20,6 +20,7 @@ import com.labpa.appweb.user.UserSoapAdapter;
 import com.labpa.appweb.user.UserSoapAdapterService;
 
 
+import config.SoapServiceFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -27,23 +28,10 @@ import mappers.DateTimeMapper;
 
 @WebServlet("/flight/list")
 public class FlightServlet extends HttpServlet {
-
-//    private final ICategoryController categoryController = ControllerFactory.getCategoryController();
-//    private final IUserController     userController     = ControllerFactory.getUserController();
-//    private final IFlightController   flightCtrl         = ControllerFactory.getFlightController();
-//    private final IFlightRouteController flightRouteCtrl = ControllerFactory.getFlightRouteController();
-    private CategorySoapAdapterService categorySoapAdapterService = new CategorySoapAdapterService();
-    private CategorySoapAdapter categoryController = categorySoapAdapterService.getCategorySoapAdapterPort();
-
-    private UserSoapAdapterService userSoapAdapterService = new UserSoapAdapterService();
-    private UserSoapAdapter userController = userSoapAdapterService.getUserSoapAdapterPort();
-
-    private FlightSoapAdapterService flightSoapAdapterService = new FlightSoapAdapterService();
-    private FlightSoapAdapter flightCtrl = flightSoapAdapterService.getFlightSoapAdapterPort();
-
-    private FlightRouteSoapAdapterService flightRouteSoapAdapterService = new FlightRouteSoapAdapterService();
-    private FlightRouteSoapAdapter flightRouteCtrl = flightRouteSoapAdapterService.getFlightRouteSoapAdapterPort();
-
+    private CategorySoapAdapter categoryController = SoapServiceFactory.getCategoryService();
+    private UserSoapAdapter userController = SoapServiceFactory.getUserService();
+    private FlightSoapAdapter flightCtrl = SoapServiceFactory.getFlightService();
+    private FlightRouteSoapAdapter flightRouteCtrl = SoapServiceFactory.getFlightRouteService();
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
