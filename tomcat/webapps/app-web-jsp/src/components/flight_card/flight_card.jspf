@@ -1,0 +1,50 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
+<div class="bg-white rounded-xl border border-gray-200 p-4 flex justify-between items-center">
+    <div>
+        <h3 class="font-bold text-gray-900">${fn:escapeXml(v.name)}</h3>
+        <p class="text-sm text-gray-600">
+            Aerolínea: <strong>${fn:escapeXml(v.airlineNickname)}</strong><br/>
+            Ruta: <strong>${fn:escapeXml(v.flightRouteName)}</strong><br/>
+            Asientos Económicos:
+            <strong>${empty v.maxEconomySeats ? '—' : v.maxEconomySeats}</strong><br/>
+            Asientos Business:
+            <strong>${empty v.maxBusinessSeats ? '—' : v.maxBusinessSeats}</strong><br/>
+            Duración:
+            <strong>${empty v.duration ? '—' : v.duration} min</strong><br/>
+            Precio Turista:
+            <strong><fmt:formatNumber value="${selectedRoute.priceTouristClass}" type="currency" currencySymbol="US$"/></strong><br/>
+            Precio Ejecutivo:
+            <strong><fmt:formatNumber value="${selectedRoute.priceBusinessClass}" type="currency" currencySymbol="US$"/></strong>
+        </p>
+    </div>
+
+    <!-- URL del detalle del vuelo -->
+    <c:url var="flightDetailUrl" value="/flight/list">
+        <c:param name="airline" value="${selectedAirline}" />
+        <c:param name="category" value="${selectedCategory}" />
+        <c:param name="route" value="${selectedRouteName}" />
+        <c:param name="flight" value="${v.name}" />
+    </c:url>
+
+    <!-- URL de reserva del vuelo -->
+    <c:url var="reserveHref" value="/reservas">
+        <c:param name="flight" value="${v.name}" />
+    </c:url>
+
+    <div class="flex gap-2">
+        <a href="${flightDetailUrl}"
+           class="px-4 py-2 bg-brand text-white rounded-lg font-semibold hover:brightness-110">
+            Ver detalle
+        </a>
+
+        <a href="${reserveHref}"
+           class="px-4 py-2 bg-[#ff8000] text-white rounded-lg font-semibold hover:bg-[#e67300]">
+            Reservar
+        </a>
+    </div>
+</div>
+

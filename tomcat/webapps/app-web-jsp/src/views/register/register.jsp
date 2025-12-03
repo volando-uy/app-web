@@ -1,0 +1,111 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<!DOCTYPE html>
+<html lang="es">
+<%
+    request.setAttribute("pageTitle", "Registrarse - Volando.uy");
+%>
+
+<%@ include file="/src/components/layout/libs.jspf" %>
+<%@ include file="/src/components/layout/head.jspf" %>
+<body class="flex items-center justify-center min-h-screen bg-gradient-to-r from-brand to-blue-300 px-4">
+<div class="relative w-full max-w-4xl bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div class="flex flex-col md:flex-row">
+        <!-- Left side (Switch Panel) -->
+        <div id="switchPanel"
+             class="w-full md:w-1/2 bg-brand text-white flex flex-col items-center justify-center p-10 transition-all duration-700 relative">
+            <!-- Flecha atrás -->
+            <a href="${pageContext.request.contextPath}/index" class="absolute top-6 left-6 group"
+               title="Volver al inicio">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     class="h-8 w-8 text-white group-hover:text-yellow-300 transition" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </a>
+            <h2 id="panelTitle" class="text-3xl font-bold mb-4">Bienvenido, capo!</h2>
+            <p id="panelText" class="mb-6">Ya tienes una cuenta?</p>
+            <a href="${pageContext.request.contextPath}/users/login"
+               class="px-6 py-2 bg-white text-brand font-semibold rounded-full hover:bg-gray-100 transition">Login</a>
+        </div>
+
+        <!-- Right side (Forms) -->
+        <div class="w-full md:w-1/2 bg-white flex items-center justify-center p-8">
+            <!-- Login Form -->
+            <!-- Register Form -->
+            <form id="registerForm" class="w-full max-w-sm" action="register" method="POST">
+                <h2 class="text-2xl font-bold text-center mb-6">Registro</h2>
+
+                <!-- Selector de tipo de usuario -->
+                <label class="block mb-2 font-semibold">Registro como:</label>
+                <select id="userType" name="userType" onchange="toggleUserType()"
+                        class="w-full mb-4 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand">
+                    <option value="" disabled selected>Seleccione...</option>
+                    <option value="cliente">Cliente</option>
+                    <option value="aerolinea">Aerolínea</option>
+                </select>
+
+                <small class="text-gray-600 mb-2 block">El nickname no puede ser modificado luego.</small>
+                <div id="nicknameMsg" class="mt-2 text-sm"></div>
+                <input id="reg-nickname" type="text" placeholder="Nickname" name="reg-nickname"
+                       class="w-full mb-4 px-4 py-2 border rounded-lg">
+
+                <!-- Mensaje de validación del Email -->
+                <div id="emailMsg" class="mt-1 text-sm font-medium"></div>
+
+                <input id="reg-email"
+                       type="email"
+                       placeholder="Email"
+                       name="reg-email"
+                       class="w-full mb-4 px-4 py-2 border rounded-lg transition-all duration-200
+                  outline-none focus:ring-2 focus:ring-brand">
+
+                <input id="reg-nombre" type="text" placeholder="Nombre" name="reg-nombre"
+                       class="w-full mb-4 px-4 py-2 border rounded-lg">
+
+
+                <input id="reg-password" type="password" placeholder="Contraseña" name="reg-password"
+                       class="w-full mb-4 px-4 py-2 border rounded-lg">
+
+                <input id="reg-confirm-password" type="password" placeholder="Verificar Contraseña" name="reg-confirm-password"
+                       class="w-full mb-4 px-4 py-2 border rounded-lg">
+
+                <div id="clienteFields" class="hidden">
+                    <input id="reg-apellido" type="text" placeholder="Apellido" name="reg-apellido"
+                           class="w-full mb-4 px-4 py-2 border rounded-lg">
+                    <label class="block mb-1 text-sm font-medium">Fecha de nacimiento:</label>
+                    <input id="reg-dob" type="date" class="w-full mb-4 px-4 py-2 border rounded-lg" name="reg-dob">
+                    <label class="block mb-1 text-sm font-medium">Tipo de documento:</label>
+                    <select id="reg-doc-type" class="w-full mb-4 px-4 py-2 border rounded-lg" name="reg-doc-type">
+                        <option value="ci">CI</option>
+                        <option value="pasaporte">Pasaporte</option>
+                    </select>
+                    <input id="reg-nacionalidad" type="text" placeholder="Nacionalidad" name="reg-nacionalidad"
+                           class="w-full mb-4 px-4 py-2 border rounded-lg">
+                    <input id="reg-doc-number" type="text" placeholder="CI o Pasaporte" name="reg-doc-number"
+                           class="w-full mb-4 px-4 py-2 border rounded-lg">
+
+
+                </div>
+
+                <div id="aerolineaFields" class="hidden">
+                    <input id="reg-web-a" type="url" placeholder="Página web" name="reg-web-a"
+                           class="w-full mb-4 px-4 py-2 border rounded-lg">
+                    <textarea id="reg-desc-a" placeholder="Descripción" name="reg-desc-a"
+                              class="w-full mb-4 px-4 py-2 border rounded-lg"></textarea>
+                </div>
+
+
+                <button id="btn-register" type="submit"
+                        class="w-full bg-brand text-white py-2 rounded-lg hover:bg-blue-700 transition">Registro
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Script específico para esta página -->
+<%
+    request.setAttribute("pageScript", "src/views/register/register.js");
+%>
+<%@ include file="/src/components/layout/scripts.jspf" %>
+</body>
+</html>

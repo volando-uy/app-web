@@ -1,0 +1,28 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<c:url var="rootUrl" value="/"/>
+<c:url var="homeUrl" value="/index"/>
+<c:url var="flightsUrl" value="/flight/list"/>
+<c:url var="packagesUrl" value="/packages/list"/>
+<c:url var="loginUrl" value="/users/login"/>
+<c:url var="profileUrl" value="/perfil"/>
+<c:url var="profileUpdateUrl" value="/perfil/update"/>
+<c:url var="logoutUrl" value="/users/logout"/>
+<c:url var="listUsersUrl" value="/users/list"/>
+<c:url var="createFlightUrl" value="/createFlight"/>
+<c:url var="createFlightRouteUrl" value="/createFlightRoute"/>
+<c:url var="createPackageUrl" value="/createPackage"/>
+<c:url var="listPackageUrl" value="/packages/list"/>
+<c:url var="checkBookingUrl" value="/booking/check"/>
+<c:url var="createCityAndCategoryUrl" value="/createCityAndCategory"/>
+<c:url var="debugUrl" value="/debug"/>
+
+<c:choose>
+    <c:when test="${not empty usuario and not empty usuario.image}">
+        <c:url var="userImage" value="/${usuario.image}"/>
+    </c:when>
+    <c:otherwise>
+        <c:url var="userImage" value="/assets/images/default-profile.jpg"/>
+    </c:otherwise>
+</c:choose>

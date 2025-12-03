@@ -1,0 +1,123 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.*" %>
+<%@ page import="com.labpa.appweb.flightroutepackage.BaseFlightRoutePackageDTO" %>
+
+<%!
+    // escape "estudiantil pero prolijo"
+    private static String escAttr(String s) {
+        if (s == null) return "";
+        StringBuilder out = new StringBuilder(s.length() + 16);
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            switch (c) {
+                case '&': out.append("&amp;"); break;
+                case '<': out.append("&lt;"); break;
+                case '>': out.append("&gt;"); break;
+                case '"': out.append("&quot;"); break;
+                case '\'': out.append("&#x27;"); break;
+                default: out.append(c);
+            }
+        }
+        return out.toString();
+    }
+%>
+
+<%
+    @SuppressWarnings("unchecked")
+    List<BaseFlightRoutePackageDTO> pkgs =
+            (List<BaseFlightRoutePackageDTO>) request.getAttribute("packages");
+    boolean hasData = (pkgs != null && !pkgs.isEmpty());
+    boolean many = hasData && pkgs.size() > 1;
+
+    String modalJson = (String) request.getAttribute("pkgModalJson");
+    if (modalJson == null) modalJson = "{}";
+%>
+
+<div class="w-full flex flex-col items-center justify-center py-12">
+    <div class="w-full max-w-4xl space-y-8">
+
+        <% if (!hasData) { %>
+        <div class="w-full rounded-xl border border-yellow-300 bg-yellow-50 p-4 text-yellow-900">
+            <strong>No hay paquetes generados todavía.</strong>
+        </div>
+        <% } else { %>
+
+        <div id="pkg-carousel"
+             class="relative w-full h-[420px] mx-auto rounded-3xl shadow-xl overflow-hidden">
+
+            <% for (int i = 0; i < pkgs.size(); i++) {
+                BaseFlightRoutePackageDTO p = pkgs.get(i);
+                String slideClass = (i == 0)
+                        ? "opacity-100 translate-x-0 z-20 pointer-events-auto"
+                        : "opacity-0 translate-x-6 z-10 pointer-events-none";
+
+                String name  = (p.getName() != null) ? p.getName() : "Paquete";
+                String desc  = (p.getDescription() != null) ? p.getDescription() : "";
+                String price = (p.getTotalPrice() != null) ? p.getTotalPrice().toString() : "--";
+            %>
+            <div
+                    class="js-slide <%= slideClass %>
+         absolute inset-0 flex flex-col items-center justify-center
+         w-full h-full rounded-3xl
+         bg-gradient-to-br from-[#0B4C73]/80 via-sky-700 to-gray-900
+         text-white px-6 shadow-2xl
+         transition-all duration-500 ease-out transform"
+                    data-name="<%= escAttr(name) %>"
+                    data-description="<%= escAttr(desc) %>"
+                    data-price="<%= escAttr(price) %>">
+
+            <h3 class="text-2xl md:text-4xl font-bold tracking-wide mb-2"><%= escAttr(name) %></h3>
+            <p class="opacity-90 text-lg md:text-xl mb-4"><%= escAttr(desc) %></p>
+            <p class="text-lg font-medium mb-6">
+                Precio total: <span class="font-semibold"><%= escAttr(price) %></span>
+            </p>
+
+            <button type="button"
+                    class="js-open-pkg-modal inline-flex items-center gap-2 px-5 py-2 rounded-full
+                   bg-white/90 text-gray-900 hover:bg-white shadow"
+                    aria-label="Ver detalles del paquete <%= escAttr(name) %>">
+                Ver detalles
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
+        </div>
+        <% } %>
+
+        <% if (many) { %>
+        <!-- Flechas -->
+        <button id="pkg-prev"
+                class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70
+                         text-white rounded-full w-10 h-10 flex items-center justify-center z-30"
+                aria-label="Anterior">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+            </svg>
+        </button>
+
+        <button id="pkg-next"
+                class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70
+                         text-white rounded-full w-10 h-10 flex items-center justify-center z-30"
+                aria-label="Siguiente">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+        </button>
+
+        <!-- Dots -->
+        <div id="pkg-dots" class="absolute bottom-4 left-0 right-0 z-30 flex justify-center gap-2"></div>
+        <% } %>
+    </div>
+    <% } %>
+
+</div>
+</div>
+
+<!-- Datos del modal desde el servidor -->
+<script>window.__PKG_MODAL_DATA__ = <%= modalJson %>;</script>
+
+<!-- JS del componente -->
+<script defer src="${pageContext.request.contextPath}/src/components/packageList/packageList.js"></script>

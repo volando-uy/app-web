@@ -1,0 +1,61 @@
+<c:if test="${not empty modalFlight}">
+    <c:set var="mf" value="${modalFlight}" />
+
+    <c:url var="backUrl" value="/flight/list">
+        <c:if test="${not empty param.origen}"><c:param name="origen" value="${param.origen}" /></c:if>
+        <c:if test="${not empty param.destino}"><c:param name="destino" value="${param.destino}" /></c:if>
+        <c:if test="${not empty param.fecha}"><c:param name="fecha" value="${param.fecha}" /></c:if>
+        <c:if test="${not empty param.aerolinea}"><c:param name="aerolinea" value="${param.aerolinea}" /></c:if>
+    </c:url>
+
+    <div id="modal-flight" class="fixed inset-0 z-50 flex items-center justify-center">
+            <%-- Fondo clickeable para cerrar --%>
+        <a href="${backUrl}" class="absolute inset-0 bg-black/40" aria-label="Cerrar modal"></a>
+
+        <div role="dialog" aria-modal="true" aria-labelledby="modal-flight-title"
+             class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-[92%] md:w-full p-6">
+                <%-- ÚNICO botón de cerrar (Font Awesome) --%>
+            <a href="${backUrl}"
+               class="absolute top-3 right-3 text-gray-400 hover:text-brand text-2xl leading-none"
+               aria-label="Cerrar" title="Cerrar">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                <span class="sr-only">Cerrar</span>
+            </a>
+
+            <h2 id="modal-flight-title" class="text-xl font-bold text-brand mb-1">Detalles del vuelo</h2>
+
+            <div class="mb-3 text-sm text-gray-700">
+                Duraci&oacute;n total: <b><c:out value="${mf.total}" default="—"/></b>
+            </div>
+
+            <div class="text-sm text-gray-500 mb-2">
+                <c:out value="${mf.operadoPor}" default=""/>
+            </div>
+
+            <c:choose>
+                <c:when test="${not empty mf.legs}">
+                    <ul class="space-y-1 text-sm text-gray-700 mb-4">
+                        <c:forEach var="leg" items="${mf.legs}" varStatus="st">
+                            <li>
+                                <b>Tramo <c:out value="${st.index + 1}"/>:</b>
+                                <c:out value="${leg.origen}" default="—"/> &rarr;
+                                <c:out value="${leg.destino}" default="—"/>
+                                (<c:out value="${leg.tiempo}" default="—"/>)
+                            </li>
+                        </c:forEach>
+                    </ul>
+                </c:when>
+                <c:otherwise>
+                    <div class="text-sm text-gray-500 mb-4">Sin tramos para mostrar.</div>
+                </c:otherwise>
+            </c:choose>
+
+            <div class="flex justify-end">
+                <a href="${backUrl}"
+                   class="px-4 py-2 rounded-lg border border-brand text-brand hover:bg-brand hover:text-white transition">
+                    Cerrar
+                </a>
+            </div>
+        </div>
+    </div>
+</c:if>

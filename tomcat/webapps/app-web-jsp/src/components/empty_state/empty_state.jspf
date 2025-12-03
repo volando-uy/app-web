@@ -1,0 +1,5 @@
+<%@ page pageEncoding="UTF-8" %>
+<div class="bg-white border rounded-xl p-6 shadow-sm text-gray-600">
+
+    <c:out value="${empty emptyText ? 'No hay datos para mostrar.' : emptyText}"/>
+</div>

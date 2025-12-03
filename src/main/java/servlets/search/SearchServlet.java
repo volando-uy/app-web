@@ -18,6 +18,8 @@ import com.labpa.appweb.flightroutepackage.FlightRoutePackageSoapAdapterService;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import servlets.SoapServiceFactory;
+
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -25,14 +27,9 @@ import java.util.*;
 @WebServlet("/buscar")
 public class SearchServlet extends HttpServlet {
 
-    private final FlightSoapAdapter flightCtrl =
-            new FlightSoapAdapterService().getFlightSoapAdapterPort();
-
-    private final FlightRouteSoapAdapter routeCtrl =
-            new FlightRouteSoapAdapterService().getFlightRouteSoapAdapterPort();
-
-    private final FlightRoutePackageSoapAdapter packageCtrl =
-            new FlightRoutePackageSoapAdapterService().getFlightRoutePackageSoapAdapterPort();
+    private FlightSoapAdapter flightCtrl = SoapServiceFactory.getFlightService();
+    private FlightRouteSoapAdapter routeCtrl = SoapServiceFactory.getFlightRouteService();
+    private FlightRoutePackageSoapAdapter packageCtrl = SoapServiceFactory.getFlightRoutePackageService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)

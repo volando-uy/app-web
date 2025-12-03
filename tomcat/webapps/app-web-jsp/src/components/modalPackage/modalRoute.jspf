@@ -1,0 +1,81 @@
+<%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<%@ include file="/src/components/layout/libs.jspf" %>
+
+<c:if test="${not empty modalPkgName and not empty routeParam}">
+    <!-- Buscar la ruta seleccionada dentro del paquete abierto -->
+    <c:set var="routes" value="${pkgRoutes[modalPkgName]}"/>
+    <c:set var="mr" value="${null}"/>
+    <c:forEach var="r" items="${routes}">
+        <c:if test="${r.name == routeParam}">
+            <c:set var="mr" value="${r}"/>
+        </c:if>
+    </c:forEach>
+
+    <c:if test="${not empty mr}">
+        <c:url var="backToPkg" value="/packages/list">
+            <c:param name="modal" value="${modalPkgName}" />
+        </c:url>
+
+        <div id="modal-route" class="fixed inset-0 z-[60] flex items-center justify-center">
+            <a href="${backToPkg}" class="absolute inset-0 bg-black/50" aria-label="Cerrar modal"></a>
+
+            <div role="dialog" aria-modal="true" aria-labelledby="modal-route-title"
+                 class="relative bg-white rounded-2xl shadow-2xl max-w-3xl w-[94%] md:w-full overflow-hidden">
+                <a href="${backToPkg}"
+                   class="absolute top-3 right-3 text-white/90 hover:text-white text-2xl leading-none z-10"
+                   aria-label="Cerrar" title="Cerrar">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                    <span class="sr-only">Cerrar</span>
+                </a>
+
+                <div class="relative h-44 md:h-56 bg-gray-200">
+                    <img src="${rootUrl}image?resourceClassName=${mr.getClass().getSimpleName()}&key=${mr.getName()}"
+                         alt="" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    <div class="absolute bottom-3 left-4 right-12 text-white">
+                        <h3 id="modal-route-title" class="text-2xl font-extrabold tracking-wide">
+                            <c:out value="${mr.name}"/>
+                        </h3>
+                        <div class="opacity-90">
+                            <c:out value="${mr.originAeroCode}"/> &rarr; <c:out value="${mr.destinationAeroCode}"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4 text-xs">
+                        <c:if test="${not empty mr.status}">
+                            <span class="px-3 py-1 rounded-full bg-gray-100">Estado: <c:out value="${mr.status}"/></span>
+                        </c:if>
+                        <c:if test="${not empty mr.airlineNickname}">
+                            <span class="px-3 py-1 rounded-full bg-gray-100">Aerol&iacute;nea: <c:out value="${mr.airlineNickname}"/></span>
+                        </c:if>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="border rounded-xl p-4">
+                            <div class="text-sm text-gray-500 mb-1">Precio turista</div>
+                            <div class="text-xl font-bold">
+                                <fmt:formatNumber value="${empty mr.priceTouristClass ? 0 : mr.priceTouristClass}"
+                                                  type="currency" currencySymbol="US$ " minFractionDigits="2"/>
+                            </div>
+                        </div>
+                        <div class="border rounded-xl p-4">
+                            <div class="text-sm text-gray-500 mb-1">Precio ejecutivo</div>
+                            <div class="text-xl font-bold">
+                                <fmt:formatNumber value="${empty mr.priceBusinessClass ? 0 : mr.priceBusinessClass}"
+                                                  type="currency" currencySymbol="US$ " minFractionDigits="2"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end mt-6">
+                        <a href="${backToPkg}" class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50">Volver</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </c:if>
+</c:if>
