@@ -42,8 +42,7 @@
 
 <!-- EXPOSE APP CONTEXT TO JS -->
 <script>
-    const APP_CTX = "${pageContext.request.contextPath}";
+    const APP_CTX = "<%= request.getContextPath() %>";
 </script>
-
 
 <script src="${pageContext.request.contextPath}/src/components/search/search-overlay.js"></script>

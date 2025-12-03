@@ -18,6 +18,15 @@ public class RealizeCheckinServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        //Primero preguntar si es celular o no
+        boolean isMobile=(boolean)req.getAttribute("isMobile");
+        //Si no es mobil, redirigir a perfil
+        if(!isMobile){
+            resp.sendRedirect(req.getContextPath() + "/perfil");
+            return;
+        }
+
         String reservationCode = req.getParameter("reservationCode");
         if (reservationCode == null || reservationCode.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -29,7 +38,8 @@ public class RealizeCheckinServlet extends HttpServlet {
         String token = (String) req.getSession().getAttribute("jwt");
 
 
-
+        log("reservationCode: " + reservationCode);
+        log("token: " + token);
         SoapBaseBookFlightDTO success = bookingSoapAdapter.completeBooking(id, token);
 
         if (success.isIsBooked()) {

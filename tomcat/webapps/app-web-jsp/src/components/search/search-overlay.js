@@ -45,7 +45,10 @@ document.getElementById("search-form").addEventListener("submit", async (e) => {
     resultsBox.innerHTML = "<p class='text-center text-gray-500'>Buscando...</p>";
 
     try {
+        let url=`${APP_CTX}/buscar?format=json&query=${encodeURIComponent(q)}`;
+        console.log(url);
         const resp = await fetch(`${APP_CTX}/buscar?format=json&query=${encodeURIComponent(q)}`);
+
         if (!resp.ok) throw new Error("Servidor no disponible");
 
         const data = await resp.json();
@@ -107,7 +110,7 @@ document.getElementById("search-form").addEventListener("submit", async (e) => {
 
     } catch (err) {
         resultsBox.innerHTML = `
-            <p class="text-red-500 text-center">Ocurrió un error al buscar.</p>
+            <p class="text-red-500 text-center">${err}</p>
         `;
     }
 });

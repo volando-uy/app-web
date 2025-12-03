@@ -31,6 +31,13 @@
         <filter-class>utils.IsCustomerFilter</filter-class>
     </filter>
 
+    <filter>
+        <filter-name>isMobile</filter-name>
+        <filter-class>utils.IsMobileFilter</filter-class>
+    </filter>
+
+
+
     <filter-mapping>
         <filter-name>AlreadyLoggedInFilter</filter-name>
         <url-pattern>/users/login</url-pattern>
@@ -40,7 +47,6 @@
         <filter-name>AlreadyLoggedInFilter</filter-name>
         <url-pattern>/users/register</url-pattern>
     </filter-mapping>
-
 
 
     <filter-mapping>
@@ -79,7 +85,6 @@
     </filter-mapping>
 
 
-
     <filter-mapping>
         <filter-name>IsAirline</filter-name>
         <url-pattern>/createFlight</url-pattern>
@@ -94,7 +99,6 @@
     </filter-mapping>
 
 
-
     <filter-mapping>
         <filter-name>IsCustomer</filter-name>
         <url-pattern>/package/buypackage</url-pattern>
@@ -104,6 +108,15 @@
         <url-pattern>/reservas</url-pattern>
     </filter-mapping>
 
+    <filter-mapping>
+        <filter-name>isMobile</filter-name>
+        <url-pattern>/reservations/realize-checkin</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>isMobile</filter-name>
+        <url-pattern>/perfil</url-pattern>
+    </filter-mapping>
 
 
 </web-app>

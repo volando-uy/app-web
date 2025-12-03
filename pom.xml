@@ -132,7 +132,7 @@
                         </goals>
                         <configuration>
                             <wsdlUrls>
-                                <wsdlUrl>http://localhost:8086/api/userService?wsdl</wsdlUrl>
+                                <wsdlUrl>http://192.168.1.31:8090/api/userService?wsdl</wsdlUrl>
                             </wsdlUrls>
                             <packageName>com.labpa.appweb.user</packageName>
                             <encoding>UTF-8</encoding>
@@ -148,7 +148,7 @@
                         </goals>
                         <configuration>
                             <wsdlUrls>
-                                <wsdlUrl>http://localhost:8086/api/authService?wsdl</wsdlUrl>
+                                <wsdlUrl>http://192.168.1.31:8090/api/authService?wsdl</wsdlUrl>
                             </wsdlUrls>
                             <packageName>com.labpa.appweb.auth</packageName>
                             <encoding>UTF-8</encoding>
@@ -163,7 +163,7 @@
                         </goals>
                         <configuration>
                             <wsdlUrls>
-                                <wsdlUrl>http://localhost:8086/api/bookingService?wsdl</wsdlUrl>
+                                <wsdlUrl>http://192.168.1.31:8090/api/bookingService?wsdl</wsdlUrl>
                             </wsdlUrls>
                             <packageName>com.labpa.appweb.booking</packageName>
                             <encoding>UTF-8</encoding>
@@ -178,7 +178,7 @@
                         </goals>
                         <configuration>
                             <wsdlUrls>
-                                <wsdlUrl>http://localhost:8086/api/flightService?wsdl</wsdlUrl>
+                                <wsdlUrl>http://192.168.1.31:8090/api/flightService?wsdl</wsdlUrl>
                             </wsdlUrls>
                             <packageName>com.labpa.appweb.flight</packageName>
                             <encoding>UTF-8</encoding>
@@ -193,7 +193,7 @@
                         </goals>
                         <configuration>
                             <wsdlUrls>
-                                <wsdlUrl>http://localhost:8086/api/flightRouteService?wsdl</wsdlUrl>
+                                <wsdlUrl>http://192.168.1.31:8090/api/flightRouteService?wsdl</wsdlUrl>
                             </wsdlUrls>
                             <packageName>com.labpa.appweb.flightroute</packageName>
                             <encoding>UTF-8</encoding>
@@ -208,7 +208,7 @@
                         </goals>
                         <configuration>
                             <wsdlUrls>
-                                <wsdlUrl>http://localhost:8086/api/seatService?wsdl</wsdlUrl>
+                                <wsdlUrl>http://192.168.1.31:8090/api/seatService?wsdl</wsdlUrl>
                             </wsdlUrls>
                             <packageName>com.labpa.appweb.seats</packageName>
                             <encoding>UTF-8</encoding>
@@ -223,7 +223,7 @@
                         </goals>
                         <configuration>
                             <wsdlUrls>
-                                <wsdlUrl>http://localhost:8086/api/flightRoutePackageService?wsdl</wsdlUrl>
+                                <wsdlUrl>http://192.168.1.31:8090/api/flightRoutePackageService?wsdl</wsdlUrl>
                             </wsdlUrls>
                             <packageName>com.labpa.appweb.flightroutepackage</packageName>
                             <encoding>UTF-8</encoding>
@@ -238,7 +238,7 @@
                         </goals>
                         <configuration>
                             <wsdlUrls>
-                                <wsdlUrl>http://localhost:8086/api/buyPackageService?wsdl</wsdlUrl>
+                                <wsdlUrl>http://192.168.1.31:8090/api/buyPackageService?wsdl</wsdlUrl>
                             </wsdlUrls>
                             <packageName>com.labpa.appweb.buypackage</packageName>
                             <encoding>UTF-8</encoding>
@@ -253,7 +253,7 @@
                         </goals>
                         <configuration>
                             <wsdlUrls>
-                                <wsdlUrl>http://localhost:8086/api/categoryService?wsdl</wsdlUrl>
+                                <wsdlUrl>http://192.168.1.31:8090/api/categoryService?wsdl</wsdlUrl>
                             </wsdlUrls>
                             <packageName>com.labpa.appweb.category</packageName>
                             <encoding>UTF-8</encoding>
@@ -268,7 +268,7 @@
                         </goals>
                         <configuration>
                             <wsdlUrls>
-                                <wsdlUrl>http://localhost:8086/api/cityService?wsdl</wsdlUrl>
+                                <wsdlUrl>http://192.168.1.31:8090/api/cityService?wsdl</wsdlUrl>
                             </wsdlUrls>
                             <packageName>com.labpa.appweb.city</packageName>
                             <encoding>UTF-8</encoding>
@@ -283,7 +283,7 @@
                         </goals>
                         <configuration>
                             <wsdlUrls>
-                                <wsdlUrl>http://localhost:8086/api/ticketService?wsdl</wsdlUrl>
+                                <wsdlUrl>http://192.168.1.31:8090/api/ticketService?wsdl</wsdlUrl>
                             </wsdlUrls>
                             <packageName>com.labpa.appweb.ticket</packageName>
                             <encoding>UTF-8</encoding>
@@ -298,7 +298,7 @@
                         </goals>
                         <configuration>
                             <wsdlUrls>
-                                <wsdlUrl>http://localhost:8086/api/imagesService?wsdl</wsdlUrl>
+                                <wsdlUrl>http://192.168.1.31:8090/api/imagesService?wsdl</wsdlUrl>
                             </wsdlUrls>
                             <packageName>com.labpa.appweb.images</packageName>
                             <encoding>UTF-8</encoding>
@@ -313,7 +313,7 @@
                         </goals>
                         <configuration>
                             <wsdlUrls>
-                                <wsdlUrl>http://localhost:8086/api/airportService?wsdl</wsdlUrl>
+                                <wsdlUrl>http://192.168.1.31:8090/api/airportService?wsdl</wsdlUrl>
                             </wsdlUrls>
                             <packageName>com.labpa.appweb.airport</packageName>
                             <encoding>UTF-8</encoding>
@@ -328,7 +328,7 @@
                         </goals>
                         <configuration>
                             <wsdlUrls>
-                                <wsdlUrl>http://localhost:8086/api/constantsService?wsdl</wsdlUrl>
+                                <wsdlUrl>http://192.168.1.31:8090/api/constantsService?wsdl</wsdlUrl>
                             </wsdlUrls>
                             <packageName>com.labpa.appweb.constants</packageName>
                             <encoding>UTF-8</encoding>
@@ -343,7 +343,7 @@
                         </goals>
                         <configuration>
                             <wsdlUrls>
-                                <wsdlUrl>http://localhost:8086/api/countriesService?wsdl</wsdlUrl>
+                                <wsdlUrl>http://192.168.1.31:8090/api/countriesService?wsdl</wsdlUrl>
                             </wsdlUrls>
                             <packageName>com.labpa.appweb.countries</packageName>
                             <encoding>UTF-8</encoding>
@@ -358,7 +358,7 @@
                         </goals>
                         <configuration>
                             <wsdlUrls>
-                                <wsdlUrl>http://localhost:8086/api/pdfService?wsdl</wsdlUrl>
+                                <wsdlUrl>http://192.168.1.31:8090/api/pdfService?wsdl</wsdlUrl>
                             </wsdlUrls>
                             <packageName>com.labpa.appweb.pdf</packageName>
                             <encoding>UTF-8</encoding>

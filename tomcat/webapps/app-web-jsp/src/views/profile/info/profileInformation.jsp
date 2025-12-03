@@ -4,17 +4,18 @@
 <%@ include file="/src/components/layout/libs.jspf" %>
 
 <%@ include file="/src/components/layout/head.jspf" %>
+
 <%
     request.setAttribute("pageTitle", "Perfil de Usuario");
     ValuesConstantsDTO valuesConstantsDTO = new ValuesConstantsDTO();
     SoapUserDTO usuario = (SoapUserDTO) request.getAttribute("usuario");
 %>
 
-
 <body class="min-h-screen bg-gradient-to-r from-brand to-blue-300 py-12 px-4 flex items-center justify-center">
-<div class="relative w-full max-w-5xl bg-white rounded-2xl shadow-lg overflow-hidden">
 
+<div class="relative w-full max-w-5xl bg-white rounded-2xl shadow-lg overflow-hidden">
     <div class="max-w-5xl mx-auto mt-12 bg-white shadow-lg rounded-xl p-8">
+
         <div class="flex flex-col md:flex-row gap-8 items-center">
             <div class="text-white p-6 flex flex-col items-center">
                 <div class="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-lg mb-4">
@@ -28,10 +29,10 @@
                 <h1 class="text-3xl font-bold text-gray-800">${usuario.name}</h1>
                 <p class="text-gray-600"><strong>Nickname:</strong> ${usuario.nickname}</p>
                 <p class="text-gray-600"><strong>Email:</strong> ${usuario.mail}</p>
+
                 <c:if test="${not empty loggedUser && loggedUser != usuario.nickname}">
                     <form action="${rootUrl}/followers/follow" method="post">
                         <input type="hidden" name="target" value="${usuario.nickname}"/>
-
                         <c:choose>
                             <c:when test="${isFollowing}">
                                 <button type="submit"
@@ -48,6 +49,7 @@
                         </c:choose>
                     </form>
                 </c:if>
+
                 <c:if test="${sessionScope.jwt_nick != null && sessionScope.jwt_nick == usuario.nickname}">
                     <form action="${logoutUrl}" method="post"
                           class="mt-4 inline-block" title="Cerrar sesión de ${usuario.nickname}">
@@ -64,7 +66,6 @@
                             Actualizar perfil
                         </button>
                     </form>
-
                 </c:if>
 
                 <a href="${homeUrl}"
@@ -79,7 +80,9 @@
         <c:choose>
 
             <c:when test="${isCustomer}">
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
                     <div>
                         <p><span class="font-semibold">Apellido:</span> ${usuario.surname}</p>
                         <p><span class="font-semibold">Fecha de nacimiento:</span> ${usuario.birthDate}</p>
@@ -89,6 +92,7 @@
                     </div>
 
                     <div>
+
                         <h2 class="text-lg font-semibold mb-2">Paquetes Comprados</h2>
                         <c:choose>
                             <c:when test="${not empty boughtPackageLinks}">
@@ -97,18 +101,15 @@
                                         <li class="p-3 rounded-lg border bg-gray-50 hover:bg-gray-100 transition">
                                             <a class="text-blue-700 hover:underline font-medium"
                                                href="${rootUrl}/booking/check?airline=${link.airline}&route=${link.routeName}&flight=${link.flightName}">
-                                                Paquete #${link.id}
-                                                <br/>
+                                                Paquete #${link.id}<br/>
                                                 <span class="text-sm text-gray-700">
-                                                Ruta: <strong>${link.routeName}</strong><br/>
-                                                Vuelo: <strong>${link.flightName}</strong><br/>
-                                                Aerolínea: <strong>${link.airline}</strong>
+                                                    Ruta: <strong>${link.routeName}</strong><br/>
+                                                    Vuelo: <strong>${link.flightName}</strong><br/>
+                                                    Aerolínea: <strong>${link.airline}</strong>
                                                 </span>
                                             </a>
-                                            <!-- Botón de descarga PDF -->
-                                            <a href="${rootUrl}/pdf/package?id=${link.id}"
-                                               title="Descargar PDF"
-                                               target="_blank"
+
+                                            <a href="${rootUrl}/pdf/package?id=${link.id}" target="_blank"
                                                class="inline-flex items-center ml-2 gap-2 px-3 py-1.5 rounded-md bg-red-100 text-red-700 text-sm font-medium hover:bg-red-200 transition">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-600"
                                                      fill="currentColor" viewBox="0 0 24 24">
@@ -125,46 +126,96 @@
                                 <p class="text-gray-500 italic">No compraste ningún paquete aún.</p>
                             </c:otherwise>
                         </c:choose>
+
                         <h2 class="text-lg font-semibold mt-4 mb-2">Reservas de Vuelo</h2>
                         <c:choose>
+
                             <c:when test="${not empty bookedFlightLinks}">
                                 <ul class="space-y-2">
                                     <c:forEach var="link" items="${bookedFlightLinks}">
                                         <li class="p-3 rounded-lg border bg-gray-50 hover:bg-gray-100 transition">
+
                                             <a class="text-blue-700 hover:underline font-medium"
                                                href="${rootUrl}booking/check?airline=${link.airline}&route=${link.routeName}&flight=${link.flightName}&booking=${link.bookingId}">
-                                                Reserva #${link.bookingId}
-                                                <br/>
+                                                Reserva #${link.bookingId}<br/>
                                                 <span class="text-sm text-gray-700">
                                                 Ruta: <strong>${link.routeName}</strong><br/>
                                                 Vuelo: <strong>${link.flightName}</strong><br/>
                                                 Aerolínea: <strong>${link.airline}</strong>
-                                                </span>
+                                            </span>
                                             </a>
+
                                             <c:if test="${not link.booked}">
-                                                <a href="${rootUrl}reservations/realize-checkin?reservationCode=${link.bookingId}"
-                                                   title="Realizar Check-In"
-                                                   class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md
+
+                                                <c:choose>
+
+                                                    <c:when test="${isMobile}">
+                                                        <a href="${rootUrl}reservations/realize-checkin?reservationCode=${link.bookingId}"
+                                                           title="Realizar Check-In"
+                                                           class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md
                                                       bg-green-100 text-green-700 hover:bg-green-200
                                                       text-sm font-medium transition ml-4">
 
-                                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                                         class="h-4 w-4 text-green-600"
-                                                         fill="currentColor" viewBox="0 0 24 24">
-                                                        <path d="M20.285 6.709l-11.285 11.291-5.285-5.291 1.416-1.417 3.869 3.875 9.869-9.875z"/>
-                                                    </svg>
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                 class="h-4 w-4 text-green-600"
+                                                                 fill="currentColor" viewBox="0 0 24 24">
+                                                                <path d="M20.285 6.709l-11.285 11.291-5.285-5.291 1.416-1.417 3.869 3.875 9.869-9.875z"/>
+                                                            </svg>
 
-                                                    Realizar Check-In
-                                                </a>
+                                                            Realizar Check-In
+                                                        </a>
+                                                    </c:when>
+
+                                                    <c:otherwise>
+                                                        <div class="relative group inline-block ml-4">
+
+                                                            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md
+                                                                 bg-gray-200 text-gray-500 cursor-not-allowed opacity-60 select-none">
+
+                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                     class="h-4 w-4 text-gray-500"
+                                                                     fill="currentColor" viewBox="0 0 24 24">
+                                                                    <path d="M12 1a11 11 0 1 0 11 11A11.013 11.013 0 0 0 12 1Zm1 16h-2v-2h2Zm0-4h-2V7h2Z"/>
+                                                                </svg>
+
+                                                                Check-In no disponible
+                                                            </div>
+
+                                                            <div class="absolute left-1/2 -translate-x-1/2 mt-1 w-max
+                                                            px-3 py-1.5 text-xs text-white bg-gray-800 rounded-md shadow-lg
+                                                            opacity-0 group-hover:opacity-100
+                                                            transition-opacity duration-200 z-10">
+                                                                Solo disponible en dispositivos móviles
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div class="text-gray-500 text-xs mt-1 italic ml-4">
+                                                            El check-in solo puede realizarse desde la app móvil o
+                                                            navegador móvil.
+                                                        </div>
+                                                    </c:otherwise>
+
+                                                </c:choose>
+
                                             </c:if>
+
                                             <c:if test="${link.booked}">
                                                 <a href="${rootUrl}pdf/booking?id=${link.bookingId}"
                                                    title="Descargar PDF"
                                                    target="_blank"
-                                                   class="inline-flex items-center ml-2 gap-2 px-3 py-1.5 rounded-md bg-red-100 text-red-700 text-sm font-medium hover:bg-red-200 transition">
+                                                   class="inline-flex items-center ml-2 gap-2 px-3 py-1.5 rounded-md
+                                                     bg-red-100 text-red-700 text-sm font-medium hover:bg-red-200 transition">
+
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-600"
                                                          fill="currentColor" viewBox="0 0 24 24">
-                                                        <path d="M6 2a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5L18.5 9H13V3.5zM8 14v-1h2.25c.97 0 1.75-.78 1.75-1.75S11.22 9.5 10.25 9.5H8v5h1zm1-4h1.25c.41 0 .75.34.75.75s-.34.75-.75.75H9v-1.5zM14 14.25c0 .41.34.75.75.75h1v.75a.75.75 0 0 0 1.5 0v-.75h.75a.75.75 0 0 0 0-1.5H17v-.75a.75.75 0 0 0-1.5 0v.75h-.75a.75.75 0 0 0-.75.75z"/>
+                                                        <path d="M6 2a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0
+                                                    2-2V8l-6-6H6zm7 1.5L18.5 9H13V3.5zM8 14v-1h2.25c.97
+                                                    0 1.75-.78 1.75-1.75S11.22 9.5 10.25
+                                                    9.5H8v5h1zm1-4h1.25c.41 0 .75.34.75.75s-.34.75-.75.75H9v-1.5zM14
+                                                    14.25c0 .41.34.75.75.75h1v.75a.75.75 0 0 0
+                                                    1.5 0v-.75h.75a.75.75 0 0 0 0-1.5H17v-.75a.75.75
+                                                    0 0 0-1.5 0v.75h-.75a.75.75 0 0 0-.75.75z"/>
                                                     </svg>
                                                     Descargar PDF
                                                 </a>
@@ -174,23 +225,27 @@
                                     </c:forEach>
                                 </ul>
                             </c:when>
+
                             <c:otherwise>
                                 <p class="text-gray-500 italic">No tenés reservas de vuelo aún.</p>
                             </c:otherwise>
-                        </c:choose>
 
+                        </c:choose>
                     </div>
                 </div>
             </c:when>
 
             <c:when test="${isAirline}">
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
                     <div>
                         <p><span class="font-semibold">Descripción:</span> ${usuario.description}</p>
                         <c:if test="${not empty usuario.web}">
                             <p><span class="font-semibold">Sitio Web:</span>
-                                <a href="${usuario.web}" class="text-blue-500 underline"
-                                   target="_blank">${usuario.web}</a>
+                                <a href="${usuario.web}" class="text-blue-500 underline" target="_blank">
+                                        ${usuario.web}
+                                </a>
                             </p>
                         </c:if>
                     </div>
@@ -203,13 +258,14 @@
                                     <c:forEach var="ruta" items="${usuario.flightRoutesNames}">
                                         <li>
                                             <a class="text-blue-700 hover:underline"
-                                               href="${rootUrl}/booking/check?airline=${usuario.nickname}&route=${fn:replace(ruta, ' ', '+')}">
+                                               href="${rootUrl}/booking/check?airline=${usuario.nickname}&route=${fn:replace(ruta,' ','+')}">
                                                     ${ruta}
                                             </a>
                                         </li>
                                     </c:forEach>
                                 </ul>
                             </c:when>
+
                             <c:otherwise>
                                 <p class="text-gray-500 italic">Sin rutas de vuelo registradas.</p>
                             </c:otherwise>
@@ -223,13 +279,14 @@
                                         <c:set var="ruta" value="${usuario.flightRoutesNames[status.index]}"/>
                                         <li>
                                             <a class="text-blue-700 hover:underline"
-                                               href="${rootUrl}/booking/check?airline=${usuario.nickname}&route=${fn:replace(ruta, ' ', '+')}&flight=${fn:replace(vuelo, ' ', '+')}">
+                                               href="${rootUrl}/booking/check?airline=${usuario.nickname}&route=${fn:replace(ruta,' ','+')}&flight=${fn:replace(vuelo,' ','+')}">
                                                     ${vuelo}
                                             </a>
                                         </li>
                                     </c:forEach>
                                 </ul>
                             </c:when>
+
                             <c:otherwise>
                                 <p class="text-gray-500 italic">Sin vuelos registrados.</p>
                             </c:otherwise>
@@ -238,9 +295,11 @@
                 </div>
             </c:when>
 
+
             <c:otherwise>
                 <p class="text-red-500">Tipo de usuario desconocido.</p>
             </c:otherwise>
+
         </c:choose>
     </div>
 </div>
@@ -250,25 +309,7 @@
 %>
 
 <%@ include file="/src/components/layout/scripts.jspf" %>
+
 </body>
-<script>
-    function downloadPackagePDF(packageId) {
-        // TODO: reemplazar con la URL real de tu endpoint SOAP o REST
-        const url = `${CONTEXT_PATH}/pdf/package/${packageId}`;
 
-        // Simulación inicial (luego usar fetch con blob)
-        alert("Preparando descarga del PDF para paquete #" + packageId);
-
-        // Ejemplo real más adelante:
-        // fetch(url)
-        //     .then(response => response.blob())
-        //     .then(blob => {
-        //         const link = document.createElement('a');
-        //         link.href = URL.createObjectURL(blob);
-        //         link.download = `paquete-${packageId}.pdf`;
-        //         link.click();
-        //     })
-        //     .catch(err => console.error("Error al generar PDF:", err));
-    }
-</script>
 </html>

@@ -22,9 +22,9 @@
             <span class="text-xl font-bold">Volando<span class="text-yellow-300">.uy</span></span>
         </a>
 
+        <!-- BOTÓN BUSCAR (Solo ícono) -->
         <button id="open-search"
                 class="block md:flex items-center justify-center p-2 rounded-lg bg-white/10 hover:bg-white/20 transition">
-
             <svg xmlns="http://www.w3.org/2000/svg"
                  viewBox="0 0 24 24"
                  fill="none"
@@ -36,75 +36,73 @@
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-
         </button>
 
         <!-- NAV DESKTOP -->
         <nav id="nav-desktop" class="hidden md:flex items-center gap-6">
-            <a href="${flightsUrl}" class="hover:text-yellow-300">Vuelos</a>
-            <a href="${packagesUrl}" class="hover:text-yellow-300">Paquetes</a>
-            <a href="${listUsersUrl}" class="hover:text-yellow-300">Usuarios</a>
+            <a href="${flightsUrl}" class="hover:text-yellow-300 transition">Vuelos</a>
+            <a href="${packagesUrl}" class="hover:text-yellow-300 transition">Paquetes</a>
+            <a href="${listUsersUrl}" class="hover:text-yellow-300 transition">Usuarios</a>
 
             <% if (isCustomer) { %>
-            <a href="${listPackageUrl}" class="hover:text-yellow-300">Mis paquetes</a>
-            <a href="${checkBookingUrl}" class="hover:text-yellow-300">Mis reservas</a>
-
+            <a href="${listPackageUrl}" class="hover:text-yellow-300 transition">Mis paquetes</a>
+            <a href="${checkBookingUrl}" class="hover:text-yellow-300 transition">Mis reservas</a>
             <% } else if (isAirline) { %>
-            <a href="${profileUrl}"class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">${nickname}</a>
-            <a href="${createFlightUrl}" class="hover:text-yellow-300">Crear vuelo</a>
-            <a href="${createFlightRouteUrl}" class="hover:text-yellow-300">Crear ruta</a>
-            <a href="${createCityAndCategoryUrl}" class="hover:text-yellow-300">Crear ciudad / categoría</a>
-            <a href="${checkBookingUrl}" class="hover:text-yellow-300">Reservas</a>
+            <a href="${createFlightUrl}" class="hover:text-yellow-300 transition">Crear vuelo</a>
+            <a href="${createFlightRouteUrl}" class="hover:text-yellow-300 transition">Crear ruta</a>
+            <a href="${createCityAndCategoryUrl}" class="hover:text-yellow-300 transition">Crear ciudad / categoría</a>
+            <a href="${checkBookingUrl}" class="hover:text-yellow-300 transition">Reservas</a>
             <% } %>
         </nav>
 
-        <c:choose>
-            <c:when test="${empty sessionScope.nickname}">
-                <div id="header-actions" class="hidden md:flex items-center gap-3">
-                    <a href="${loginUrl}" class="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20">Iniciar sesión</a>
-                </div>
-            </c:when>
-            <c:otherwise>
-                <div id="header-actions" class="hidden md:flex items-center gap-3">
-                    <a href="${profileUrl}"
-                       class="inline-flex items-center justify-center px-3 py-2 rounded-lg hover:bg-white/20 text-center">
-                        ${nickname}
+        <!-- ACCIONES DEL USUARIO -->
+        <div id="header-actions" class="hidden md:flex items-center gap-3">
+            <c:choose>
+                <c:when test="${empty sessionScope.nickname}">
+                    <a href="${loginUrl}" class="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition">
+                        Iniciar sesión
                     </a>
-
+                </c:when>
+                <c:otherwise>
+                    <a href="${profileUrl}"
+                       class="inline-flex items-center justify-center px-3 py-2 rounded-lg hover:bg-white/20 transition text-center"
+                       title="Ir a perfil">
+                        Perfil
+                    </a>
                     <form action="${logoutUrl}" method="post" title="Cerrar sesión de ${nickname}">
                         <button type="submit"
-                                class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-center appearance-none">
+                                class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition text-center appearance-none">
                             Cerrar sesión
                         </button>
                     </form>
-                </div>
-            </c:otherwise>
-        </c:choose>
+                </c:otherwise>
+            </c:choose>
+        </div>
 
+        <!-- BOTÓN MOBILE MENU -->
         <button id="togglePanelBtn"
                 class="md:hidden bg-brand text-white flex items-center justify-center text-3xl p-2">
             ☰
         </button>
     </div>
+
+    <!-- PANEL MOBILE -->
     <div id="mobilePanel"
          class="md:hidden bg-brand text-white rounded-2xl shadow-lg p-4 flex flex-col gap-2
-            w-[200px] hidden absolute right-4 top-[70px] z-[60]">
+            w-[220px] hidden absolute right-4 top-[70px] z-[60]">
         <% if (!isLogged) { %>
         <a href="${loginUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Iniciar sesión</a>
         <% } else { %>
         <% if (isCustomer) { %>
-        <a href="${profileUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Mi perfil / Check-In</a>
+        <a href="${profileUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Mi perfil</a>
         <a href="${flightsUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Buscar vuelos</a>
         <a href="${checkBookingUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Mis reservas</a>
-
         <% } else if (isAirline) { %>
-        <a href="${profileUrl}"
-           class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">
-            ${nickname}
-        </a>
+        <a href="${profileUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Mi perfil</a>
         <a href="${createFlightUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Crear vuelo</a>
         <a href="${createFlightRouteUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Crear ruta</a>
-        <a href="${createCityAndCategoryUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Crear ciudad/categoría</a>
+        <a href="${createCityAndCategoryUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Crear
+            ciudad/categoría</a>
         <a href="${checkBookingUrl}" class="block text-sm px-3 py-2 rounded-lg hover:bg-white/10">Reservas</a>
         <% } %>
 
@@ -117,6 +115,7 @@
         <% } %>
     </div>
 </header>
+
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -132,8 +131,19 @@
 
 <style>
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
-    .animate-fade-in { animation: fadeIn 0.17s ease-out; }
-</style><%@ include file="/src/components/search/search-overlay.jspf" %>
+
+    .animate-fade-in {
+        animation: fadeIn 0.2s ease-out;
+    }
+
+</style>
+<%@ include file="/src/components/search/search-overlay.jspf" %>

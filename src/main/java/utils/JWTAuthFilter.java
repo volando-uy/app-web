@@ -17,24 +17,26 @@ public class JWTAuthFilter implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
         HttpSession session = req.getSession(false);
 
-        if (SessionUtils.isUserAuthenticated(session)) {
-            // Refrescar nickname si no está
+        if (SessionUtils.isUserAuthenticated(session) && session.getAttribute("jwt") != null) {
+
             String nickname = SessionUtils.getNickname(session);
             session.setAttribute("jwt_nick", nickname);
-            chain.doFilter(request, response); // sigue a /perfil o recurso protegido
-        } else {
-            if (session == null) session = req.getSession(true);
 
-            String originalUrl = req.getRequestURI();
-            if (req.getQueryString() != null) {
-                originalUrl += "?" + req.getQueryString();
-            }
-
-            session.setAttribute("redirectAfterLogin", originalUrl);
-            session.setAttribute("toastMessage", "Debes iniciar sesión para acceder a esta página");
-            session.setAttribute("toastType", "warning");
-
-            res.sendRedirect(req.getContextPath() + "/users/login");
+            chain.doFilter(request, response);
+            return;
         }
+
+        if (session == null) session = req.getSession(true);
+
+        String originalUrl = req.getRequestURI();
+        if (req.getQueryString() != null) {
+            originalUrl += "?" + req.getQueryString();
+        }
+
+        session.setAttribute("redirectAfterLogin", originalUrl);
+        session.setAttribute("toastMessage", "Debes iniciar sesión para acceder a esta página");
+        session.setAttribute("toastType", "warning");
+
+        res.sendRedirect(req.getContextPath() + "/users/login");
     }
 }

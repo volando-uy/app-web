@@ -13,7 +13,9 @@
     boolean isCustomer = user instanceof SoapBaseCustomerDTO;
     boolean isAirline = user instanceof SoapBaseAirlineDTO;
 
-    String userImage = user.getImage() != null ? user.getImage() : "/public/images/users/default-user.jpg";
+    String userImage = request.getContextPath() + "/image?resourceClassName=" +
+            (isCustomer ? "Customer" : "Airline") +
+            "&key=" + user.getNickname();
     String profileUpdateUrl = request.getContextPath() + "/perfil/update";
     String profileUrl = request.getContextPath() + "/perfil";
 %>
