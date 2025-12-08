@@ -1,148 +1,184 @@
-# 🧠 Estructura de Carpetas Explicada
+# 🌐 Volando - Módulo Web (Frontend JSP)
+
+Este módulo corresponde a la capa de **presentación web** de la aplicación Volando. Permite a los usuarios interactuar mediante interfaces JSP consumiendo servicios expuestos por el servidor central vía SOAP.
+
+---
+
+## 🧾 Requisitos del sistema
+
+* Java 17+
+* Apache Tomcat 9+
+* Maven
+* PostgreSQL (base de datos `volandodb` debe existir)
+
+---
+
+## 📂 Ruta obligatoria
+
+Este proyecto **debe estar ubicado** en:
+
+```bash
+C:\Users\<tu usuario>\volandouy\app-web
+```
+
+Y debe coexistir con:
+
+```bash
+C:\Users\<tu usuario>\volandouy\app-central
+C:\Users\<tu usuario>\volandouy\VolandoApp.exe
+```
+
+---
+
+## ⚙️ Configuración (`application.properties`)
+
+Archivo ubicado en:
+
+```bash
+src/main/resources/application.properties
+```
+
+Contenido:
+
+```properties
+# Configuración de la base de datos
+db.host=localhost
+db.port=5432
+db.name=volandodb
+db.user=postgres
+db.password=admin
+
+# Configuración SOAP
+soap.ip=192.168.1.4
+soap.port=8086
+soap.path=/api
+
+# Endpoints de servicios SOAP (expuestos por el servidor central)
+userService.endpoint=http://192.168.1.4:8086/api/userService?wsdl
+authService.endpoint=http://192.168.1.4:8086/api/authService?wsdl
+bookingService.endpoint=http://192.168.1.4:8086/api/bookingService?wsdl
+flightService.endpoint=http://192.168.1.4:8086/api/flightService?wsdl
+flightRouteService.endpoint=http://192.168.1.4:8086/api/flightRouteService?wsdl
+seatService.endpoint=http://192.168.1.4:8086/api/seatService?wsdl
+flightRoutePackageService.endpoint=http://192.168.1.4:8086/api/flightRoutePackageService?wsdl
+buyPackageService.endpoint=http://192.168.1.4:8086/api/buyPackageService?wsdl
+categoryService.endpoint=http://192.168.1.4:8086/api/categoryService?wsdl
+cityService.endpoint=http://192.168.1.4:8086/api/cityService?wsdl
+ticketService.endpoint=http://192.168.1.4:8086/api/ticketService?wsdl
+imagesService.endpoint=http://192.168.1.4:8086/api/imagesService?wsdl
+airportService.endpoint=http://192.168.1.4:8086/api/airportService?wsdl
+constantsService.endpoint=http://192.168.1.4:8086/api/constantsService?wsdl
+countriesService.endpoint=http://192.168.1.4:8086/api/countriesService?wsdl
+pdfService.endpoint=http://192.168.1.4:8086/api/pdfService?wsdl
+
+# Web
+cargo.port=8085
+```
+
+> ⚠️ Asegúrate de que la IP del servidor central sea correcta. Puede cambiar si no está fija (recomendado usar IP estática o hostname).
+
+---
+
+## 🧠 Estructura General del Proyecto
 
 ```bash
 📦 app-web/
-├── public/
-│   └── assets/
-│       ├── icons/
-│       └── images/
-├── config/
-├── jsp/
-├── src/
-│   ├── scripts/
-│   │   ├── auth/
-│   │   ├── utils/
-│   │   └── validators/
-│   ├── views/
-│   │   ├── components/
-│   │   │   ├── button/
-│   │   │   ├── modal/
-│   │   │   └── sidebar/
-│   │   ├── footer/
-│   │   ├── header/
-│   │   └── main/
-│   └── styles.css
-│   └── index.html
-├── .gitignore
-└── readme.md
+├── main/
+│   ├── java/
+│   │   ├── adapters/            # Adaptadores y DTOs del lado cliente
+│   │   ├── config/              # Configuración de propiedades
+│   │   ├── mappers/             # Conversores entre entidades SOAP y DTOs
+│   │   ├── servlets/           # Controladores front-end (JSP + lógica)
+│   │   └── utils/              # Utilidades comunes (auth, imágenes, etc.)
+│   ├── resources/
+│   │   └── application.properties
+│   └── webapp/
+│       ├── index.jsp           # Página principal
+│       ├── styles.css          # Estilos base (más Tailwind)
+│       ├── config/             # Config global del sitio (robots.txt)
+│       ├── resources/          # JS/CSS externos (FontAwesome, Tailwind, etc.)
+│       ├── src/                # Código fuente JSP modular
+│       │   ├── components/     # Subcomponentes reusables por secciones
+│       │   └── views/          # Vistas JSP completas (login, vuelo, reserva, etc.)
+│       └── WEB-INF/
+│           └── web.xml         # Configuración del WAR
 ```
 
 ---
 
-## 📁 `public/assets/`
+## 🔧 Cómo compilar y ejecutar localmente
 
-Contiene archivos **estáticos** que se sirven tal cual al navegador.
+1. Asegúrate que `app-central` esté corriendo primero (el backend SOAP).
+2. Posicionate en la raíz de `app-web`:
 
-* `icons/`: íconos tipo `.svg`, `.png`, `.ico`.
-* `images/`: imágenes usadas en la UI.
+```bash
+cd C:\Users\<tu usuario>\volandouy\app-web
+```
 
-Usado directamente en el HTML:
+3. Compilar y correr en Tomcat:
 
-```html
-<img src="/assets/images/banner.jpg" />
+```bash
+mvn clean package cargo:run
+```
+
+4. Accede desde tu navegador:
+
+```
+http://localhost:8085/app-web-jsp/
 ```
 
 ---
 
-## 📁 `config/`
+## 🧱 Arquitectura y comunicación
 
-Archivos de configuración del sitio.
+Esta app-web actúa como **cliente web**:
 
-* `robots.txt`: controla el acceso de los motores de búsqueda.
-
----
-
-## 📁 `jsp/`
-
-Espacio para tus **Java Server Pages** (a futuro).
-
-* `includes/`: fragmentos reusables como headers, footers.
-* `pages/`: vistas dinámicas completas.
+* Los Servlets JSP capturan acciones del usuario
+* Los `SoapServiceFactory` crean clientes SOAP para conectarse al backend central
+* Los DTOs adaptan la estructura de los datos entre backend y frontend
+* La estructura web está pensada con TailwindCSS + JSP modular
 
 ---
 
-## 📁 `src/`
+## 🧪 Testing Manual
 
-Código fuente **editable** del frontend.
-
-### 📁 `scripts/`
-
-Organización por tipo de lógica:
-
-* `auth/`: login, sesión, etc.
-* `utils/`: helpers reutilizables.
-* `validators/`: validaciones de formularios y datos.
-
-### 📁 `views/`
-
-Templates HTML divididos por sección visual:
-
-* `footer/`, `header/`, `main/`: componentes visuales reusables.
-
-* `components/`: componentes reutilizables pequeños y modulares como `button`, `modal`, `sidebar`, etc.
-
-> Cada componente dentro de `views/components/` debe tener su propio scope con **`HTML`, `CSS` y `JS`** dentro del mismo directorio. Esto permite encapsular la lógica, estilo y estructura de forma clara y reutilizable:
->
-> ```bash
-> 📁 button/
-> ├── button.html
-> ├── button.css
-> └── button.js
-> ```
->
-> En el caso de usar **TailwindCSS**, estos estilos pueden ser mínimos o inexistentes, ya que las clases utilitarias de Tailwind resuelven gran parte del layout y estilos visuales. Sin embargo, si necesitás customizaciones específicas, cada componente puede tener su propio archivo `.css` para override o clases utilitarias personalizadas.
-
-### 📄 `index.html`
-
-Archivo de entrada principal del sitio.
+* Se recomienda usar el navegador con DevTools activado
+* Validar cada flujo: login, registro, reservas, pagos, perfil, etc.
+* Usar Postgres con una base existente `volandodb` para datos persistentes
 
 ---
 
-## Archivos raíz
+## 📤 Despliegue (manual)
 
-* `.gitignore`: excluye archivos temporales o de entorno.
-* `readme.md`: documentación del proyecto.
+* Generar WAR:
 
----
+```bash
+mvn clean package
+```
 
-## 🔮 Escalabilidad
+* Copiar `target/app-web.war` al `webapps/` de Tomcat
+* Iniciar el servidor Tomcat
 
-Esta estructura permite:
+## 📤 Despliegue (automatizado)
 
-* Usar TailwindCSS de forma nativa sin CSS adicional.
-* Separar frontend estático de backend dinámico (JSP).
-* Modularizar el JS y HTML sin dolor.
-* Documentar y testear de forma clara.
-
----
-
-## 🧱 Analogía de Arquitectura
-
-* `public/assets/`: decoración y materiales visuales.
-* `src/`: planos, herramientas y obreros.
-* `views/components/`: muebles modulares reutilizables (cada uno con su plano, acabado y comportamiento).
-* `jsp/`: habitaciones dinámicas.
-* `config/`: reglas del edificio.
-
-Todo separado, limpio y listo para escalar.
+* Ejecutar el start-web.bat en la carpeta padre de la aplicacion
 
 ---
 
-## 🔄 CI/CD
+## 📚 Documentación adicional
 
-Estamos usando un workflow de Heroku.
-Se activa por cada push a main.
-
-1. Los archivos importantes son el Dockerfile y el Heroku.yml, estos definen el workflow.
-2. Heroku detecta el push y comienza a buildear el Dockerfile.
-   1. Se descarga el JAR desde la app-central y se instala
-   2. Se buildea el WAR de la app-web
-   3. Se modifica el puerto de la aplicación por el generado dinámicamente de Heroku, esto mediante el catalina-wrapper.sh
-   4. Se inicia la aplicación con el catalina.sh
-3. Una vez finalizado el buildeo, se inicia un contenedor con el comando de inicio en Heroku.yaml
-4. Ya quedaría desplegada la [aplicación web](https://volando-uy-c508d037c1a0.herokuapp.com/app-web-jsp/)
+* Repositorio central (backend): [`app-central`](../app-central)
+* Ejecutable desktop: `VolandoApp.exe`
 
 ---
-Compilar proyecto a servlet y correrlo
 
-**mvn clean package cargo:run**
+## 🛠️ Mantenimiento
+
+* Validar el archivo `application.properties` al mover la app
+* Las IPs y puertos deben coincidir con el entorno real del backend
+* El sistema está desacoplado, pero altamente dependiente de los endpoints SOAP
+
+
+---
+
+![imagen_web](image.png)
